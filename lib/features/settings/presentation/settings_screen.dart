@@ -10,7 +10,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _keyController = TextEditingController();
-  bool _isSaved = false;
 
   @override
   void initState() {
@@ -27,9 +26,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _saveKey() async {
     await ApiKeyService.saveApiKey(_keyController.text);
-    setState(() {
-      _isSaved = true;
-    });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('API Key सफलतापूर्वक सेव हो गई!')),
     );
