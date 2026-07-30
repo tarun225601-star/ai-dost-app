@@ -31,12 +31,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-        working-directory: ./ai-dost-app
 
       - name: Run analyze
         run: flutter analyze
-        working-directory: ./ai-dost-app
 
       - name: Build APK
         run: flutter build apk --release
-        working-directory: ./ai-dost-app
