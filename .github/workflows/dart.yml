@@ -29,11 +29,9 @@ jobs:
       - name: Verify Flutter
         run: flutter --version
 
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Run analyze
-        run: flutter analyze
-
-      - name: Build APK
-        run: flutter build apk --release
+      - name: Install dependencies & Build
+        run: |
+          cd ai-dost-app
+          flutter pub get
+          flutter analyze
+          flutter build apk --release
