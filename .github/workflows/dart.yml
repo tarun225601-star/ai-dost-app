@@ -29,6 +29,9 @@ jobs:
       - name: Verify Flutter
         run: flutter --version
 
+      - name: Generate Android Platform Files
+        run: flutter create . --platforms=android
+
       - name: Install dependencies
         run: flutter pub get
 
