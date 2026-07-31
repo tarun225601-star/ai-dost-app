@@ -21,13 +21,16 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: Ensure Supabase in pubspec
+      - name: Fix Android v1 Embedding Once And For All
         run: |
-          # अगर pubspec.yaml में supabase_flutter नहीं है, तो अपने आप जोड़ देगा
-          if ! grep -q "supabase_flutter" pubspec.yaml; then
-            echo "  supabase_flutter: ^2.5.4" >> pubspec.yaml
-          fi
-          flutter pub get
+          # पुराना v1 वाला android फोल्डर हमेशा के लिए उड़ा दो
+          rm -rf android
+          
+          # नया v2 एंड्रॉइड फोल्डर अपने आप फ्रेश बन जाएगा
+          flutter create . --platforms=android --project-name=ai_dost
+
+      - name: Get Dependencies
+        run: flutter pub get
 
       - name: Build APK Release
         run: flutter build apk --release
