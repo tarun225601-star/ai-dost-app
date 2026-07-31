@@ -18,12 +18,11 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.3'
+          flutter-version: '3.27.4'
           channel: 'stable'
 
-      - name: Nuke Cache and Rebuild Android
+      - name: Fresh Build
         run: |
-          rm -rf ~/.pub-cache
           rm -rf pubspec.lock .dart_tool android ios windows macos linux
           flutter create . --platforms=android --project-name=ai_dost_app
           flutter pub get
