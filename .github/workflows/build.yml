@@ -21,10 +21,11 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: Fix Android Platform and Dependencies
+      - name: Force Clean and Purge Cache
         run: |
           rm -f pubspec.lock
-          flutter create . --platforms=android --project-name=ai_dost
+          rm -rf .dart_tool
+          flutter clean
           flutter pub get
 
       - name: Build APK Release
