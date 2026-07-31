@@ -34,6 +34,11 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+      - name: Create Android v2 Setup
+        run: flutter create . --org com.tarun.aidost --platforms android
+
+      - name: Build APK
+        run: flutter build apk --release
 
       - name: Build APK
         run: flutter build apk --release
