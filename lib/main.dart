@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(const AiDostApp());
@@ -60,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ==========================================
-// 1. VIP SMART CHAT SCREEN (असली Gemini API के साथ)
+// 1. VIP SMART CHAT SCREEN (असली HTTP Gemini API)
 // ==========================================
 class SingleSmartChatScreen extends StatefulWidget {
   const SingleSmartChatScreen({super.key});
@@ -133,7 +134,7 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
     });
   }
 
-  // असली Gemini API से कनेक्ट करके जवाब लाने का फंक्शन
+  // सीधे HTTP के जरिए असली Gemini API को कॉल करने का फंक्शन
   void _sendMessage() async {
     if (_messageController.text.trim().isEmpty) return;
     String userText = _messageController.text;
@@ -159,29 +160,41 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
         return;
       }
 
-      // असली जेमिनी मॉडल इनिशियलाइज करना
-      final model = GenerativeModel(
-        model: 'gemini-1.5-flash',
-        apiKey: apiKey,
-        systemInstruction: Content.text(_activeSystemPrompt),
+      // Google Gemini API URL
+      final url = Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey');
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "system_instruction": {
+            "parts": [{"text": _activeSystemPrompt}]
+          },
+          "contents": [
+            {
+              "parts": [{"text": userText}]
+            }
+          ]
+        }),
       );
 
-      final content = [Content.text(userText)];
-      final response = await model.generateContent(content);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        String aiResponse = data['candidates'][0]['content']['parts'][0]['text'];
 
-      setState(() {
-        _messages.add({
-          'sender': 'ai', 
-          'text': response.text ?? 'जेमिनी से कोई उत्तर नहीं मिला।'
+        setState(() {
+          _messages.add({'sender': 'ai', 'text': aiResponse});
+          _isLoading = false;
         });
-        _isLoading = false;
-      });
+      } else {
+        setState(() {
+          _messages.add({'sender': 'ai', 'text': '❌ API एरर (${response.statusCode}): ${response.body}'});
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
-        _messages.add({
-          'sender': 'ai', 
-          'text': '❌ एरर आ गई: $e'
-        });
+        _messages.add({'sender': 'ai', 'text': '❌ कनेक्शन एरर: $e'});
         _isLoading = false;
       });
     }
@@ -286,7 +299,7 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
-                      hintText: 'यहाँ असली सवाल पूछें (जैसे: 1 से 100 तक गिनती लिखो)...',
+                      hintText: 'यहाँ असली सवाल पूछें...',
                       filled: true,
                       fillColor: const Color(0xFF1E293B),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
