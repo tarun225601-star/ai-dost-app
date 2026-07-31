@@ -21,11 +21,10 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: Clean Old Locks and Recreate Android
+      - name: Clean and Purge Old Locks
         run: |
-          rm -rf android
           rm -f pubspec.lock
-          flutter create . --platforms=android --project-name=ai_dost
+          flutter clean
 
       - name: Get Dependencies
         run: flutter pub get
