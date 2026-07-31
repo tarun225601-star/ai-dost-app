@@ -21,6 +21,19 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
+      - name: Save existing main.dart
+        run: |
+          mkdir -p /tmp/backup
+          cp lib/main.dart /tmp/backup/main.dart
+
+      - name: Upgrade Android Platform to v2
+        run: |
+          flutter create . --platforms=android --overwrite
+
+      - name: Restore AI main.dart
+        run: |
+          cp /tmp/backup/main.dart lib/main.dart
+
       - name: Get Dependencies
         run: flutter pub get
 
