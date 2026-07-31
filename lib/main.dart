@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 void main() {
   runApp(const AiDostApp());
@@ -59,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ==========================================
-// 1. VIP SMART CHAT SCREEN
+// 1. VIP SMART CHAT SCREEN (असली Gemini API के साथ)
 // ==========================================
 class SingleSmartChatScreen extends StatefulWidget {
   const SingleSmartChatScreen({super.key});
@@ -74,6 +75,7 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
   final TextEditingController _taskInstructionsController = TextEditingController();
   
   bool _isEditingForm = false;
+  bool _isLoading = false;
   String _activeTaskTitle = "सामान्य सहायक (General Assistant)";
   String _activeSystemPrompt = "तुम एक स्मार्ट एआई असिस्टेंट हो।";
   final List<Map<String, String>> _messages = [];
@@ -105,7 +107,7 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
     setState(() {
       _messages.add({
         'sender': 'ai', 
-        'text': 'नमस्ते! अपनी एपीआई सेटिंग्स चेक करें और VIP प्रॉम्प्ट भेजना शुरू करें।'
+        'text': 'नमस्ते! मैं पूरी तरह तैयार हूँ। अपना सवाल पूछें।'
       });
     });
   }
@@ -126,28 +128,63 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
       _isEditingForm = false;
       _messages.add({
         'sender': 'ai', 
-        'text': '✨ नया टास्क फॉर्म सेव हो गया! रोल: "$_activeTaskTitle"'
+        'text': '✨ नया टास्क और निर्देश सेट हो गया है: "$_activeTaskTitle"'
       });
     });
   }
 
-  void _sendMessage() {
+  // असली Gemini API से कनेक्ट करके जवाब लाने का फंक्शन
+  void _sendMessage() async {
     if (_messageController.text.trim().isEmpty) return;
     String userText = _messageController.text;
     
     setState(() {
       _messages.add({'sender': 'user', 'text': userText});
       _messageController.clear();
+      _isLoading = true;
+    });
 
-      Future.delayed(const Duration(milliseconds: 900), () {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String apiKey = prefs.getString('gemini_api_key') ?? '';
+
+      if (apiKey.isEmpty) {
         setState(() {
           _messages.add({
             'sender': 'ai', 
-            'text': '[रोल: $_activeTaskTitle]\nआपके सवाल "$userText" का उत्तर तैयार है।'
+            'text': '⚠️ पहले API Settings टैब में जाकर अपनी असली Gemini API Key सेव करें!'
           });
+          _isLoading = false;
         });
+        return;
+      }
+
+      // असली जेमिनी मॉडल इनिशियलाइज करना
+      final model = GenerativeModel(
+        model: 'gemini-1.5-flash',
+        apiKey: apiKey,
+        systemInstruction: Content.text(_activeSystemPrompt),
+      );
+
+      final content = [Content.text(userText)];
+      final response = await model.generateContent(content);
+
+      setState(() {
+        _messages.add({
+          'sender': 'ai', 
+          'text': response.text ?? 'जेमिनी से कोई उत्तर नहीं मिला।'
+        });
+        _isLoading = false;
       });
-    });
+    } catch (e) {
+      setState(() {
+        _messages.add({
+          'sender': 'ai', 
+          'text': '❌ एरर आ गई: $e'
+        });
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -195,7 +232,7 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
                       controller: _taskInstructionsController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText: 'यहाँ निर्देश डालें...',
+                        hintText: 'यहाँ पूरा निर्देश (System Prompt) डालें...',
                         filled: true,
                         fillColor: const Color(0xFF0F172A),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -236,6 +273,11 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
               },
             ),
           ),
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: LinearProgressIndicator(color: Colors.indigoAccent),
+            ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -244,7 +286,7 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
-                      hintText: 'यहाँ VIP प्रॉम्प्ट लिखें...',
+                      hintText: 'यहाँ असली सवाल पूछें (जैसे: 1 से 100 तक गिनती लिखो)...',
                       filled: true,
                       fillColor: const Color(0xFF1E293B),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
@@ -254,7 +296,7 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
                 const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.send, color: Colors.indigoAccent),
-                  onPressed: _sendMessage,
+                  onPressed: _isLoading ? null : _sendMessage,
                 ),
               ],
             ),
