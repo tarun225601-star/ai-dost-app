@@ -22,9 +22,9 @@ jobs:
           channel: 'stable'
 
       - name: Fix Android Platform and Dependencies
-        run: ai_dost_app
+        run: |
           rm -f pubspec.lock
-          flutter create . 
+          flutter create . --platforms=android --project-name=ai_dost
           flutter pub get
 
       - name: Build APK Release
