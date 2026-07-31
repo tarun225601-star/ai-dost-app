@@ -21,11 +21,10 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: Deep Clean and Override
+      - name: Purge Cache and Fresh Build
         run: |
-          find . -name "pubspec.lock" -delete
-          find . -name ".dart_tool" -type d -exec rm -rf {} +
-          rm -rf android ios windows macos linux
+          flutter pub cache clean -f
+          rm -rf pubspec.lock .dart_tool android ios windows macos linux
           flutter create . --platforms=android --project-name=ai_dost_app
           flutter pub get
 
