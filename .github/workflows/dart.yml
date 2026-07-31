@@ -3,8 +3,6 @@ name: Build Android APK
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
@@ -25,12 +23,6 @@ jobs:
 
       - name: Add Flutter to Path
         run: echo "$HOME/flutter/bin" >> $GITHUB_PATH
-
-      - name: Verify Flutter
-        run: flutter --version
-
-      - name: Clean & Setup Android v2
-        run: flutter create . --org com.tarun.aidost --platforms android --overwrite
 
       - name: Install dependencies
         run: flutter pub get
