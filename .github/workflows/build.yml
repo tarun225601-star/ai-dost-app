@@ -21,6 +21,22 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
+      - name: Backup Project Files
+        run: |
+          mkdir -p /tmp/backup
+          cp pubspec.yaml /tmp/backup/pubspec.yaml
+          cp -r lib /tmp/backup/lib
+
+      - name: Upgrade Android to v2 Cleanly
+        run: |
+          rm -rf android
+          flutter create . --platforms=android --project-name=ai_dost
+
+      - name: Restore Project Files
+        run: |
+          cp /tmp/backup/pubspec.yaml pubspec.yaml
+          cp -r /tmp/backup/lib/* lib/
+
       - name: Get Dependencies
         run: flutter pub get
 
