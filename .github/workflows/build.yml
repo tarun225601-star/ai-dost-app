@@ -21,9 +21,9 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: Purge Cache and Fresh Build
+      - name: Nuke Cache and Rebuild Android
         run: |
-          flutter pub cache clean -f
+          rm -rf ~/.pub-cache
           rm -rf pubspec.lock .dart_tool android ios windows macos linux
           flutter create . --platforms=android --project-name=ai_dost_app
           flutter pub get
