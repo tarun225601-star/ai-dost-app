@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
+import 'http_helper.dart' as http; // Safe network handler
 import 'dart:convert';
 
 void main() {
@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ==========================================
-// 1. VIP SMART CHAT SCREEN (असली HTTP Gemini API)
+// 1. VIP SMART CHAT SCREEN (असली Gemini API)
 // ==========================================
 class SingleSmartChatScreen extends StatefulWidget {
   const SingleSmartChatScreen({super.key});
@@ -134,7 +134,6 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
     });
   }
 
-  // सीधे HTTP के जरिए असली Gemini API को कॉल करने का फंक्शन
   void _sendMessage() async {
     if (_messageController.text.trim().isEmpty) return;
     String userText = _messageController.text;
@@ -160,7 +159,6 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
         return;
       }
 
-      // Google Gemini API URL
       final url = Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey');
 
       final response = await http.post(
