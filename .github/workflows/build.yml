@@ -21,19 +21,11 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: Recreate Android and Fix SDK Versions
+      - name: Clean Old Locks and Recreate Android
         run: |
           rm -rf android
+          rm -f pubspec.lock
           flutter create . --platforms=android --project-name=ai_dost
-
-          # app_links और gradle की एरर रोकने के लिए compileSdkVersion और namespace पक्का करते हैं
-          BUILD_GRADLE="android/app/build.gradle"
-          if [ -f "$BUILD_GRADLE" ]; then
-            echo "Fixing build.gradle..."
-            sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/g' $BUILD_GRADLE
-            sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 21/g' $BUILD_GRADLE
-            sed -i 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 34/g' $BUILD_GRADLE
-          fi
 
       - name: Get Dependencies
         run: flutter pub get
