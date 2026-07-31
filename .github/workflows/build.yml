@@ -21,26 +21,13 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: Ultimate Safe Clean & Recreate Android
+      - name: Ensure Supabase in pubspec
         run: |
-          # 1. अपनी असली फाइलों का सुरक्षित बैकअप ले लो
-          mkdir -p /tmp/my_app_backup
-          cp pubspec.yaml /tmp/my_app_backup/
-          cp -r lib /tmp/my_app_backup/
-
-          # 2. पुराने और सड़े हुए एंड्रॉइड/आईओएस फोल्डर को हमेशा के लिए उड़ा दो
-          rm -rf android ios
-
-          # 3. एकदम नया, चकाचक v2 एंड्रॉइड प्रोजेक्ट फ्रेश बनाओ
-          flutter create . --platforms=android --project-name=ai_dost
-
-          # 4. अपनी असली डिपेंडेंसी (pubspec.yaml) और कोड (lib) वापस अपनी जगह चिपकाओ
-          cp /tmp/my_app_backup/pubspec.yaml pubspec.yaml
-          rm -rf lib
-          cp -r /tmp/my_app_backup/lib lib
-
-      - name: Get Dependencies
-        run: flutter pub get
+          # अगर pubspec.yaml में supabase_flutter नहीं है, तो अपने आप जोड़ देगा
+          if ! grep -q "supabase_flutter" pubspec.yaml; then
+            echo "  supabase_flutter: ^2.5.4" >> pubspec.yaml
+          fi
+          flutter pub get
 
       - name: Build APK Release
         run: flutter build apk --release
