@@ -21,6 +21,20 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
+      - name: Save main.dart Backup
+        run: |
+          mkdir -p /tmp/backup
+          cp lib/main.dart /tmp/backup/main.dart
+
+      - name: Fix Android v2 Embedding
+        run: |
+          rm -rf android
+          flutter create . --platforms=android --project-name=ai_dost
+
+      - name: Restore main.dart
+        run: |
+          cp /tmp/backup/main.dart lib/main.dart
+
       - name: Get Dependencies
         run: flutter pub get
 
