@@ -21,11 +21,8 @@ jobs:
           flutter-version: '3.27.4'
           channel: 'stable'
 
-      - name: Fresh Build
-        run: |
-          rm -rf pubspec.lock .dart_tool android ios windows macos linux
-          flutter create . --platforms=android --project-name=ai_dost_app
-          flutter pub get
+      - name: Get Dependencies
+        run: flutter pub get
 
       - name: Build APK Release
         run: flutter build apk --release
