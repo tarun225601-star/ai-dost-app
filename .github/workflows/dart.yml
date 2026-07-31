@@ -1,4 +1,4 @@
-name: Flutter CI
+name: Build Android APK
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
           java-version: '17'
 
       - name: Clone Flutter
-        run: git clone https://github.com/flutter/flutter.git --branch stable --depth 1 ~/flutter
+        run: git clone https://github.com/flutter/flutter.git -b stable --depth 1 $HOME/flutter
 
       - name: Add Flutter to Path
         run: echo "$HOME/flutter/bin" >> $GITHUB_PATH
@@ -29,18 +29,13 @@ jobs:
       - name: Verify Flutter
         run: flutter --version
 
-      - name: Generate Android Platform Files
-        run: flutter create . --platforms=android
+      - name: Clean & Setup Android v2
+        run: flutter create . --org com.tarun.aidost --platforms android --overwrite
 
       - name: Install dependencies
         run: flutter pub get
-      - name: Create Android v2 Setup
-        run: flutter create . --org com.tarun.aidost --platforms android
 
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Build APK
+      - name: Build APK Release
         run: flutter build apk --release
 
       - name: Upload APK Artifact
