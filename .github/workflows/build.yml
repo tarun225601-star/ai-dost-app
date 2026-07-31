@@ -21,13 +21,11 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: Clean and Purge Old Locks
+      - name: Fix Android Platform and Dependencies
         run: |
           rm -f pubspec.lock
-          flutter clean
-
-      - name: Get Dependencies
-        run: flutter pub get
+          flutter create . --platforms=android
+          flutter pub get
 
       - name: Build APK Release
         run: flutter build apk --release
