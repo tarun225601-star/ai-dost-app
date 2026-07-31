@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'http_helper.dart' as http; // Safe network handler
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 void main() {
@@ -60,9 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ==========================================
-// 1. VIP SMART CHAT SCREEN (असली Gemini API)
-// ==========================================
 class SingleSmartChatScreen extends StatefulWidget {
   const SingleSmartChatScreen({super.key});
 
@@ -232,7 +229,7 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
                     TextField(
                       controller: _taskTitleController,
                       decoration: InputDecoration(
-                        hintText: 'टास्क का नाम (जैसे: होटल मेन्यू / बैंक फॉर्म)',
+                        hintText: 'टास्क का नाम',
                         filled: true,
                         fillColor: const Color(0xFF0F172A),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -243,7 +240,7 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
                       controller: _taskInstructionsController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText: 'यहाँ पूरा निर्देश (System Prompt) डालें...',
+                        hintText: 'यहाँ निर्देश (System Prompt) डालें...',
                         filled: true,
                         fillColor: const Color(0xFF0F172A),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -297,7 +294,7 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
-                      hintText: 'यहाँ असली सवाल पूछें...',
+                      hintText: 'यहाँ सवाल पूछें...',
                       filled: true,
                       fillColor: const Color(0xFF1E293B),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
@@ -318,23 +315,13 @@ class _SingleSmartChatScreenState extends State<SingleSmartChatScreen> {
   }
 }
 
-// ==========================================
-// 2. 10 MODES SCREEN
-// ==========================================
 class ModesListScreen extends StatelessWidget {
   const ModesListScreen({super.key});
 
   final List<String> modes = const [
-    '1. Business Consultant',
-    '2. Hotel Front-Desk Manager',
-    '3. Voice Companion (Offline)',
-    '4. Code Architect',
-    '5. Content & Media Creator',
-    '6. Data Automation Expert',
-    '7. Voice Biometric Guard',
-    '8. Sarcastic AI Roast',
-    '9. Task Scheduler',
-    '10. Ultimate Super-Bot'
+    '1. Business Consultant', '2. Hotel Manager', '3. Voice Companion',
+    '4. Code Architect', '5. Media Creator', '6. Data Automation',
+    '7. Voice Biometric', '8. Sarcastic AI', '9. Task Scheduler', '10. Super-Bot'
   ];
 
   @override
@@ -344,10 +331,7 @@ class ModesListScreen extends StatelessWidget {
       body: GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1.4,
+          crossAxisCount: 2, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 1.4,
         ),
         itemCount: modes.length,
         itemBuilder: (context, index) {
@@ -360,11 +344,7 @@ class ModesListScreen extends StatelessWidget {
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  modes[index],
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                ),
+                child: Text(modes[index], textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ),
           );
@@ -374,9 +354,6 @@ class ModesListScreen extends StatelessWidget {
   }
 }
 
-// ==========================================
-// 3. SETTINGS SCREEN (4 Core APIs)
-// ==========================================
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -414,9 +391,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.setString('supabase_key', _supabaseKeyController.text);
     
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('सभी 4 API और Supabase सेटिंग्स सेव हो गई हैं!')),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('सेटिंग्स सेव हो गई हैं!')));
   }
 
   @override
@@ -430,12 +405,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextField(
             controller: controller,
             obscureText: obscure,
-            decoration: InputDecoration(
-              hintText: hint,
-              filled: true,
-              fillColor: const Color(0xFF1E293B),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            ),
+            decoration: InputDecoration(hintText: hint, filled: true, fillColor: const Color(0xFF1E293B), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
           ),
           const SizedBox(height: 14),
         ],
@@ -443,24 +413,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('4 Core API Settings'), backgroundColor: const Color(0xFF1E293B)),
+      appBar: AppBar(title: const Text('API Settings'), backgroundColor: const Color(0xFF1E293B)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildField('1. Gemini API Key', _geminiKeyController, 'AIzaSy...', obscure: true),
-            buildField('2. Razorpay API Key', _razorpayKeyController, 'rzp_live_...', obscure: true),
-            buildField('3. Supabase Link (URL)', _supabaseUrlController, 'https://xyzcompany.supabase.co'),
-            buildField('4. Supabase API Key', _supabaseKeyController, 'eyJhbGciOiJIUzI1NiIsIn...', obscure: true),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green, padding: const EdgeInsets.all(14)),
-                onPressed: _saveKeys,
-                child: const Text('Save All 4 Configurations', style: TextStyle(fontSize: 16, color: Colors.white)),
-              ),
+            buildField('Gemini API Key', _geminiKeyController, 'AIzaSy...', obscure: true),
+            buildField('Razorpay Key', _razorpayKeyController, 'rzp_live_...', obscure: true),
+            buildField('Supabase URL', _supabaseUrlController, 'https://xyz.supabase.co'),
+            buildField('Supabase Key', _supabaseKeyController, 'eyJhbGci...', obscure: true),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              onPressed: _saveKeys,
+              child: const Text('Save Configurations', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
