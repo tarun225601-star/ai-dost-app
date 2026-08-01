@@ -478,11 +478,7 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
       ),
     );
   }
-}
-// मान ले तेरी फाइल का बाकी कोड ऊपर लिखा है...
-
-// और यह वाला हिस्सा बिल्कुल सबसे नीचे (फाइल के अंत में) चिपका दे:
-Future<void> callGroqApi() async {
+}Future<void> callGroqApi() async {
   try {
     final url = Uri.parse('https://api.groq.com/openai/v1/chat/completions');
     
@@ -500,21 +496,14 @@ Future<void> callGroqApi() async {
       }),
     );
 
-        if (response.statusCode == 200) {
+    if (response.statusCode == 200) {
       print("मस्त काम हो गया: ${response.body}");
     } else {
       print("सर्वर का एरर कोड: ${response.statusCode}");
       print("वजह: ${response.body}");
     }
   } catch (e, stackTrace) {
-      } catch (e, stackTrace) {
-    setState(() {
-      errorMessage = "❌ असली एरर: $e"; // यह सीधा स्क्रीन के वेरिएबल को अपडेट कर देगा
-    });
+    print("❌ असली एरर की वजह यह रही: $e");
     print("स्टैक ट्रेस: $stackTrace");
   }
-  
-  }
-}
-
 }
