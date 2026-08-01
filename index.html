@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Business Studio</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: sans-serif; }
+    </style>
+</head>
+<body class="flex flex-col h-screen justify-between">
+
+    <!-- Top Header -->
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center shadow-md">
+        <div>
+            <h1 class="text-lg font-bold text-slate-100">AI Business Studio (Llama 3.3)</h1>
+            <p class="text-xs text-emerald-400">बिज़नेस: General Business</p>
+        </div>
+        <button class="text-slate-300 hover:text-white"><i class="fa-solid fa-sliders text-xl"></i></button>
+    </header>
+
+    <!-- Chat Messages Container -->
+    <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Initial Welcome Bubble -->
+        <div class="flex items-start space-x-2">
+            <div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl max-w-[85%] text-sm text-slate-200 shadow">
+                नमस्ते! Llama 3.3 (70B) मॉडल के साथ आपका बिजनेस एआई पार्टनर तैयार है। वर्तमान बिजनेस: General Business
+            </div>
+        </div>
+    </main>
+
+    <!-- Input Area -->
+    <div class="bg-slate-900 border-t border-slate-800 p-3 flex items-center space-x-2">
+        <input type="text" id="user-input" placeholder="अपने बिजनेस से जुड़ा सवाल यहाँ पूछें..." 
+            class="flex-1 bg-slate-800 text-slate-100 placeholder-slate-400 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-700">
+        <button onclick="sendMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-xl flex items-center justify-center transition">
+            <i class="fa-solid fa-paper-plane text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bg-slate-900 border-t border-slate-800 flex justify-around py-3 text-xs text-slate-400">
+        <button class="flex flex-col items-center text-emerald-400">
+            <i class="fa-solid fa-briefcase text-lg mb-1"></i>
+            <span>Business Chat</span>
+        </button>
+        <button class="flex flex-col items-center hover:text-slate-200">
+            <i class="fa-solid fa-grid-2 text-lg mb-1"></i>
+            <span>10 Modes</span>
+        </button>
+        <button class="flex flex-col items-center hover:text-slate-200">
+            <i class="fa-solid fa-gear text-lg mb-1"></i>
+            <span>API Settings</span>
+        </button>
+    </nav>
+
+    <!-- JavaScript logic to connect Groq API -->
+    <script>
+        const apiKey = "YAHAN_APNI_GROQ_API_KEY_DAL_DE"; // अपनी असली Groq API Key यहाँ डाल देना
+
+        async function sendMessage() {
+            const inputField = document.getElementById('user-input');
+            const chatContainer = document.getElementById('chat-container');
+            const userText = inputField.value.trim();
+
+            if (!userText) return;
+
+            // Append User Bubble
+            chatContainer.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="bg-indigo-600 text-white p-3 rounded-2xl max-w-[85%] text-sm shadow">
+                        ${userText}
+                    </div>
+                </div>
+            `;
+            inputField.value = '';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Loading placeholder
+            const loadingId = 'loading-' + Date.now();
+            chatContainer.innerHTML += `
+                <div id="${loadingId}" class="flex items-start space-x-2">
+                    <div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl text-sm text-slate-400 shadow">
+                        जवाब तैयार हो रहा है...
+                    </div>
+                </div>
+            `;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: "llama-3.3-70b-versatile",
+                        messages: [{ role: "user", content: userText }]
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+
+                const aiReply = data.choices && data.choices[0] ? data.choices[0].message.content : "क्षमा करें, रिस्पॉन्स प्राप्त करने में दिक्कत आई।";
+
+                // Append AI Bubble
+                chatContainer.innerHTML += `
+                    <div class="flex items-start space-x-2">
+                        <div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl max-w-[85%] text-sm text-slate-200 shadow">
+                            ${aiReply}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                chatContainer.innerHTML += `
+                    <div class="flex items-start space-x-2">
+                        <div class="bg-red-950 border border-red-800 p-3 rounded-2xl max-w-[85%] text-sm text-red-200 shadow">
+                            कनेक्शन एरर: ${error.message}
+                        </div>
+                    </div>
+                `;
+            }
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
