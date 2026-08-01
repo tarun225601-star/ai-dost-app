@@ -169,7 +169,8 @@ class _BusinessChatScreenState extends State<BusinessChatScreen> {
         return;
       }
 
-      final url = Uri.parse('https://104.18.38.236/openai/v1/chat/completions');
+      final url = Uri.parse('https://api.groq.com/openai/v1/chat/completions');
+
 
 
       final response = await http.post(
