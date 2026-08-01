@@ -500,7 +500,7 @@ Future<void> callGroqApi() async {
       }),
     );
 
-    if (response.statusCode == 200) {
+        if (response.statusCode == 200) {
       print("मस्त काम हो गया: ${response.body}");
     } else {
       print("सर्वर का एरर कोड: ${response.statusCode}");
@@ -510,4 +510,6 @@ Future<void> callGroqApi() async {
     print("❌ असली एरर की वजह यह रही: $e");
     print("स्टैक ट्रेस: $stackTrace");
   }
+}
+
 }
