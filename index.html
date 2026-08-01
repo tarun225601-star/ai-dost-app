@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Global Studio - Llama 3.3 Pro</title>
+    <title>AI Business Studio - Llama 3.3 Pro</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,109 +19,87 @@
     <header class="bg-[#1E293B] border-b border-slate-800 p-4 flex justify-between items-center shadow-md">
         <div>
             <h1 class="text-sm font-bold text-slate-100">AI Business Studio (Llama 3.3)</h1>
-            <p id="header-subtitle" class="text-xs text-green-400">बिजनेस: General Business</p>
+            <p id="header-subtitle" class="text-xs text-green-400">एक्टिव मोड: सामान्य चैट (General Chat)</p>
         </div>
         <div class="flex items-center space-x-3">
-            <button onclick="toggleEditForm()" id="tune-btn" class="text-green-400 hover:text-white hidden"><i class="fa-solid fa-sliders text-xl"></i></button>
+            <button onclick="switchTab('settings')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-gear text-lg"></i></button>
         </div>
     </header>
 
-    <!-- TAB 1: Business Chat Screen -->
+    <!-- TAB 1: Chat Mode (General AI like Gemini) -->
     <div id="chat-tab" class="tab-content active flex-col flex-1 overflow-hidden justify-between">
-        
-        <!-- Collapsible Business & Prompt Editor Form -->
-        <div id="edit-form-container" class="hidden bg-[#1E293B] border-b border-slate-700 p-4 overflow-y-auto max-h-60 space-y-3">
-            <div>
-                <label class="text-xs font-bold text-green-400">🏢 1. ऊपर डालें (क्या बिजनेस है?):</label>
-                <input type="text" id="business-type-input" placeholder="जैसे: Hotel, Bank, Hospital..." 
-                    class="w-full mt-1 bg-[#0F172A] text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-green-400">
-            </div>
-            <div>
-                <label class="text-xs font-bold text-indigo-400">✍️ 2. नीचे डालें (एआई से क्या काम करवाना है - Prompt):</label>
-                <textarea id="custom-prompt-input" rows="3" placeholder="यहाँ लिखें कि Llama 3.3 को इस बिजनेस में क्या भूमिका निभानी है..."
-                    class="w-full mt-1 bg-[#0F172A] text-slate-100 text-xs rounded-lg p-3 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-400"></textarea>
-            </div>
-            <button onclick="saveAndActivateBusinessMode()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-lg transition">
-                Save & Apply Business Mode
-            </button>
-        </div>
-
-        <!-- Chat Messages Container -->
         <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4">
             <div class="flex items-start space-x-2">
                 <div class="bg-[#334155] p-3 rounded-2xl max-w-[85%] text-sm text-slate-100 shadow">
-                    नमस्ते! Llama 3.3 (70B) मॉडल के साथ आपका बिजनेस एआई पार्टनर तैयार है। वर्तमान बिजनेस: General Business
+                    नमस्ते! यह **चैट मोड** है। यहाँ आप मुझसे कुछ भी पूछ सकते हैं—एक सामान्य एआई की तरह।
                 </div>
             </div>
         </main>
-
-        <!-- Loading Indicator -->
-        <div id="loading-bar" class="hidden px-4">
+        
+        <!-- Loading Bar -->
+        <div id="loading-bar-chat" class="hidden px-4">
             <div class="w-full bg-slate-800 h-1 rounded overflow-hidden">
                 <div class="bg-green-400 h-full w-1/2 animate-pulse"></div>
             </div>
         </div>
 
-        <!-- Input Area -->
         <div class="p-3 bg-[#0F172A] flex items-center space-x-2">
-            <input type="text" id="user-input" placeholder="अपने बिजनेस से जुड़ा सवाल यहाँ पूछें..." 
+            <input type="text" id="user-input-chat" autocomplete="off" placeholder="यहाँ कुछ भी पूछें..." 
                 class="flex-1 bg-[#1E293B] text-slate-100 placeholder-slate-400 text-sm rounded-xl px-4 py-3 focus:outline-none border border-slate-700">
             <div class="bg-indigo-600 rounded-full">
-                <button onclick="sendMessage()" class="p-3 text-white flex items-center justify-center">
+                <button onclick="sendMessage('chat')" class="p-3 text-white flex items-center justify-center">
                     <i class="fa-solid fa-paper-plane text-lg"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- TAB 2: 10 Modes Screen -->
-    <div id="modes-tab" class="tab-content flex-col flex-1 p-4 overflow-y-auto">
-        <h2 class="text-sm font-bold text-slate-200 mb-3">10 Specialized AI Modes</h2>
-        <div class="grid grid-cols-2 gap-3">
-            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
-                <span class="text-xs font-bold text-green-400">1. Hotel Manager</span>
-                <span class="text-[10px] text-slate-400 mt-1">होटल बुकिंग और गेस्ट सर्विस</span>
+    <!-- TAB 2: Business Mode (Strict Business & Rates with Auto Voice) -->
+    <div id="business-tab" class="tab-content flex-col flex-1 overflow-hidden justify-between">
+        <!-- Business Setup Form inside Business Mode -->
+        <div class="bg-[#1E293B] border-b border-slate-700 p-4 space-y-3 overflow-y-auto max-h-56">
+            <div>
+                <label class="text-xs font-bold text-green-400">🏢 बिजनेस का नाम:</label>
+                <input type="text" id="business-type-input" autocomplete="off" placeholder="जैसे: Fruit Shop, Hotel..." 
+                    class="w-full mt-1 bg-[#0F172A] text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-green-400">
             </div>
-            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
-                <span class="text-xs font-bold text-green-400">2. Bank Advisor</span>
-                <span class="text-[10px] text-slate-400 mt-1">लोन और फाइनेंसियल प्लानिंग</span>
+            <div>
+                <label class="text-xs font-bold text-indigo-400">✍️ बिजनेस प्रॉम्प्ट (रेट लिस्ट / नियम):</label>
+                <textarea id="custom-prompt-input" rows="3" autocomplete="off" placeholder="यहाँ लिखें जैसे: आम 80 रुपए किलो है, केला 50 रुपए दर्जन..."
+                    class="w-full mt-1 bg-[#0F172A] text-slate-100 text-xs rounded-lg p-3 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-400"></textarea>
             </div>
-            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
-                <span class="text-xs font-bold text-green-400">3. Hospital Admin</span>
-                <span class="text-[10px] text-slate-400 mt-1">हेल्थकेयर और पेशेंट मैनेजमेंट</span>
+            <button onclick="saveAndActivateBusinessMode()" class="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 rounded-lg transition">
+                Save & Start Business AI
+            </button>
+        </div>
+
+        <main id="biz-chat-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <div class="flex items-start space-x-2">
+                <div class="bg-[#334155] p-3 rounded-2xl max-w-[85%] text-sm text-slate-100 shadow">
+                    नमस्ते! यह **बिजनेस मोड** है। ऊपर अपना बिजनेस और रेट लिस्ट सेव करें, फिर ग्राहक के सवाल पूछें—यह ब्लूटूथ स्पीकर पर अपने आप बोलकर जवाब देगा!
+                </div>
             </div>
-            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
-                <span class="text-xs font-bold text-green-400">4. Code Architect</span>
-                <span class="text-[10px] text-slate-400 mt-1">सॉफ्टवेयर और ऐप कोडिंग</span>
+        </main>
+
+        <!-- Loading Bar -->
+        <div id="loading-bar-biz" class="hidden px-4">
+            <div class="w-full bg-slate-800 h-1 rounded overflow-hidden">
+                <div class="bg-green-400 h-full w-1/2 animate-pulse"></div>
             </div>
-            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
-                <span class="text-xs font-bold text-green-400">5. Business Coach</span>
-                <span class="text-[10px] text-slate-400 mt-1">स्टार्टअप ग्रोथ और स्ट्रेटजी</span>
-            </div>
-            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
-                <span class="text-xs font-bold text-green-400">6. Data Automation</span>
-                <span class="text-[10px] text-slate-400 mt-1">ऑटोमेशन और वर्कफ़्लो</span>
-            </div>
-            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
-                <span class="text-xs font-bold text-green-400">7. Voice Companion</span>
-                <span class="text-[10px] text-slate-400 mt-1">स्मार्ट कन्वर्सेशन बॉट</span>
-            </div>
-            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
-                <span class="text-xs font-bold text-green-400">8. Marketing Expert</span>
-                <span class="text-[10px] text-slate-400 mt-1">डिजिटल मार्केटिंग और सेल्स</span>
-            </div>
-            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
-                <span class="text-xs font-bold text-green-400">9. Task Scheduler</span>
-                <span class="text-[10px] text-slate-400 mt-1">डेली टास्क और प्लानिंग</span>
-            </div>
-            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
-                <span class="text-xs font-bold text-green-400">10. Super-Bot Pro</span>
-                <span class="text-[10px] text-slate-400 mt-1">अल्टीमेट ऑलराउंडर एआई</span>
+        </div>
+
+        <div class="p-3 bg-[#0F172A] flex items-center space-x-2">
+            <input type="text" id="user-input-biz" autocomplete="off" placeholder="ग्राहक का सवाल पूछें (जैसे: आम कितने का है?)..." 
+                class="flex-1 bg-[#1E293B] text-slate-100 placeholder-slate-400 text-sm rounded-xl px-4 py-3 focus:outline-none border border-slate-700">
+            <div class="bg-green-600 rounded-full">
+                <button onclick="sendMessage('business')" class="p-3 text-white flex items-center justify-center">
+                    <i class="fa-solid fa-paper-plane text-lg"></i>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- TAB 3: API Settings Screen (Only Groq API Key) -->
+    <!-- TAB 3: API Settings Screen -->
     <div id="settings-tab" class="tab-content flex-col flex-1 p-6 space-y-6 overflow-y-auto">
         <div class="bg-[#1E293B] border border-slate-700 p-5 rounded-2xl shadow-lg space-y-4">
             <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
@@ -132,7 +110,7 @@
             </p>
             <div class="space-y-2">
                 <label class="text-xs font-semibold text-green-400">Groq API Key:</label>
-                <input type="password" id="groq-key-input" placeholder="gsk_..." 
+                <input type="password" id="groq-key-input" autocomplete="off" placeholder="gsk_..." 
                     class="w-full bg-[#0F172A] text-slate-100 placeholder-slate-500 text-sm rounded-xl px-4 py-3 focus:outline-none border border-slate-700">
             </div>
             <button onclick="saveKeys()" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-xl transition shadow-md text-sm">
@@ -144,63 +122,120 @@
 
     <!-- Bottom Navigation Bar -->
     <nav class="bg-[#1E293B] border-t border-slate-800 flex justify-around py-3 text-xs text-slate-400">
-        <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center text-green-400">
-            <i class="fa-solid fa-business-center text-lg mb-1"></i>
-            <span>Business Chat</span>
+        <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center text-green-400 flex-1">
+            <i class="fa-solid fa-comments text-lg mb-1"></i>
+            <span>Chat Mode</span>
         </button>
-        <button onclick="switchTab('modes')" id="nav-modes" class="flex flex-col items-center hover:text-slate-200">
-            <i class="fa-solid fa-grid-view text-lg mb-1"></i>
-            <span>10 Modes</span>
+        <button onclick="switchTab('business')" id="nav-business" class="flex flex-col items-center hover:text-slate-200 flex-1">
+            <i class="fa-solid fa-store text-lg mb-1"></i>
+            <span>Business Mode</span>
         </button>
-        <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center hover:text-slate-200">
+        <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center hover:text-slate-200 flex-1">
             <i class="fa-solid fa-gear text-lg mb-1"></i>
-            <span>API Settings</span>
+            <span>Settings</span>
         </button>
     </nav>
 
+    <!-- Hidden Silent Audio Player for Background Keep-Alive Loop -->
+    <audio id="silent-audio" loop preload="auto">
+        <source src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+
     <!-- JavaScript Logic -->
     <script>
-        let activeBusiness = "General Business";
-        let activeSystemPrompt = "तुम एक एक्सपर्ट बिजनेस कंसलटेंट हो जो कंपनियों और स्टार्टअप्स को आगे बढ़ाने में मदद करते हैं।";
-        let messagesList = [];
+        let chatMessages = [];
+        let bizMessages = [];
+        let activeBusiness = "";
+        let activeSystemPrompt = "";
+        let wakeLock = null;
+
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) { console.log(err); }
+        }
+
+        function startSilentAudioLoop() {
+            const audio = document.getElementById('silent-audio');
+            audio.play().catch(e => console.log(e));
+        }
 
         window.onload = function() {
+            requestWakeLock();
+            startSilentAudioLoop();
+
+            document.addEventListener('click', () => {
+                startSilentAudioLoop();
+            }, { once: true });
+
+            document.addEventListener('visibilitychange', async () => {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
+                    await requestWakeLock();
+                }
+                startSilentAudioLoop();
+            });
+
             const savedKey = localStorage.getItem('groq_api_key');
             if (savedKey) document.getElementById('groq-key-input').value = savedKey;
 
             const savedBiz = localStorage.getItem('biz_type');
             const savedPrompt = localStorage.getItem('biz_prompt');
-            if (savedBiz) activeBusiness = savedBiz;
-            if (savedPrompt) activeSystemPrompt = savedPrompt;
-
-            document.getElementById('header-subtitle').innerText = `बिजनेस: ${activeBusiness}`;
-            document.getElementById('business-type-input').value = activeBusiness;
-            document.getElementById('custom-prompt-input').value = activeSystemPrompt;
-
-            const savedChat = localStorage.getItem('chat_messages');
-            if (savedChat) {
-                try {
-                    messagesList = JSON.parse(savedChat);
-                    renderMessages();
-                } catch(e) { messagesList = []; }
-            } else {
-                messagesList.push({
-                    'sender': 'ai', 
-                    'text': `नमस्ते! Llama 3.3 (70B) मॉडल के साथ आपका बिजनेस एआई पार्टनर तैयार है। वर्तमान बिजनेस: ${activeBusiness}`
-                });
-                renderMessages();
+            if (savedBiz && savedPrompt) {
+                activeBusiness = savedBiz;
+                activeSystemPrompt = savedPrompt;
+                document.getElementById('business-type-input').value = activeBusiness;
+                document.getElementById('custom-prompt-input').value = activeSystemPrompt;
             }
+
+            // Load Chat History
+            const savedChat = localStorage.getItem('chat_history');
+            if (savedChat) {
+                try { chatMessages = JSON.parse(savedChat); } catch(e) { chatMessages = []; }
+            } else {
+                chatMessages.push({'sender': 'ai', 'text': 'नमस्ते! चैट मोड में आपका स्वागत है। आप मुझसे कुछ भी पूछ सकते हैं।'});
+            }
+            renderMessages('chat');
+
+            // Load Biz History
+            const savedBizChat = localStorage.getItem('biz_history');
+            if (savedBizChat) {
+                try { bizMessages = JSON.parse(savedBizChat); } catch(e) { bizMessages = []; }
+            } else {
+                bizMessages.push({'sender': 'ai', 'text': 'नमस्ते! बिजनेस मोड तैयार है। ऊपर अपना बिजनेस और प्रॉम्प्ट सेट करें।'});
+            }
+            renderMessages('business');
         };
 
-        function renderMessages() {
-            const container = document.getElementById('chat-container');
+        function speakOutLoud(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'hi-IN';
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function renderMessages(mode) {
+            const container = document.getElementById(mode === 'chat' ? 'chat-container' : 'biz-chat-container');
+            const list = mode === 'chat' ? chatMessages : bizMessages;
             container.innerHTML = '';
-            messagesList.forEach(msg => {
+            list.forEach((msg, index) => {
                 const isUser = msg.sender === 'user';
+                let speakButton = '';
+                if (!isUser && mode === 'business') {
+                    // Safe string escaping for speech button
+                    let safeText = msg.text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    speakButton = `<button onclick="speakOutLoud('${safeText}')" class="ml-2 text-xs text-green-400 hover:text-green-300 bg-[#1E293B] px-2 py-1 rounded border border-slate-700" title="दोबारा बोलें"><i class="fa-solid fa-volume-high"></i></button>`;
+                }
+
                 container.innerHTML += `
                     <div class="flex ${isUser ? 'justify-end' : 'items-start space-x-2'}">
-                        <div class="${isUser ? 'bg-indigo-600 text-white' : 'bg-[#334155] text-slate-100'} p-3 rounded-2xl max-w-[85%] text-sm shadow">
-                            ${msg.text}
+                        <div class="${isUser ? 'bg-indigo-600 text-white' : 'bg-[#334155] text-slate-100'} p-3 rounded-2xl max-w-[85%] text-sm shadow flex items-center justify-between">
+                            <span>${msg.text}</span>
+                            ${speakButton}
                         </div>
                     </div>
                 `;
@@ -208,33 +243,32 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        function saveChatStorage() {
-            localStorage.setItem('chat_messages', JSON.stringify(messagesList));
-        }
-
         function switchTab(tabName) {
-            const tabs = ['chat', 'modes', 'settings'];
+            startSilentAudioLoop();
+            const tabs = ['chat', 'business', 'settings'];
             tabs.forEach(t => {
                 document.getElementById(`${t}-tab`).classList.remove('active');
-                document.getElementById(`nav-${t}`).classList.remove('text-green-400');
-                document.getElementById(`nav-${t}`).classList.add('text-slate-400');
+                const navBtn = document.getElementById(`nav-${t}`);
+                if(navBtn) {
+                    navBtn.classList.remove('text-green-400');
+                    navBtn.classList.add('text-slate-400');
+                }
             });
 
             document.getElementById(`${tabName}-tab`).classList.add('active');
-            document.getElementById(`nav-${tabName}`).classList.add('text-green-400');
-            document.getElementById(`nav-${tabName}`).classList.remove('text-slate-400');
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if(activeNav) {
+                activeNav.classList.add('text-green-400');
+                activeNav.classList.remove('text-slate-400');
+            }
 
             if(tabName === 'chat') {
-                document.getElementById('tune-btn').classList.remove('hidden');
+                document.getElementById('header-subtitle').innerText = "मोड: सामान्य चैट (General Chat)";
+            } else if(tabName === 'business') {
+                document.getElementById('header-subtitle').innerText = activeBusiness ? `बिजनेस: ${activeBusiness}` : "मोड: बिजनेस (सेट नहीं है)";
             } else {
-                document.getElementById('tune-btn').classList.add('hidden');
-                document.getElementById('edit-form-container').classList.add('hidden');
+                document.getElementById('header-subtitle').innerText = "सेटिंग्स (Settings)";
             }
-        }
-
-        function toggleEditForm() {
-            const form = document.getElementById('edit-form-container');
-            form.classList.toggle('hidden');
         }
 
         function saveAndActivateBusinessMode() {
@@ -242,7 +276,7 @@
             const promptText = document.getElementById('custom-prompt-input').value.trim();
 
             if (businessName === '' || promptText === '') {
-                alert('⚠️ कृपया ऊपर बिजनेस का नाम और नीचे प्रॉम्प्ट दोनों भरें!');
+                alert('⚠️ कृपया बिजनेस का नाम और प्रॉम्प्ट दोनों भरें!');
                 return;
             }
 
@@ -253,14 +287,13 @@
             localStorage.setItem('biz_prompt', promptText);
 
             document.getElementById('header-subtitle').innerText = `बिजनेस: ${activeBusiness}`;
-            toggleEditForm();
-
-            messagesList.push({
-                'sender': 'ai', 
-                'text': `✅ नया बिजनेस मोड सेट हो गया: "${businessName}"। अब मैं Llama 3.3 के साथ इसी रोल में काम करूँगा।`
-            });
-            saveChatStorage();
-            renderMessages();
+            
+            let welcomeMsg = `✅ बिजनेस मोड एक्टिव हो गया: "${businessName}"। अब ग्राहक के हर सवाल का जवाब यह ब्लूटूथ स्पीकर पर बोलकर देगा!`;
+            bizMessages.push({'sender': 'ai', 'text': welcomeMsg});
+            localStorage.setItem('biz_history', JSON.stringify(bizMessages));
+            renderMessages('business');
+            speakOutLoud(welcomeMsg);
+            alert('✅ बिजनेस मोड सफलतापूर्वक सेव हो गया!');
         }
 
         function saveKeys() {
@@ -278,29 +311,47 @@
             }, 1500);
         }
 
-        async function sendMessage() {
-            const messageInput = document.getElementById('user-input');
-            const userText = messageInput.value.trim();
+        async function sendMessage(mode) {
+            startSilentAudioLoop();
+            const inputId = mode === 'chat' ? 'user-input-chat' : 'user-input-biz';
+            const inputField = document.getElementById(inputId);
+            const userText = inputField.value.trim();
             if (userText === '') return;
 
-            messagesList.push({'sender': 'user', 'text': userText});
-            messageInput.value = '';
-            saveChatStorage();
-            renderMessages();
+            const list = mode === 'chat' ? chatMessages : bizMessages;
+            list.push({'sender': 'user', 'text': userText});
+            inputField.value = '';
+            
+            if(mode === 'chat') {
+                localStorage.setItem('chat_history', JSON.stringify(chatMessages));
+            } else {
+                localStorage.setItem('biz_history', JSON.stringify(bizMessages));
+            }
+            renderMessages(mode);
 
-            document.getElementById('loading-bar').classList.remove('hidden');
+            const loadingId = mode === 'chat' ? 'loading-bar-chat' : 'loading-bar-biz';
+            document.getElementById(loadingId).classList.remove('hidden');
 
             try {
                 const groqKey = localStorage.getItem('groq_api_key') || '';
                 if (groqKey === '') {
-                    document.getElementById('loading-bar').classList.add('hidden');
-                    messagesList.push({
-                        'sender': 'ai', 
-                        'text': '⚠️ कृपया पहले "API Settings" टैब में जाकर अपनी Groq API Key सेव करें!'
-                    });
-                    renderMessages();
+                    document.getElementById(loadingId).classList.add('hidden');
+                    list.push({'sender': 'ai', 'text': '⚠️ कृपया पहले "Settings" टैब में जाकर अपनी Groq API Key सेव करें!'});
+                    renderMessages(mode);
                     switchTab('settings');
                     return;
+                }
+
+                let sysPrompt = "तुम एक बहुत मददगार और बुद्धिमान एआई असिस्टेंट हो। यूजर के सवालों के सही जवाब दो।";
+                if(mode === 'business') {
+                    if(!activeSystemPrompt) {
+                        document.getElementById(loadingId).classList.add('hidden');
+                        list.push({'sender': 'ai', 'text': '⚠️ कृपया पहले ऊपर बिजनेस का नाम और प्रॉम्प्ट सेव करें!'});
+                        renderMessages(mode);
+                        return;
+                    }
+                    // स्ट्रिक्ट निर्देश ताकि एआई सिर्फ और सिर्फ छोटे और सटीक बोलचाल वाले जवाब दे
+                    sysPrompt = `${activeSystemPrompt}\n\n[महत्वपूर्ण निर्देश: तुम काउंटर पर रखे ब्लूटूथ स्पीकर हो। ग्राहक के सवाल का जवाब बहुत छोटा, सीधा और स्पष्ट हिंदी में दो, ताकि बोलते ही तुरंत समझ आ जाए। जैसे अगर पूछे आम कितने का है, तो सीधे बोलो 'आम 80 रुपए किलो है'। कोई फालतू की बात मत जोड़ो।]`;
                 }
 
                 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -312,34 +363,41 @@
                     body: JSON.stringify({
                         "model": "llama-3.3-70b-versatile",
                         "messages": [
-                            {"role": "system", "content": activeSystemPrompt},
+                            {"role": "system", "content": sysPrompt},
                             {"role": "user", "content": userText}
                         ],
                     }),
                 });
 
-                document.getElementById('loading-bar').classList.add('hidden');
+                document.getElementById(loadingId).classList.add('hidden');
 
                 if (response.ok) {
                     const data = await response.json();
                     let aiResponse = data.choices[0].message.content;
-                    messagesList.push({'sender': 'ai', 'text': aiResponse});
+                    list.push({'sender': 'ai', 'text': aiResponse});
+                    
+                    // बिजनेस मोड में एआई का जवाब आते ही अपने आप ब्लूटूथ स्पीकर पर बोलेगा
+                    if(mode === 'business') {
+                        speakOutLoud(aiResponse);
+                    }
                 } else {
                     const errBody = await response.text();
-                    messagesList.push({'sender': 'ai', 'text': `❌ API एरर (${response.status}): ${errBody}`});
+                    list.push({'sender': 'ai', 'text': `❌ API एरर (${response.status}): ${errBody}`});
                 }
-                saveChatStorage();
-                renderMessages();
+
+                if(mode === 'chat') {
+                    localStorage.setItem('chat_history', JSON.stringify(chatMessages));
+                } else {
+                    localStorage.setItem('biz_history', JSON.stringify(bizMessages));
+                }
+                renderMessages(mode);
 
             } catch (e) {
-                document.getElementById('loading-bar').classList.add('hidden');
-                messagesList.push({'sender': 'ai', 'text': `❌ कनेक्शन एरर: $e`});
-                saveChatStorage();
-                renderMessages();
+                document.getElementById(loadingId).classList.add('hidden');
+                list.push({'sender': 'ai', 'text': `❌ कनेक्शन एरर: ${e}`});
+                renderMessages(mode);
             }
         }
-
-        document.getElementById('tune-btn').classList.remove('hidden');
     </script>
 </body>
 </html>
