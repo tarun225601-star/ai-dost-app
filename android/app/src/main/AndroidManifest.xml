@@ -33,3 +33,4 @@
             android:value="2" />
     </application>
 </manifest>
+android:networkSecurityConfig="@xml/network_security_config"
