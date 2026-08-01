@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Business Studio</title>
+    <title>AI Global Studio - Llama 3.3 Pro</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: sans-serif; }
+        body { background-color: #0F172A; color: #F8FAFC; font-family: sans-serif; }
         .tab-content { display: none; }
         .tab-content.active { display: flex; }
     </style>
@@ -16,64 +16,140 @@
 <body class="flex flex-col h-screen justify-between">
 
     <!-- Top Header -->
-    <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center shadow-md">
+    <header class="bg-[#1E293B] border-b border-slate-800 p-4 flex justify-between items-center shadow-md">
         <div>
-            <h1 class="text-lg font-bold text-slate-100">AI Business Studio (Llama 3.3)</h1>
-            <p class="text-xs text-emerald-400">बिज़नेस: General Business</p>
+            <h1 class="text-sm font-bold text-slate-100">AI Business Studio (Llama 3.3)</h1>
+            <p id="header-subtitle" class="text-xs text-green-400">बिजनेस: General Business</p>
         </div>
-        <button onclick="switchTab('settings')" class="text-slate-300 hover:text-white"><i class="fa-solid fa-gear text-xl"></i></button>
+        <div class="flex items-center space-x-3">
+            <button onclick="toggleEditForm()" id="tune-btn" class="text-green-400 hover:text-white hidden"><i class="fa-solid fa-sliders text-xl"></i></button>
+        </div>
     </header>
 
     <!-- TAB 1: Business Chat Screen -->
     <div id="chat-tab" class="tab-content active flex-col flex-1 overflow-hidden justify-between">
+        
+        <!-- Collapsible Business & Prompt Editor Form -->
+        <div id="edit-form-container" class="hidden bg-[#1E293B] border-b border-slate-700 p-4 overflow-y-auto max-h-60 space-y-3">
+            <div>
+                <label class="text-xs font-bold text-green-400">🏢 1. ऊपर डालें (क्या बिजनेस है?):</label>
+                <input type="text" id="business-type-input" placeholder="जैसे: Hotel, Bank, Hospital..." 
+                    class="w-full mt-1 bg-[#0F172A] text-slate-100 text-xs rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-green-400">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-indigo-400">✍️ 2. नीचे डालें (एआई से क्या काम करवाना है - Prompt):</label>
+                <textarea id="custom-prompt-input" rows="3" placeholder="यहाँ लिखें कि Llama 3.3 को इस बिजनेस में क्या भूमिका निभानी है..."
+                    class="w-full mt-1 bg-[#0F172A] text-slate-100 text-xs rounded-lg p-3 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-400"></textarea>
+            </div>
+            <button onclick="saveAndActivateBusinessMode()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-lg transition">
+                Save & Apply Business Mode
+            </button>
+        </div>
+
         <!-- Chat Messages Container -->
         <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4">
             <div class="flex items-start space-x-2">
-                <div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl max-w-[85%] text-sm text-slate-200 shadow">
-                    नमस्ते! Llama 3.3 (70B) मॉडल के साथ आपका बिजनेस एआई पार्टनर तैयार है। कृपया नीचे बॉटम बार से **API Settings** में जाकर अपनी Groq API Key सेव कर लें।
+                <div class="bg-[#334155] p-3 rounded-2xl max-w-[85%] text-sm text-slate-100 shadow">
+                    नमस्ते! Llama 3.3 (70B) मॉडल के साथ आपका बिजनेस एआई पार्टनर तैयार है। वर्तमान बिजनेस: General Business
                 </div>
             </div>
         </main>
 
+        <!-- Loading Indicator -->
+        <div id="loading-bar" class="hidden px-4">
+            <div class="w-full bg-slate-800 h-1 rounded overflow-hidden">
+                <div class="bg-green-400 h-full w-1/2 animate-pulse"></div>
+            </div>
+        </div>
+
         <!-- Input Area -->
-        <div class="bg-slate-900 border-t border-slate-800 p-3 flex items-center space-x-2">
+        <div class="p-3 bg-[#0F172A] flex items-center space-x-2">
             <input type="text" id="user-input" placeholder="अपने बिजनेस से जुड़ा सवाल यहाँ पूछें..." 
-                class="flex-1 bg-slate-800 text-slate-100 placeholder-slate-400 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-700">
-            <button onclick="sendMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-xl flex items-center justify-center transition">
-                <i class="fa-solid fa-paper-plane text-lg"></i>
-            </button>
+                class="flex-1 bg-[#1E293B] text-slate-100 placeholder-slate-400 text-sm rounded-xl px-4 py-3 focus:outline-none border border-slate-700">
+            <div class="bg-indigo-600 rounded-full">
+                <button onclick="sendMessage()" class="p-3 text-white flex items-center justify-center">
+                    <i class="fa-solid fa-paper-plane text-lg"></i>
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- TAB 2: API Settings Screen -->
+    <!-- TAB 2: 10 Modes Screen -->
+    <div id="modes-tab" class="tab-content flex-col flex-1 p-4 overflow-y-auto">
+        <h2 class="text-sm font-bold text-slate-200 mb-3">10 Specialized AI Modes</h2>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
+                <span class="text-xs font-bold text-green-400">1. Hotel Manager</span>
+                <span class="text-[10px] text-slate-400 mt-1">होटल बुकिंग और गेस्ट सर्विस</span>
+            </div>
+            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
+                <span class="text-xs font-bold text-green-400">2. Bank Advisor</span>
+                <span class="text-[10px] text-slate-400 mt-1">लोन और फाइनेंसियल प्लानिंग</span>
+            </div>
+            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
+                <span class="text-xs font-bold text-green-400">3. Hospital Admin</span>
+                <span class="text-[10px] text-slate-400 mt-1">हेल्थकेयर और पेशेंट मैनेजमेंट</span>
+            </div>
+            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
+                <span class="text-xs font-bold text-green-400">4. Code Architect</span>
+                <span class="text-[10px] text-slate-400 mt-1">सॉफ्टवेयर और ऐप कोडिंग</span>
+            </div>
+            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
+                <span class="text-xs font-bold text-green-400">5. Business Coach</span>
+                <span class="text-[10px] text-slate-400 mt-1">स्टार्टअप ग्रोथ और स्ट्रेटजी</span>
+            </div>
+            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
+                <span class="text-xs font-bold text-green-400">6. Data Automation</span>
+                <span class="text-[10px] text-slate-400 mt-1">ऑटोमेशन और वर्कफ़्लो</span>
+            </div>
+            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
+                <span class="text-xs font-bold text-green-400">7. Voice Companion</span>
+                <span class="text-[10px] text-slate-400 mt-1">स्मार्ट कन्वर्सेशन बॉट</span>
+            </div>
+            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
+                <span class="text-xs font-bold text-green-400">8. Marketing Expert</span>
+                <span class="text-[10px] text-slate-400 mt-1">डिजिटल मार्केटिंग और सेल्स</span>
+            </div>
+            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
+                <span class="text-xs font-bold text-green-400">9. Task Scheduler</span>
+                <span class="text-[10px] text-slate-400 mt-1">डेली टास्क और प्लानिंग</span>
+            </div>
+            <div class="bg-[#1E293B] border border-green-400/40 p-3 rounded-xl text-center flex flex-col justify-center">
+                <span class="text-xs font-bold text-green-400">10. Super-Bot Pro</span>
+                <span class="text-[10px] text-slate-400 mt-1">अल्टीमेट ऑलराउंडर एआई</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: API Settings Screen (Only Groq API Key) -->
     <div id="settings-tab" class="tab-content flex-col flex-1 p-6 space-y-6 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg space-y-4">
+        <div class="bg-[#1E293B] border border-slate-700 p-5 rounded-2xl shadow-lg space-y-4">
             <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
-                <i class="fa-solid fa-key text-emerald-400"></i> API Settings
+                <i class="fa-solid fa-key text-green-400"></i> API Settings
             </h2>
             <p class="text-xs text-slate-400">
-                यहाँ अपनी Groq API Key दर्ज करें। यह चाबी केवल आपके मोबाइल/ब्राउज़र के लोकल स्टोरेज (LocalStorage) में सुरक्षित रहेगी और कभी गिटहब पर लीक नहीं होगी।
+                यहाँ अपनी Groq API Key दर्ज करें। यह सुरक्षित रूप से आपके डिवाइस के लोकल स्टोरेज में सेव रहेगी।
             </p>
             <div class="space-y-2">
-                <label class="text-xs font-semibold text-slate-300">Groq API Key:</label>
-                <input type="password" id="api-key-input" placeholder="gsk_..." 
-                    class="w-full bg-slate-800 text-slate-100 placeholder-slate-500 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 border border-slate-700">
+                <label class="text-xs font-semibold text-green-400">Groq API Key:</label>
+                <input type="password" id="groq-key-input" placeholder="gsk_..." 
+                    class="w-full bg-[#0F172A] text-slate-100 placeholder-slate-500 text-sm rounded-xl px-4 py-3 focus:outline-none border border-slate-700">
             </div>
-            <button onclick="saveApiKey()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl transition shadow-md">
-                API Key सेव करें
+            <button onclick="saveKeys()" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-xl transition shadow-md text-sm">
+                Save Configurations
             </button>
-            <p id="save-status" class="text-xs text-center text-emerald-400 hidden">API Key सफलतापूर्वक सेव हो गई है!</p>
+            <p id="save-status" class="text-xs text-center text-green-400 hidden">✅ सेटिंग्स सफलतापूर्वक सेव हो गई हैं!</p>
         </div>
     </div>
 
     <!-- Bottom Navigation Bar -->
-    <nav class="bg-slate-900 border-t border-slate-800 flex justify-around py-3 text-xs text-slate-400">
-        <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center text-emerald-400">
-            <i class="fa-solid fa-briefcase text-lg mb-1"></i>
+    <nav class="bg-[#1E293B] border-t border-slate-800 flex justify-around py-3 text-xs text-slate-400">
+        <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center text-green-400">
+            <i class="fa-solid fa-business-center text-lg mb-1"></i>
             <span>Business Chat</span>
         </button>
-        <button onclick="alert('मोड्स जल्द आ रहे हैं!')" class="flex flex-col items-center hover:text-slate-200">
-            <i class="fa-solid fa-grid-2 text-lg mb-1"></i>
+        <button onclick="switchTab('modes')" id="nav-modes" class="flex flex-col items-center hover:text-slate-200">
+            <i class="fa-solid fa-grid-view text-lg mb-1"></i>
             <span>10 Modes</span>
         </button>
         <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center hover:text-slate-200">
@@ -84,42 +160,116 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // Page Load पर चेक करें कि क्या पहले से की सेव है
+        let activeBusiness = "General Business";
+        let activeSystemPrompt = "तुम एक एक्सपर्ट बिजनेस कंसलटेंट हो जो कंपनियों और स्टार्टअप्स को आगे बढ़ाने में मदद करते हैं।";
+        let messagesList = [];
+
         window.onload = function() {
             const savedKey = localStorage.getItem('groq_api_key');
-            if (savedKey) {
-                document.getElementById('api-key-input').value = savedKey;
+            if (savedKey) document.getElementById('groq-key-input').value = savedKey;
+
+            const savedBiz = localStorage.getItem('biz_type');
+            const savedPrompt = localStorage.getItem('biz_prompt');
+            if (savedBiz) activeBusiness = savedBiz;
+            if (savedPrompt) activeSystemPrompt = savedPrompt;
+
+            document.getElementById('header-subtitle').innerText = `बिजनेस: ${activeBusiness}`;
+            document.getElementById('business-type-input').value = activeBusiness;
+            document.getElementById('custom-prompt-input').value = activeSystemPrompt;
+
+            const savedChat = localStorage.getItem('chat_messages');
+            if (savedChat) {
+                try {
+                    messagesList = JSON.parse(savedChat);
+                    renderMessages();
+                } catch(e) { messagesList = []; }
+            } else {
+                messagesList.push({
+                    'sender': 'ai', 
+                    'text': `नमस्ते! Llama 3.3 (70B) मॉडल के साथ आपका बिजनेस एआई पार्टनर तैयार है। वर्तमान बिजनेस: ${activeBusiness}`
+                });
+                renderMessages();
             }
         };
 
-        // Tab Switching Logic
-        function switchTab(tabName) {
-            const chatTab = document.getElementById('chat-tab');
-            const settingsTab = document.getElementById('settings-tab');
-            const navChat = document.getElementById('nav-chat');
-            const navSettings = document.getElementById('nav-settings');
+        function renderMessages() {
+            const container = document.getElementById('chat-container');
+            container.innerHTML = '';
+            messagesList.forEach(msg => {
+                const isUser = msg.sender === 'user';
+                container.innerHTML += `
+                    <div class="flex ${isUser ? 'justify-end' : 'items-start space-x-2'}">
+                        <div class="${isUser ? 'bg-indigo-600 text-white' : 'bg-[#334155] text-slate-100'} p-3 rounded-2xl max-w-[85%] text-sm shadow">
+                            ${msg.text}
+                        </div>
+                    </div>
+                `;
+            });
+            container.scrollTop = container.scrollHeight;
+        }
 
-            if (tabName === 'chat') {
-                chatTab.classList.add('active');
-                settingsTab.classList.remove('active');
-                navChat.classList.add('text-emerald-400');
-                navSettings.classList.remove('text-emerald-400');
+        function saveChatStorage() {
+            localStorage.setItem('chat_messages', JSON.stringify(messagesList));
+        }
+
+        function switchTab(tabName) {
+            const tabs = ['chat', 'modes', 'settings'];
+            tabs.forEach(t => {
+                document.getElementById(`${t}-tab`).classList.remove('active');
+                document.getElementById(`nav-${t}`).classList.remove('text-green-400');
+                document.getElementById(`nav-${t}`).classList.add('text-slate-400');
+            });
+
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            document.getElementById(`nav-${tabName}`).classList.add('text-green-400');
+            document.getElementById(`nav-${tabName}`).classList.remove('text-slate-400');
+
+            if(tabName === 'chat') {
+                document.getElementById('tune-btn').classList.remove('hidden');
             } else {
-                settingsTab.classList.add('active');
-                chatTab.classList.remove('active');
-                navSettings.classList.add('text-emerald-400');
-                navChat.classList.remove('text-emerald-400');
+                document.getElementById('tune-btn').classList.add('hidden');
+                document.getElementById('edit-form-container').classList.add('hidden');
             }
         }
 
-        // Save API Key to LocalStorage
-        function saveApiKey() {
-            const keyInput = document.getElementById('api-key-input').value.trim();
-            if (!keyInput) {
+        function toggleEditForm() {
+            const form = document.getElementById('edit-form-container');
+            form.classList.toggle('hidden');
+        }
+
+        function saveAndActivateBusinessMode() {
+            const businessName = document.getElementById('business-type-input').value.trim();
+            const promptText = document.getElementById('custom-prompt-input').value.trim();
+
+            if (businessName === '' || promptText === '') {
+                alert('⚠️ कृपया ऊपर बिजनेस का नाम और नीचे प्रॉम्प्ट दोनों भरें!');
+                return;
+            }
+
+            activeBusiness = businessName;
+            activeSystemPrompt = promptText;
+
+            localStorage.setItem('biz_type', businessName);
+            localStorage.setItem('biz_prompt', promptText);
+
+            document.getElementById('header-subtitle').innerText = `बिजनेस: ${activeBusiness}`;
+            toggleEditForm();
+
+            messagesList.push({
+                'sender': 'ai', 
+                'text': `✅ नया बिजनेस मोड सेट हो गया: "${businessName}"। अब मैं Llama 3.3 के साथ इसी रोल में काम करूँगा।`
+            });
+            saveChatStorage();
+            renderMessages();
+        }
+
+        function saveKeys() {
+            const groqKey = document.getElementById('groq-key-input').value.trim();
+            if(!groqKey) {
                 alert('कृपया वैध Groq API Key दर्ज करें!');
                 return;
             }
-            localStorage.setItem('groq_api_key', keyInput);
+            localStorage.setItem('groq_api_key', groqKey);
             const status = document.getElementById('save-status');
             status.classList.remove('hidden');
             setTimeout(() => {
@@ -128,81 +278,68 @@
             }, 1500);
         }
 
-        // Send Message Function using saved API Key
         async function sendMessage() {
-            const apiKey = localStorage.getItem('groq_api_key');
-            if (!apiKey) {
-                alert('पहले कृपया API Settings में जाकर अपनी Groq API Key सेव करें!');
-                switchTab('settings');
-                return;
-            }
+            const messageInput = document.getElementById('user-input');
+            const userText = messageInput.value.trim();
+            if (userText === '') return;
 
-            const inputField = document.getElementById('user-input');
-            const chatContainer = document.getElementById('chat-container');
-            const userText = inputField.value.trim();
+            messagesList.push({'sender': 'user', 'text': userText});
+            messageInput.value = '';
+            saveChatStorage();
+            renderMessages();
 
-            if (!userText) return;
-
-            // Append User Bubble
-            chatContainer.innerHTML += `
-                <div class="flex justify-end">
-                    <div class="bg-indigo-600 text-white p-3 rounded-2xl max-w-[85%] text-sm shadow">
-                        ${userText}
-                    </div>
-                </div>
-            `;
-            inputField.value = '';
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            // Loading placeholder
-            const loadingId = 'loading-' + Date.now();
-            chatContainer.innerHTML += `
-                <div id="${loadingId}" class="flex items-start space-x-2">
-                    <div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl text-sm text-slate-400 shadow">
-                        जवाब तैयार हो रहा है...
-                    </div>
-                </div>
-            `;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            document.getElementById('loading-bar').classList.remove('hidden');
 
             try {
+                const groqKey = localStorage.getItem('groq_api_key') || '';
+                if (groqKey === '') {
+                    document.getElementById('loading-bar').classList.add('hidden');
+                    messagesList.push({
+                        'sender': 'ai', 
+                        'text': '⚠️ कृपया पहले "API Settings" टैब में जाकर अपनी Groq API Key सेव करें!'
+                    });
+                    renderMessages();
+                    switchTab('settings');
+                    return;
+                }
+
                 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
+                        'Authorization': `Bearer ${groqKey}`,
                     },
                     body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
-                        messages: [{ role: "user", content: userText }]
-                    })
+                        "model": "llama-3.3-70b-versatile",
+                        "messages": [
+                            {"role": "system", "content": activeSystemPrompt},
+                            {"role": "user", "content": userText}
+                        ],
+                    }),
                 });
 
-                const data = await response.json();
-                document.getElementById(loadingId).remove();
+                document.getElementById('loading-bar').classList.add('hidden');
 
-                const aiReply = data.choices && data.choices[0] ? data.choices[0].message.content : (data.error ? data.error.message : "क्षमा करें, रिस्पॉन्स प्राप्त करने में दिक्कत आई।");
+                if (response.ok) {
+                    const data = await response.json();
+                    let aiResponse = data.choices[0].message.content;
+                    messagesList.push({'sender': 'ai', 'text': aiResponse});
+                } else {
+                    const errBody = await response.text();
+                    messagesList.push({'sender': 'ai', 'text': `❌ API एरर (${response.status}): ${errBody}`});
+                }
+                saveChatStorage();
+                renderMessages();
 
-                // Append AI Bubble
-                chatContainer.innerHTML += `
-                    <div class="flex items-start space-x-2">
-                        <div class="bg-slate-800 border border-slate-700 p-3 rounded-2xl max-w-[85%] text-sm text-slate-200 shadow">
-                            ${aiReply}
-                        </div>
-                    </div>
-                `;
-            } catch (error) {
-                document.getElementById(loadingId).remove();
-                chatContainer.innerHTML += `
-                    <div class="flex items-start space-x-2">
-                        <div class="bg-red-950 border border-red-800 p-3 rounded-2xl max-w-[85%] text-sm text-red-200 shadow">
-                            कनेक्शन एरर: ${error.message}
-                        </div>
-                    </div>
-                `;
+            } catch (e) {
+                document.getElementById('loading-bar').classList.add('hidden');
+                messagesList.push({'sender': 'ai', 'text': `❌ कनेक्शन एरर: $e`});
+                saveChatStorage();
+                renderMessages();
             }
-            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
+
+        document.getElementById('tune-btn').classList.remove('hidden');
     </script>
 </body>
 </html>
