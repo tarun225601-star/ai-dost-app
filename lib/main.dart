@@ -507,8 +507,13 @@ Future<void> callGroqApi() async {
       print("वजह: ${response.body}");
     }
   } catch (e, stackTrace) {
-    print("❌ असली एरर की वजह यह रही: $e");
+      } catch (e, stackTrace) {
+    setState(() {
+      errorMessage = "❌ असली एरर: $e"; // यह सीधा स्क्रीन के वेरिएबल को अपडेट कर देगा
+    });
     print("स्टैक ट्रेस: $stackTrace");
+  }
+  
   }
 }
 
