@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viziya - Real Media Feed</title>
+    <title>Viziya - Ultimate AI & Live Media Mirror</title>
+    <!-- Supabase JS Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-color: #05070b;
@@ -209,7 +211,7 @@
             color: #e2e8f0;
         }
 
-        /* Working Settings Modal Panel */
+        /* Master Settings Modal Panel */
         #settingsModal {
             display: none;
             position: fixed;
@@ -219,16 +221,18 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            overflow-y: auto;
         }
 
         .modal-content {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             background: var(--surface-color);
             border: 1px solid var(--neon-glow);
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 0 35px rgba(0, 240, 255, 0.3);
+            margin: auto;
         }
 
         .field-label {
@@ -286,12 +290,12 @@
 <body>
 
     <div class="app-wrapper">
-        <!-- Top App Bar with Working Settings Icon -->
+        <!-- Top App Bar -->
         <header class="app-header">
             <h1 class="logo-title">VIZIYA</h1>
             <div class="header-icons">
                 <div class="icon-btn" onclick="initRealCamera()" title="Start Camera">📷</div>
-                <div class="icon-btn" onclick="openSettingsModal()" title="API Settings">⚙️</div>
+                <div class="icon-btn" onclick="openSettingsModal()" title="Master Settings">⚙️</div>
             </div>
         </header>
 
@@ -307,19 +311,19 @@
                 <button class="btn btn-primary" style="margin-top: 12px;" onclick="initRealCamera()">Start Camera Feed</button>
             </div>
 
-            <!-- 2. Real Direct Gallery Upload (Instagram Style) -->
+            <!-- 2. Direct Gallery Media Upload -->
             <div class="card">
-                <div class="card-title">✨ Direct Gallery Media Upload</div>
+                <div class="card-title">✨ Direct Gallery Media Upload (Supabase Cloud)</div>
                 <input type="file" id="realMediaFile" class="input-field" accept="image/*,video/*" style="padding: 10px; background: #000; border-style: dashed;">
                 <input type="text" id="postCaption" class="input-field" placeholder="Write caption for your media...">
-                <button class="btn btn-primary" onclick="publishDirectMedia()">Post to Feed</button>
+                <button class="btn btn-primary" onclick="publishDirectMedia()">Post to Cloud Feed</button>
             </div>
 
-            <!-- 3. Live Feed Stream -->
+            <!-- 3. Live Cloud Feed Stream -->
             <div id="realFeedContainer"></div>
         </div>
 
-        <!-- Dedicated Settings Modal Panel with API Inputs -->
+        <!-- Master Settings Modal Panel (All APIs & Keys) -->
         <div id="settingsModal">
             <div class="modal-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -328,22 +332,27 @@
                 </div>
                 
                 <div style="margin-bottom: 10px;">
-                    <span class="field-label">1. WebRTC Signaling API Key</span>
-                    <input type="text" id="cfgSignaling" class="input-field" placeholder="Enter signaling key...">
+                    <span class="field-label">1. Supabase Project URL</span>
+                    <input type="text" id="cfgSupabaseUrl" class="input-field" placeholder="https://xyz.supabase.co">
                 </div>
 
                 <div style="margin-bottom: 10px;">
-                    <span class="field-label">2. AI Vibe Token</span>
-                    <input type="text" id="cfgAi" class="input-field" placeholder="Enter AI token...">
+                    <span class="field-label">2. Supabase Anon / Public Key</span>
+                    <input type="text" id="cfgSupabaseKey" class="input-field" placeholder="eyJhbGciOiJIUzI1NiIsIn...">
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <span class="field-label">3. Agora App ID / SDK Key (Starts & ends with 4)</span>
+                    <input type="text" id="cfgAgoraId" class="input-field" placeholder="Enter Agora App ID...">
                 </div>
 
                 <div style="margin-bottom: 15px;">
-                    <span class="field-label">3. Enterprise SDK Key</span>
-                    <input type="text" id="cfgSdk" class="input-field" placeholder="Enter SDK key...">
+                    <span class="field-label">4. Grok AI API Key</span>
+                    <input type="text" id="cfgGrokKey" class="input-field" placeholder="xai-...">
                 </div>
 
-                <button class="btn btn-primary" onclick="saveAllApiKeys()">Save Keys Permanently</button>
-                <div id="saveMsg" class="save-msg">✓ All API Keys saved permanently!</div>
+                <button class="btn btn-primary" onclick="saveAllMasterKeys()">Save All Keys Permanently</button>
+                <div id="saveMsg" class="save-msg">✓ All Master Keys Saved Successfully!</div>
             </div>
         </div>
 
@@ -356,28 +365,57 @@
     </div>
 
     <script>
-        // --- Working Settings Modal Logic ---
+        let supabaseClient = null;
+
+        function initMasterConfigs() {
+            const url = localStorage.getItem('viziya_supabase_url');
+            const key = localStorage.getItem('viziya_supabase_key');
+            if (url && key) {
+                try {
+                    supabaseClient = window.supabase.createClient(url, key);
+                    fetchCloudPosts();
+                } catch (e) {
+                    console.error("Supabase init error:", e);
+                }
+            }
+        }
+
+        // --- Settings Modal Logic ---
         function openSettingsModal() {
             document.getElementById('settingsModal').style.display = 'flex';
-            document.getElementById('cfgSignaling').value = localStorage.getItem('viziya_signaling_key') || '';
-            document.getElementById('cfgAi').value = localStorage.getItem('viziya_ai_token') || '';
-            document.getElementById('cfgSdk').value = localStorage.getItem('viziya_sdk_key') || '';
+            document.getElementById('cfgSupabaseUrl').value = localStorage.getItem('viziya_supabase_url') || '';
+            document.getElementById('cfgSupabaseKey').value = localStorage.getItem('viziya_supabase_key') || '';
+            document.getElementById('cfgAgoraId').value = localStorage.getItem('viziya_agora_id') || '';
+            document.getElementById('cfgGrokKey').value = localStorage.getItem('viziya_grok_key') || '';
         }
 
         function closeSettingsModal() {
             document.getElementById('settingsModal').style.display = 'none';
         }
 
-        function saveAllApiKeys() {
-            localStorage.setItem('viziya_signaling_key', document.getElementById('cfgSignaling').value.trim());
-            localStorage.setItem('viziya_ai_token', document.getElementById('cfgAi').value.trim());
-            localStorage.setItem('viziya_sdk_key', document.getElementById('cfgSdk').value.trim());
+        function saveAllMasterKeys() {
+            const url = document.getElementById('cfgSupabaseUrl').value.trim();
+            const key = document.getElementById('cfgSupabaseKey').value.trim();
+            const agoraId = document.getElementById('cfgAgoraId').value.trim();
+            const grokKey = document.getElementById('cfgGrokKey').value.trim();
+
+            if (!url || !key) {
+                alert("Supabase URL and Key are required for database feed!");
+                return;
+            }
+
+            localStorage.setItem('viziya_supabase_url', url);
+            localStorage.setItem('viziya_supabase_key', key);
+            localStorage.setItem('viziya_agora_id', agoraId);
+            localStorage.setItem('viziya_grok_key', grokKey);
 
             const msg = document.getElementById('saveMsg');
             msg.style.display = 'block';
+            
             setTimeout(() => {
                 msg.style.display = 'none';
                 closeSettingsModal();
+                initMasterConfigs();
             }, 1500);
         }
 
@@ -388,19 +426,23 @@
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
                 videoElement.srcObject = stream;
             } catch (err) {
-                alert("Camera access error: " + err.message);
+                console.log("Camera notice: " + err.message);
             }
         }
 
-        // --- Direct Gallery File Upload Logic (Instagram Style) ---
-        let realPosts = JSON.parse(localStorage.getItem('vizia_direct_media_posts')) || [];
-
+        // --- Direct Gallery File Upload & Supabase Sync ---
         window.onload = () => {
-            renderRealFeed();
             initRealCamera();
+            initMasterConfigs();
         };
 
         function publishDirectMedia() {
+            if (!supabaseClient) {
+                alert("Please configure your Supabase settings in the ⚙️ panel first!");
+                openSettingsModal();
+                return;
+            }
+
             const fileInput = document.getElementById('realMediaFile');
             const caption = document.getElementById('postCaption').value.trim();
 
@@ -412,59 +454,82 @@
             const file = fileInput.files[0];
             const reader = new FileReader();
 
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 const base64Data = e.target.result;
                 const isVideo = file.type.startsWith('video');
 
                 const newPost = {
-                    user: 'Tarun Viziya',
+                    user_name: 'Tarun Viziya',
                     handle: '@viziya_global',
-                    media: base64Data,
-                    type: isVideo ? 'video' : 'image',
+                    media_url: base64Data,
+                    media_type: isVideo ? 'video' : 'image',
                     caption: caption || 'Direct live gallery drop 🚀'
                 };
 
-                realPosts.unshift(newPost);
-                localStorage.setItem('vizia_direct_media_posts', JSON.stringify(realPosts));
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('posts')
+                        .insert([newPost]);
 
-                document.getElementById('postCaption').value = '';
-                fileInput.value = '';
-                renderRealFeed();
+                    if (error) {
+                        alert("Supabase Error: " + error.message + "\n(Make sure 'posts' table exists in Supabase)");
+                    } else {
+                        document.getElementById('postCaption').value = '';
+                        fileInput.value = '';
+                        fetchCloudPosts();
+                    }
+                } catch (err) {
+                    alert("Upload failed: " + err.message);
+                }
             };
 
             reader.readAsDataURL(file);
         }
 
-        function renderRealFeed() {
+        async function fetchCloudPosts() {
             const container = document.getElementById('realFeedContainer');
-            container.innerHTML = '';
             
-            if(realPosts.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">No posts yet. Select a photo/video above to post!</div>`;
+            if (!supabaseClient) {
+                container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">Configure Supabase in settings to view cloud feed.</div>`;
                 return;
             }
 
-            realPosts.forEach(p => {
-                let mediaHtml = p.type === 'video' 
-                    ? `<video src="${p.media}" class="post-media" controls autoplay loop muted playsinline></video>`
-                    : `<img src="${p.media}" class="post-media">`;
+            try {
+                const { data: posts, error } = await supabaseClient
+                    .from('posts')
+                    .select('*')
+                    .order('id', { ascending: false });
 
-                container.innerHTML += `
-                    <div class="post-card">
-                        <div class="post-header">
-                            <div class="avatar-circle">${p.user.charAt(0)}</div>
-                            <div>
-                                <strong style="font-size: 13px; display: block; color: #fff;">${p.user}</strong>
-                                <span style="font-size: 10px; color: var(--neon-glow);">${p.handle}</span>
+                if (error || !posts || posts.length === 0) {
+                    container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">No cloud posts found yet. Post something above!</div>`;
+                    return;
+                }
+
+                container.innerHTML = '';
+                posts.forEach(p => {
+                    let mediaHtml = p.media_type === 'video' 
+                        ? `<video src="${p.media_url}" class="post-media" controls autoplay loop muted playsinline></video>`
+                        : `<img src="${p.media_url}" class="post-media">`;
+
+                    container.innerHTML += `
+                        <div class="post-card">
+                            <div class="post-header">
+                                <div class="avatar-circle">${p.user_name ? p.user_name.charAt(0) : 'T'}</div>
+                                <div>
+                                    <strong style="font-size: 13px; display: block; color: #fff;">${p.user_name || 'User'}</strong>
+                                    <span style="font-size: 10px; color: var(--neon-glow);">${p.handle || '@viziya'}</span>
+                                </div>
+                            </div>
+                            ${mediaHtml}
+                            <div class="post-footer">
+                                <strong style="color: #fff; margin-right: 6px;">${p.user_name || 'User'}</strong>${p.caption || ''}
                             </div>
                         </div>
-                        ${mediaHtml}
-                        <div class="post-footer">
-                            <strong style="color: #fff; margin-right: 6px;">${p.user}</strong>${p.caption}
-                        </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            } catch (err) {
+                console.error("Fetch error:", err);
+            }
         }
     </script>
 </body>
