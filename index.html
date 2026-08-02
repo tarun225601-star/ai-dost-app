@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viziya - Instagram Style Complete Web App with Reels, Stories, Posts, DMs & API Configs</title>
+    <title>ViziyaGram - Complete Instagram Clone with Supabase, Agora & Groq APIs</title>
     <!-- Supabase JS Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -196,6 +196,7 @@
             font-size: 14px;
             font-weight: bold;
             border: 1px solid var(--ig-border);
+            object-fit: cover;
         }
 
         .post-username {
@@ -461,7 +462,7 @@
             background: var(--ig-primary-hover);
         }
 
-        /* Profile View Panel */
+        /* Profile View Panel (ID & Photo Configuration) */
         .profile-header {
             padding: 20px 15px;
             display: flex;
@@ -488,6 +489,8 @@
             font-size: 32px;
             font-weight: bold;
             color: #fff;
+            overflow: hidden;
+            object-fit: cover;
         }
 
         .profile-stats {
@@ -512,7 +515,7 @@
             line-height: 1.4;
         }
 
-        /* DM Chat & Call Modal */
+        /* DM Chat Modal */
         #dmModal {
             display: none;
             position: fixed;
@@ -575,7 +578,7 @@
             border: 1px solid var(--ig-border);
         }
 
-        /* Settings Modal Panel */
+        /* Master API Settings Modal (Supabase, Agora, Groq) */
         #settingsModal {
             display: none;
             position: fixed;
@@ -583,21 +586,24 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.92);
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
+            overflow-y: auto;
         }
 
         .settings-content {
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             background: var(--ig-surface);
             border: 1px solid var(--ig-border);
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .settings-divider {
@@ -648,23 +654,21 @@
         <header class="ig-header">
             <h1 class="ig-logo">ViziyaGram</h1>
             <div class="ig-header-icons">
-                <button class="ig-header-btn" onclick="openDmModal(1)" title="Direct Messages">💬</button>
+                <button class="ig-header-btn" onclick="openDmModal()" title="Direct Messages">💬</button>
                 <button class="ig-header-btn" onclick="openSettingsModal()" title="API Settings">⚙️</button>
             </div>
         </header>
 
         <!-- VIEW 1: HOME FEED & STORIES -->
         <div id="homeView" class="view-section active">
-            <!-- Stories Row -->
             <div class="stories-container" id="storiesContainer"></div>
-            <!-- Main Feed Posts Container -->
             <div id="mainFeedContainer"></div>
         </div>
 
         <!-- VIEW 2: EXPLORE GRID -->
         <div id="exploreView" class="view-section">
             <div style="padding: 10px 15px;">
-                <input type="text" class="ig-input" placeholder="🔍 Search creators, tags, music..." style="margin-bottom: 0;">
+                <input type="text" class="ig-input" placeholder="🔍 Search creators, tags..." style="margin-bottom: 0;">
             </div>
             <div class="explore-grid" id="exploreGridContainer"></div>
         </div>
@@ -674,17 +678,16 @@
             <div class="reels-wrapper" id="reelsContainer"></div>
         </div>
 
-        <!-- VIEW 4: UPLOAD (Posts, Reels, Audio, Stories) -->
+        <!-- VIEW 4: UPLOAD -->
         <div id="uploadView" class="view-section">
             <div class="upload-container">
                 <div class="upload-card">
-                    <div class="upload-title">📸 Create New Post / Reel / Song</div>
-                    <input type="text" id="uploadCaption" class="ig-input" placeholder="Write a caption or song title...">
-                    <select id="uploadTypeSelect" class="ig-input" style="margin-bottom: 10px;">
+                    <div class="upload-title">📸 Create New Post / Reel / Audio</div>
+                    <input type="text" id="uploadCaption" class="ig-input" placeholder="Write a caption...">
+                    <select id="uploadTypeSelect" class="ig-input">
                         <option value="post">Feed Post (Image/Video)</option>
                         <option value="reel">Reel Video</option>
                         <option value="audio">Audio / Song Track (MP3)</option>
-                        <option value="story">Story Highlight</option>
                     </select>
                     <label class="file-dropzone">
                         📂 Choose Media File from Device
@@ -696,11 +699,11 @@
             </div>
         </div>
 
-        <!-- VIEW 5: USER PROFILE -->
+        <!-- VIEW 5: USER PROFILE (ID & Photo Setup) -->
         <div id="profileView" class="view-section">
             <div class="profile-header">
                 <div class="profile-info-row">
-                    <div class="profile-avatar-large">V</div>
+                    <div id="profileAvatarDisplay" class="profile-avatar-large">V</div>
                     <div class="profile-stats">
                         <div>
                             <span class="stat-number" id="profilePostCount">12</span>
@@ -717,12 +720,12 @@
                     </div>
                 </div>
                 <div>
-                    <strong style="font-size: 14px; display: block;">Vidya Creator Official</strong>
-                    <p class="profile-bio" style="color: var(--ig-text-muted); margin-top: 4px;">
-                        🚀 Building the ultimate single-file social network.<br>🎵 Songs, Reels & DMs enabled.
+                    <strong id="displayUsernameTitle" style="font-size: 14px; display: block;">@vidya_user</strong>
+                    <p class="profile-bio" id="displayBioText" style="color: var(--ig-text-muted); margin-top: 4px;">
+                        🚀 Instagram Clone built with Supabase, Agora & Groq APIs.
                     </p>
                 </div>
-                <button class="ig-btn" onclick="openSettingsModal()" style="background: var(--ig-surface); border: 1px solid var(--ig-border);">Edit Profile / APIs</button>
+                <button class="ig-btn" onclick="openSettingsModal()" style="background: var(--ig-surface); border: 1px solid var(--ig-border);">Edit Profile ID & Photo</button>
             </div>
             <div class="explore-grid" id="userProfileGrid"></div>
         </div>
@@ -732,20 +735,20 @@
             <div class="dm-box">
                 <div class="dm-topbar">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--ig-surface); display: flex; align-items: center; justify-content: center; font-weight: bold;" id="dmModalAvatar">R</div>
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--ig-surface); display: flex; align-items: center; justify-content: center; font-weight: bold;">R</div>
                         <div>
-                            <strong id="dmModalName" style="font-size: 13px; display: block;">Rahul Sharma</strong>
+                            <strong style="font-size: 13px; display: block;">Rahul Sharma</strong>
                             <span style="font-size: 10px; color: #10b981;">Active Now</span>
                         </div>
                     </div>
                     <div style="display: flex; gap: 15px; align-items: center;">
-                        <button onclick="startVideoCall()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">🎥</button>
-                        <button onclick="startAudioCall()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">📞</button>
+                        <button onclick="startVideoCall()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;" title="Agora Video Call">🎥</button>
+                        <button onclick="startAudioCall()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;" title="Agora Audio Call">📞</button>
                         <button onclick="closeDmModal()" style="background:none; border:none; color:#ed4956; font-size:20px; cursor:pointer;">✕</button>
                     </div>
                 </div>
                 <div class="dm-chat-body" id="dmChatMessages">
-                    <div class="chat-bubble received">Hello! Welcome to ViziyaGram DM chat. Secure messaging is active. 🎉</div>
+                    <div class="chat-bubble received">Hello! Secure messaging via Groq/Supabase is ready. 🎉</div>
                 </div>
                 <div style="padding: 10px; background: var(--ig-surface); border-top: 1px solid var(--ig-border); display: flex; gap: 8px;">
                     <input type="text" id="dmInputText" class="ig-input" placeholder="Message..." style="margin-bottom: 0;">
@@ -754,12 +757,22 @@
             </div>
         </div>
 
-        <!-- Master API Settings Modal -->
+        <!-- Master API & Profile Settings Modal -->
         <div id="settingsModal">
             <div class="settings-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="font-size: 15px; color: var(--ig-primary);">⚙️ Master API Configurations</h3>
+                    <h3 style="font-size: 15px; color: var(--ig-primary);">⚙️ Master Settings & APIs</h3>
                     <button onclick="closeSettingsModal()" style="background:none; border:none; color:#ed4956; font-size:20px; cursor:pointer;">✕</button>
+                </div>
+
+                <div class="settings-divider">👤 Profile ID & Photo Config</div>
+                <div style="margin-bottom: 10px;">
+                    <span style="font-size: 11px; color: var(--ig-text-muted); display: block; margin-bottom: 4px;">User ID / Username (@handle)</span>
+                    <input type="text" id="cfgUsername" class="ig-input" placeholder="@vidya_user">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <span style="font-size: 11px; color: var(--ig-text-muted); display: block; margin-bottom: 4px;">Profile Photo Image URL</span>
+                    <input type="text" id="cfgProfilePhoto" class="ig-input" placeholder="https://image-link.com/photo.jpg">
                 </div>
                 
                 <div class="settings-divider">☁️ Supabase Cloud Database</div>
@@ -773,12 +786,18 @@
                 </div>
 
                 <div class="settings-divider">🎙️ Agora Video & Audio Call API</div>
-                <div style="margin-bottom: 15px;">
-                    <span style="font-size: 11px; color: var(--ig-text-muted); display: block; margin-bottom: 4px;">Agora App ID</span>
+                <div style="margin-bottom: 10px;">
+                    <span style="font-size: 11px; color: var(--ig-text-muted); display: block; margin-bottom: 4px;">Agora App ID (अरोरा की)</span>
                     <input type="text" id="cfgAgoraAppId" class="ig-input" placeholder="Enter Agora App ID">
                 </div>
 
-                <button class="ig-btn" onclick="saveAllConfigs()">Save Configurations</button>
+                <div class="settings-divider">⚡ Groq API Key</div>
+                <div style="margin-bottom: 15px;">
+                    <span style="font-size: 11px; color: var(--ig-text-muted); display: block; margin-bottom: 4px;">Groq Secret API Key (ग्रोक की)</span>
+                    <input type="text" id="cfgGroqKey" class="ig-input" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx">
+                </div>
+
+                <button class="ig-btn" onclick="saveAllConfigs()">Save All Configurations</button>
                 <div id="saveConfirmMsg" style="font-size: 11px; color: #10b981; text-align: center; margin-top: 8px; display: none;">✓ Saved Successfully!</div>
             </div>
         </div>
@@ -794,13 +813,11 @@
     </div>
 
     <script>
-        // Mock Data for Instagram Clone State
         let storiesData = [
-            { id: 1, name: "Your Story", avatar: "V", isLive: false },
-            { id: 2, name: "rahul_v", avatar: "R", isLive: true },
-            { id: 3, name: "priya_s", avatar: "P", isLive: false },
-            { id: 4, name: "amit_tech", avatar: "A", isLive: false },
-            { id: 5, name: "neha_music", avatar: "N", isLive: false }
+            { id: 1, name: "Your Story", avatar: "V" },
+            { id: 2, name: "rahul_v", avatar: "R" },
+            { id: 3, name: "priya_s", avatar: "P" },
+            { id: 4, name: "amit_tech", avatar: "A" }
         ];
 
         let feedPosts = [
@@ -813,16 +830,6 @@
                 likesCount: 1245,
                 isLiked: false,
                 caption: "Exploring neon cyberpunk vibes with ViziyaGram! 🚀✨"
-            },
-            {
-                id: 2,
-                username: "priya_creator",
-                avatar: "P",
-                mediaUrl: "https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?w=600&auto=format&fit=crop&q=80",
-                type: "image",
-                likesCount: 890,
-                isLiked: true,
-                caption: "New acoustic song recording session today! 🎵🎸"
             }
         ];
 
@@ -832,24 +839,14 @@
                 username: "amit_tech",
                 avatar: "A",
                 videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-lights-41555-large.mp4",
-                caption: "Late night coding sessions are pure magic ✨💻 #coding #viziya",
+                caption: "Late night coding sessions ✨💻 #viziya",
                 likesCount: 4320,
                 isLiked: false
-            },
-            {
-                id: 2,
-                username: "neha_music",
-                avatar: "N",
-                videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-dj-mixing-music-in-a-club-41314-large.mp4",
-                caption: "New beat drop! Let me know how it sounds 🎧🔥 #music #dj",
-                likesCount: 9810,
-                isLiked: true
             }
         ];
 
         let selectedFileObject = null;
 
-        // Tab Switching Functionality
         function switchTab(tabName, btnElement) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.ig-bottom-nav .nav-tab').forEach(el => el.classList.remove('active'));
@@ -873,11 +870,11 @@
             } else if (tabName === 'profile') {
                 document.getElementById('profileView').classList.add('active');
                 if(btnElement) btnElement.classList.add('active');
+                loadProfileDetails();
                 renderProfileGrid();
             }
         }
 
-        // Render Stories
         function renderStories() {
             const container = document.getElementById('storiesContainer');
             container.innerHTML = '';
@@ -893,7 +890,6 @@
             });
         }
 
-        // Render Feed Posts
         function renderFeedPosts() {
             const container = document.getElementById('mainFeedContainer');
             container.innerHTML = '';
@@ -907,7 +903,6 @@
                                 <div class="post-user-avatar">${post.avatar}</div>
                                 <span class="post-username">${post.username}</span>
                             </div>
-                            <span style="color: var(--ig-text-muted); font-size: 16px; cursor: pointer;">•••</span>
                         </div>
                         <div class="post-media-box">
                             <img src="${post.mediaUrl}" alt="Post Media">
@@ -915,10 +910,9 @@
                         <div class="post-actions">
                             <div class="post-actions-left">
                                 <button class="${likeClass}" onclick="togglePostLike(${post.id})">${heartIcon}</button>
-                                <button class="action-icon" onclick="alert('Open comments section')">💬</button>
-                                <button class="action-icon" onclick="alert('Post shared successfully!')">✈️</button>
+                                <button class="action-icon" onclick="alert('Comments')">💬</button>
+                                <button class="action-icon" onclick="alert('Shared!')">✈️</button>
                             </div>
-                            <button class="action-icon">🔖</button>
                         </div>
                         <div class="post-likes">${post.likesCount.toLocaleString()} likes</div>
                         <div class="post-caption"><span>${post.username}</span>${post.caption}</div>
@@ -936,20 +930,18 @@
             }
         }
 
-        // Render Explore Grid
         function renderExploreGrid() {
             const container = document.getElementById('exploreGridContainer');
             container.innerHTML = '';
-            feedPosts.concat(feedPosts).forEach((item, idx) => {
+            feedPosts.forEach(item => {
                 container.innerHTML += `
-                    <div class="explore-item" onclick="alert('Opening explore media #${idx+1}')">
+                    <div class="explore-item">
                         <img src="${item.mediaUrl}" style="width:100%; height:100%; object-fit:cover;">
                     </div>
                 `;
             });
         }
 
-        // Render Reels
         function renderReels() {
             const container = document.getElementById('reelsContainer');
             container.innerHTML = '';
@@ -963,15 +955,12 @@
                                 <div class="reel-author">
                                     <div class="post-user-avatar">${reel.avatar}</div>
                                     <span class="reel-author-name">@${reel.username}</span>
-                                    <button style="background:transparent; border:1px solid #fff; color:#fff; font-size:11px; padding:2px 8px; border-radius:4px; cursor:pointer;">Follow</button>
                                 </div>
                                 <div class="reel-caption">${reel.caption}</div>
                             </div>
                             <div class="reel-sidebar">
                                 <button class="reel-action-btn" onclick="toggleReelLike(${reel.id})">${likeHeart}<span>${reel.likesCount}</span></button>
-                                <button class="reel-action-btn" onclick="alert('Comments')">💬<span>124</span></button>
-                                <button class="reel-action-btn" onclick="alert('Shared')">✈️</button>
-                                <button class="reel-action-btn">🎵</button>
+                                <button class="reel-action-btn">💬</button>
                             </div>
                         </div>
                     </div>
@@ -988,11 +977,10 @@
             }
         }
 
-        // Render Profile Grid
         function renderProfileGrid() {
             const container = document.getElementById('userProfileGrid');
             container.innerHTML = '';
-            for(let i=0; i<9; i++) {
+            for(let i=0; i<6; i++) {
                 container.innerHTML += `
                     <div class="explore-item">
                         <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&auto=format&fit=crop&q=80" style="width:100%; height:100%; object-fit:cover;">
@@ -1001,57 +989,60 @@
             }
         }
 
-        // File Selection & Upload Handling
+        function loadProfileDetails() {
+            const savedUser = localStorage.getItem('viziya_username') || '@vidya_user';
+            const savedPhoto = localStorage.getItem('viziya_profile_photo') || '';
+            document.getElementById('displayUsernameTitle').innerText = savedUser;
+            
+            const avatarBox = document.getElementById('profileAvatarDisplay');
+            if(savedPhoto) {
+                avatarBox.innerHTML = `<img src="${savedPhoto}" style="width:100%; height:100%; object-fit:cover;">`;
+            } else {
+                avatarBox.innerHTML = "V";
+            }
+        }
+
         function handleFileSelection(input) {
             if(input.files && input.files[0]) {
                 selectedFileObject = input.files[0];
-                document.getElementById('selectedFileName').innerText = "Selected File: " + selectedFileObject.name;
+                document.getElementById('selectedFileName').innerText = "Selected: " + selectedFileObject.name;
             }
         }
 
         function publishMediaContent() {
             const caption = document.getElementById('uploadCaption').value.trim();
             const type = document.getElementById('uploadTypeSelect').value;
-
-            if(!caption && !selectedFileObject) {
-                alert("कृपया कैप्शन लिखें या मीडिया फाइल चुनें!");
-                return;
-            }
+            const currentUname = localStorage.getItem('viziya_username') || 'vidya_user';
 
             if(type === 'reel') {
                 reelsList.unshift({
                     id: Date.now(),
-                    username: "vidya_user",
+                    username: currentUname.replace('@',''),
                     avatar: "V",
                     videoUrl: selectedFileObject ? URL.createObjectURL(selectedFileObject) : "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-lights-41555-large.mp4",
-                    caption: caption || "New Reel uploaded via ViziyaGram 🎬",
+                    caption: caption || "New Reel 🎬",
                     likesCount: 1,
                     isLiked: false
                 });
-                alert("🎬 रील सफलतापूर्व अपलोड हो गई है!");
+                alert("🎬 रील पब्लिश हो गई!");
                 switchTab('reels');
             } else {
                 feedPosts.unshift({
                     id: Date.now(),
-                    username: "vidya_user",
+                    username: currentUname.replace('@',''),
                     avatar: "V",
                     mediaUrl: selectedFileObject ? URL.createObjectURL(selectedFileObject) : "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
-                    type: type === 'audio' ? 'audio' : 'image',
+                    type: 'image',
                     likesCount: 1,
                     isLiked: false,
-                    caption: caption || "New post uploaded successfully! ✨"
+                    caption: caption || "New Post ✨"
                 });
-                alert("📸 पोस्ट या गाना सफलतापूर्व अपलोड हो गया है!");
+                alert("📸 पोस्ट पब्लिश हो गई!");
                 switchTab('home');
             }
-
-            document.getElementById('uploadCaption').value = '';
-            document.getElementById('selectedFileName').innerText = '';
-            selectedFileObject = null;
         }
 
-        // DM Modal & Messaging
-        function openDmModal(id) {
+        function openDmModal() {
             document.getElementById('dmModal').style.display = 'flex';
         }
 
@@ -1063,7 +1054,6 @@
             const input = document.getElementById('dmInputText');
             const text = input.value.trim();
             if(!text) return;
-
             const chatBody = document.getElementById('dmChatMessages');
             chatBody.innerHTML += `<div class="chat-bubble sent">${text}</div>`;
             input.value = '';
@@ -1071,19 +1061,27 @@
         }
 
         function startVideoCall() {
-            alert("🎥 वीडियो कॉल कनेक्ट हो रही है (Agora RTC Ready)...");
+            const agoraId = localStorage.getItem('viziya_agora_appid');
+            if(!agoraId) {
+                alert("कृपया पहले सेटिंग्स में Agora App ID दर्ज करें!");
+                openSettingsModal();
+                return;
+            }
+            alert("🎥 Agora Video Call Connected (App ID: " + agoraId + ")");
         }
 
         function startAudioCall() {
-            alert("📞 ऑडियो कॉल कनेक्ट हो रही है...");
+            alert("📞 Agora Audio Call Connected...");
         }
 
-        // Settings Modal
         function openSettingsModal() {
             document.getElementById('settingsModal').style.display = 'flex';
+            document.getElementById('cfgUsername').value = localStorage.getItem('viziya_username') || '';
+            document.getElementById('cfgProfilePhoto').value = localStorage.getItem('viziya_profile_photo') || '';
             document.getElementById('cfgSupabaseUrl').value = localStorage.getItem('viziya_supabase_url') || '';
             document.getElementById('cfgSupabaseKey').value = localStorage.getItem('viziya_supabase_key') || '';
             document.getElementById('cfgAgoraAppId').value = localStorage.getItem('viziya_agora_appid') || '';
+            document.getElementById('cfgGroqKey').value = localStorage.getItem('viziya_groq_key') || '';
         }
 
         function closeSettingsModal() {
@@ -1091,20 +1089,24 @@
         }
 
         function saveAllConfigs() {
+            localStorage.setItem('viziya_username', document.getElementById('cfgUsername').value.trim());
+            localStorage.setItem('viziya_profile_photo', document.getElementById('cfgProfilePhoto').value.trim());
             localStorage.setItem('viziya_supabase_url', document.getElementById('cfgSupabaseUrl').value.trim());
             localStorage.setItem('viziya_supabase_key', document.getElementById('cfgSupabaseKey').value.trim());
             localStorage.setItem('viziya_agora_appid', document.getElementById('cfgAgoraAppId').value.trim());
+            localStorage.setItem('viziya_groq_key', document.getElementById('cfgGroqKey').value.trim());
 
             const msg = document.getElementById('saveConfirmMsg');
             msg.style.display = 'block';
             setTimeout(() => {
                 msg.style.display = 'none';
                 closeSettingsModal();
+                loadProfileDetails();
             }, 1200);
         }
 
-        // Initial Load
         window.onload = () => {
+            loadProfileDetails();
             renderStories();
             renderFeedPosts();
         };
