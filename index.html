@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viziya - Ultimate AI & Live Media Mirror</title>
+    <title>Viziya - Ultimate AI & Live Media Mirror with Music</title>
     <!-- Supabase JS Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -205,6 +205,18 @@
             background: #000;
         }
 
+        .song-tag {
+            background: rgba(176, 0, 255, 0.15);
+            border-top: 1px solid rgba(176, 0, 255, 0.3);
+            border-bottom: 1px solid rgba(176, 0, 255, 0.3);
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #e879f9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .post-footer {
             padding: 12px;
             font-size: 13px;
@@ -311,11 +323,19 @@
                 <button class="btn btn-primary" style="margin-top: 12px;" onclick="initRealCamera()">Start Camera Feed</button>
             </div>
 
-            <!-- 2. Direct Gallery Media Upload -->
+            <!-- 2. Direct Media Upload with Song Search Feature -->
             <div class="card">
-                <div class="card-title">✨ Direct Gallery Media Upload (Supabase Cloud)</div>
+                <div class="card-title">✨ Direct Media & Song Upload (Supabase Cloud)</div>
                 <input type="file" id="realMediaFile" class="input-field" accept="image/*,video/*" style="padding: 10px; background: #000; border-style: dashed;">
-                <input type="text" id="postCaption" class="input-field" placeholder="Write caption for your media...">
+                <input type="text" id="postCaption" class="input-field" placeholder="Write caption for your post...">
+                
+                <!-- Song Search & Select Component -->
+                <div style="position: relative; margin-bottom: 10px;">
+                    <input type="text" id="songSearchInput" class="input-field" placeholder="🔍 Search song (e.g. Animal, Arjit Singh...)" oninput="filterSongs(this.value)" style="margin-bottom: 2px;">
+                    <div id="songDropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; max-height:150px; overflow-y:auto; background:#111827; border:1px solid var(--neon-glow); border-radius:8px; z-index:50;"></div>
+                </div>
+                <div id="selectedSongBadge" style="font-size: 12px; color: #e879f9; margin-bottom: 10px; display: none;">🎵 Selected Song: <span id="songNameDisplay">None</span></div>
+
                 <button class="btn btn-primary" onclick="publishDirectMedia()">Post to Cloud Feed</button>
             </div>
 
@@ -323,7 +343,7 @@
             <div id="realFeedContainer"></div>
         </div>
 
-        <!-- Master Settings Modal Panel (All APIs & Keys) -->
+        <!-- Master Settings Modal Panel -->
         <div id="settingsModal">
             <div class="modal-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -341,18 +361,8 @@
                     <input type="text" id="cfgSupabaseKey" class="input-field" placeholder="eyJhbGciOiJIUzI1NiIsIn...">
                 </div>
 
-                <div style="margin-bottom: 10px;">
-                    <span class="field-label">3. Agora App ID / SDK Key (Starts & ends with 4)</span>
-                    <input type="text" id="cfgAgoraId" class="input-field" placeholder="Enter Agora App ID...">
-                </div>
-
-                <div style="margin-bottom: 15px;">
-                    <span class="field-label">4. Grok AI API Key</span>
-                    <input type="text" id="cfgGrokKey" class="input-field" placeholder="xai-...">
-                </div>
-
                 <button class="btn btn-primary" onclick="saveAllMasterKeys()">Save All Keys Permanently</button>
-                <div id="saveMsg" class="save-msg">✓ All Master Keys Saved Successfully!</div>
+                <div id="saveMsg" class="save-msg">✓ Master Keys Saved Successfully!</div>
             </div>
         </div>
 
@@ -366,6 +376,48 @@
 
     <script>
         let supabaseClient = null;
+        let selectedSong = "";
+
+        // Sample song library for search
+        const popularSongs = [
+            "Arjan Vailly - Animal",
+            "Pehle Bhi Main - Animal",
+            "Kesariya - Brahmastra",
+            "Heeriye - Jasleen Royal & Arijit Singh",
+            "Naa Ready - Leo",
+            "Chaleya - Jawan",
+            "Sajni - Laapataa Ladies",
+            "Tauba Tauba - Bad News",
+            "Ayi Nai - Stree 2",
+            "Millionaire - Honey Singh"
+        ];
+
+        function filterSongs(query) {
+            const dropdown = document.getElementById('songDropdown');
+            if (!query.trim()) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            const filtered = popularSongs.filter(s => s.toLowerCase().includes(query.toLowerCase()));
+            if (filtered.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            dropdown.style.display = 'block';
+            dropdown.innerHTML = filtered.map(song => `
+                <div onclick="selectSong('${song}')" style="padding: 10px; font-size: 13px; color: #fff; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#1f2937'" onmouseout="this.style.background='transparent'">
+                    🎵 ${song}
+                </div>
+            `).join('');
+        }
+
+        function selectSong(songName) {
+            selectedSong = songName;
+            document.getElementById('songSearchInput').value = songName;
+            document.getElementById('songDropdown').style.display = 'none';
+            document.getElementById('songNameDisplay').innerText = songName;
+            document.getElementById('selectedSongBadge').style.display = 'block';
+        }
 
         function initMasterConfigs() {
             const url = localStorage.getItem('viziya_supabase_url');
@@ -380,13 +432,10 @@
             }
         }
 
-        // --- Settings Modal Logic ---
         function openSettingsModal() {
             document.getElementById('settingsModal').style.display = 'flex';
             document.getElementById('cfgSupabaseUrl').value = localStorage.getItem('viziya_supabase_url') || '';
             document.getElementById('cfgSupabaseKey').value = localStorage.getItem('viziya_supabase_key') || '';
-            document.getElementById('cfgAgoraId').value = localStorage.getItem('viziya_agora_id') || '';
-            document.getElementById('cfgGrokKey').value = localStorage.getItem('viziya_grok_key') || '';
         }
 
         function closeSettingsModal() {
@@ -396,18 +445,14 @@
         function saveAllMasterKeys() {
             const url = document.getElementById('cfgSupabaseUrl').value.trim();
             const key = document.getElementById('cfgSupabaseKey').value.trim();
-            const agoraId = document.getElementById('cfgAgoraId').value.trim();
-            const grokKey = document.getElementById('cfgGrokKey').value.trim();
 
             if (!url || !key) {
-                alert("Supabase URL and Key are required for database feed!");
+                alert("Supabase URL and Key are required!");
                 return;
             }
 
             localStorage.setItem('viziya_supabase_url', url);
             localStorage.setItem('viziya_supabase_key', key);
-            localStorage.setItem('viziya_agora_id', agoraId);
-            localStorage.setItem('viziya_grok_key', grokKey);
 
             const msg = document.getElementById('saveMsg');
             msg.style.display = 'block';
@@ -419,21 +464,27 @@
             }, 1500);
         }
 
-        // --- Real Camera Stream Logic ---
         async function initRealCamera() {
+            const videoElement = document.getElementById('realCameraStream');
             try {
-                const videoElement = document.getElementById('realCameraStream');
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    alert("Your browser does not support camera access!");
+                    return;
+                }
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'user' }, 
+                    audio: false 
+                });
                 videoElement.srcObject = stream;
+                await videoElement.play();
             } catch (err) {
-                console.log("Camera notice: " + err.message);
+                alert("Camera Error: " + err.message);
             }
         }
 
-        // --- Direct Gallery File Upload & Supabase Sync ---
         window.onload = () => {
-            initRealCamera();
             initMasterConfigs();
+            setTimeout(() => { initRealCamera(); }, 500);
         };
 
         function publishDirectMedia() {
@@ -447,7 +498,7 @@
             const caption = document.getElementById('postCaption').value.trim();
 
             if (fileInput.files.length === 0) {
-                alert("Please select a photo or video from your device storage!");
+                alert("Please select a photo or video!");
                 return;
             }
 
@@ -463,18 +514,22 @@
                     handle: '@viziya_global',
                     media_url: base64Data,
                     media_type: isVideo ? 'video' : 'image',
-                    caption: caption || 'Direct live gallery drop 🚀'
+                    caption: caption || 'Media drop with music 🚀',
+                    song_name: selectedSong || ''
                 };
 
                 try {
-                    const { data, error } = await supabaseClient
+                    const { error } = await supabaseClient
                         .from('posts')
                         .insert([newPost]);
 
                     if (error) {
-                        alert("Supabase Error: " + error.message + "\n(Make sure 'posts' table exists in Supabase)");
+                        alert("Supabase Error: " + error.message);
                     } else {
                         document.getElementById('postCaption').value = '';
+                        document.getElementById('songSearchInput').value = '';
+                        document.getElementById('selectedSongBadge').style.display = 'none';
+                        selectedSong = "";
                         fileInput.value = '';
                         fetchCloudPosts();
                     }
@@ -511,6 +566,10 @@
                         ? `<video src="${p.media_url}" class="post-media" controls autoplay loop muted playsinline></video>`
                         : `<img src="${p.media_url}" class="post-media">`;
 
+                    let songHtml = p.song_name 
+                        ? `<div class="song-tag">🎵 Original Audio: <b>${p.song_name}</b></div>` 
+                        : '';
+
                     container.innerHTML += `
                         <div class="post-card">
                             <div class="post-header">
@@ -521,6 +580,7 @@
                                 </div>
                             </div>
                             ${mediaHtml}
+                            ${songHtml}
                             <div class="post-footer">
                                 <strong style="color: #fff; margin-right: 6px;">${p.user_name || 'User'}</strong>${p.caption || ''}
                             </div>
