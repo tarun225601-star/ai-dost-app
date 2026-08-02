@@ -1,1582 +1,525 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  FlatList,
-  StyleSheet,
-  Modal,
-  Dimensions,
-  ScrollView,
-  Alert,
-  StatusBar,
-  SafeAreaView,
-  ActivityIndicator
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Video from 'react-native-video';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Pro - Tarun App</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #000; color: #fff; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+        .app-container { width: 100%; max-width: 450px; height: 100%; background: #000; display: flex; flex-direction: column; position: relative; border-left: 1px solid #222; border-right: 1px solid #222; }
+        
+        /* 4 API Keys Setup Overlay */
+        .setup-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; flex-direction: column; justify-content: center; padding: 25px; overflow-y: auto; }
+        .setup-title { font-size: 22px; font-weight: bold; margin-bottom: 8px; color: #fff; }
+        .setup-desc { font-size: 13px; color: #aaa; margin-bottom: 20px; line-height: 1.4; }
+        .setup-input { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 12px; font-size: 13px; }
+        .setup-btn { width: 100%; background: #0095f6; border: none; padding: 12px; border-radius: 8px; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 5px; }
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #262626; background: #000; z-index: 10; }
+        .logo { font-size: 22px; font-weight: bold; font-style: italic; letter-spacing: -0.5px; }
+        .header-icons { display: flex; gap: 15px; font-size: 20px; cursor: pointer; }
 
-// ==========================================
-// MOCK DATA: 100% WORKING REAL MUSIC & MEDIA
-// ==========================================
-const INITIAL_SONGS = [
-  {
-    id: 's1',
-    title: 'Upbeat Energetic Pop',
-    artist: 'SoundHelix Artist 1',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    duration: '06:12'
-  },
-  {
-    id: 's2',
-    title: 'Chill Lo-Fi Beat Atmospheric',
-    artist: 'SoundHelix Artist 2',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    duration: '07:05'
-  },
-  {
-    id: 's3',
-    title: 'Aesthetic Deep House Track',
-    artist: 'SoundHelix Artist 3',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    duration: '05:44'
-  },
-  {
-    id: 's4',
-    title: 'Romantic Acoustic Guitar Melody',
-    artist: 'SoundHelix Artist 4',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-    duration: '05:02'
-  },
-  {
-    id: 's5',
-    title: 'Electronic Synthwave Drive',
-    artist: 'SoundHelix Artist 5',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
-    duration: '06:33'
-  }
-];
+        /* Content Area */
+        .content-area { flex: 1; overflow-y: auto; background: #000; padding-bottom: 60px; }
+        .content-area::-webkit-scrollbar { display: none; }
 
-const INITIAL_STORIES = [
-  { id: 'st0', user: 'Your Story', avatar: 'https://picsum.photos/id/64/150/150', isUser: true },
-  { id: 'st1', user: 'viziag_global', avatar: 'https://picsum.photos/id/1011/150/150', isUser: false },
-  { id: 'st2', user: 'elight_cleaning', avatar: 'https://picsum.photos/id/1025/150/150', isUser: false },
-  { id: 'st3', user: 'jet_black_india', avatar: 'https://picsum.photos/id/1062/150/150', isUser: false },
-  { id: 'st4', user: 'cyber_guard', avatar: 'https://picsum.photos/id/1074/150/150', isUser: false },
-];
+        /* Stories */
+        .stories-bar { display: flex; padding: 10px 0; border-bottom: 1px solid #262626; gap: 12px; overflow-x: auto; padding-left: 12px; }
+        .story-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 65px; }
+        .story-ring { width: 64px; height: 64px; border-radius: 50%; border: 2.5px solid #c13584; padding: 2px; display: flex; justify-content: center; align-items: center; }
+        .story-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; }
+        .story-name { font-size: 11px; margin-top: 4px; color: #aaa; text-overflow: ellipsis; overflow: hidden; width: 60px; text-align: center; }
 
-const INITIAL_POSTS = [
-  {
-    id: 'p1',
-    username: 'viziag_global',
-    userAvatar: 'https://picsum.photos/id/1011/100/100',
-    location: 'Faridabad, India',
-    type: 'video',
-    mediaUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    likesCount: 1240,
-    caption: 'High resolution 8K Video Upscaling demo! Check out the details ✨ #AI #VideoEditing #ViziagGlobal',
-    attachedSong: INITIAL_SONGS[0],
-    comments: [
-      { id: 'c1', user: 'rahul_dev', text: 'Quality is top notch brother 🔥' },
-      { id: 'c2', user: 'priya_art', text: 'Which AI tool did you use for this?' }
-    ],
-    timestamp: '2 HOURS AGO'
-  },
-  {
-    id: 'p2',
-    username: 'elight_cleaning',
-    userAvatar: 'https://picsum.photos/id/1025/100/100',
-    location: 'Sector 15, Faridabad',
-    type: 'image',
-    mediaUrl: 'https://picsum.photos/id/201/800/800',
-    likesCount: 856,
-    caption: 'Deep cleaning service done for luxury residential suite. Book your slot now! 🧼✨ #DeepCleaning #Faridabad',
-    attachedSong: INITIAL_SONGS[1],
-    comments: [
-      { id: 'c3', user: 'sector15_resident', text: 'Great service team, very professional!' }
-    ],
-    timestamp: '5 HOURS AGO'
-  },
-  {
-    id: 'p3',
-    username: 'jet_black_india',
-    userAvatar: 'https://picsum.photos/id/1062/100/100',
-    location: 'Automotive Lab',
-    type: 'image',
-    mediaUrl: 'https://picsum.photos/id/111/800/800',
-    likesCount: 2310,
-    caption: 'Jet Black Tire & Dashboard Polish - High shine chemical formulation tested on premium vehicles 🚗💨',
-    attachedSong: INITIAL_SONGS[2],
-    comments: [
-      { id: 'c4', user: 'auto_detailer', text: 'Is this silicon emulsion based?' },
-      { id: 'c5', user: 'tarun_shop', text: 'Yes, 100% hydrophobic coating effect!' }
-    ],
-    timestamp: '1 DAY AGO'
-  }
-];
+        /* Post Card */
+        .post { border-bottom: 1px solid #262626; margin-bottom: 15px; }
+        .post-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; }
+        .post-user { display: flex; align-items: center; gap: 10px; }
+        .post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .post-username { font-size: 13px; font-weight: bold; }
+        .post-location { font-size: 11px; color: #aaa; }
+        .post-media-box { width: 100%; height: 380px; background: #111; position: relative; display: flex; justify-content: center; align-items: center; }
+        .post-media { width: 100%; height: 100%; object-fit: cover; }
+        .music-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #fff; cursor: pointer; }
+        .post-actions { display: flex; justify-content: space-between; padding: 10px 12px; font-size: 22px; }
+        .post-actions-left { display: flex; gap: 15px; cursor: pointer; }
+        .post-info { padding: 0 12px 12px 12px; font-size: 13px; }
+        .likes-count { font-weight: bold; margin-bottom: 4px; }
+        .caption span { font-weight: bold; margin-right: 5px; }
+        .comments-link { color: #888; margin-top: 4px; cursor: pointer; display: block; }
+        .time-ago { font-size: 10px; color: #555; margin-top: 4px; text-transform: uppercase; }
 
-const INITIAL_REELS = [
-  {
-    id: 'r1',
-    username: 'viziag_global',
-    userAvatar: 'https://picsum.photos/id/1011/100/100',
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    caption: 'Mastering AI Video Workflows in 2026 🚀 #Editing #FlutterFlow',
-    songTitle: 'SoundHelix Song 1 - Upbeat Pop',
-    likes: '45.2K',
-    commentsCount: '1,204'
-  },
-  {
-    id: 'r2',
-    username: 'master_bot_ai',
-    userAvatar: 'https://picsum.photos/id/1074/100/100',
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    caption: 'Autonomous Bot Prototype Testing Tracked Wheel Chassis 🤖⚙️',
-    songTitle: 'SoundHelix Song 3 - Deep House',
-    likes: '89.1K',
-    commentsCount: '3,410'
-  }
-];
+        /* Bottom Nav */
+        .bottom-nav { position: absolute; bottom: 0; width: 100%; height: 50px; background: #000; border-top: 1px solid #262626; display: flex; justify-content: space-around; align-items: center; font-size: 22px; cursor: pointer; z-index: 10; }
 
-// ==========================================
-// MAIN APP COMPONENT
-// ==========================================
-export default function App() {
-  // Navigation State
-  const [currentTab, setCurrentTab] = useState('Home'); // 'Home', 'Search', 'Reels', 'Activity', 'Profile'
+        /* Call Screen Overlay */
+        .call-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111; z-index: 100; display: none; flex-direction: column; justify-content: space-between; align-items: center; padding: 40px 20px; }
+        .call-title { font-size: 20px; font-weight: bold; }
+        .call-timer { color: #0095f6; font-size: 15px; margin-top: 5px; }
+        .call-avatar-box { width: 220px; height: 320px; background: #222; border-radius: 20px; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .call-avatar-box img, .call-avatar-box video { width: 100%; height: 100%; object-fit: cover; }
+        .call-controls { display: flex; gap: 20px; align-items: center; }
+        .call-btn { width: 55px; height: 55px; border-radius: 50%; background: #333; display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; border: none; color: #fff; }
+        .end-call-btn { width: 65px; height: 65px; border-radius: 50%; background: #ff3b30; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; border: none; color: #fff; }
 
-  // Settings & Keys Modal State
-  const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-  const [appIdKey, setAppIdKey] = useState('');
-  const [tokenKey, setTokenKey] = useState('');
-  const [channelKey, setChannelKey] = useState('');
-  const [apiKey, setApiKey] = useState('');
+        /* Modals */
+        .modal { position: absolute; bottom: 0; left: 0; width: 100%; height: 75%; background: #1c1c1c; border-top-left-radius: 16px; border-top-right-radius: 16px; z-index: 50; display: none; flex-direction: column; padding: 15px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold; font-size: 16px; }
+        .modal-close { cursor: pointer; font-size: 18px; }
+        .search-input, .post-input { width: 100%; background: #2a2a2a; border: 1px solid #444; padding: 10px; border-radius: 8px; color: #fff; margin-bottom: 12px; font-size: 13px; }
+        .song-row { display: flex; justify-content: space-between; align-items: center; background: #262626; padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
+        .song-row:hover { background: #333; }
+        .post-submit-btn { width: 100%; background: #0095f6; border: none; padding: 10px; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; font-size: 14px; }
 
-  // Feed & Interactive State
-  const [posts, setPosts] = useState(INITIAL_POSTS);
-  const [likedPosts, setLikedPosts] = useState({});
-  const [savedPosts, setSavedPosts] = useState({});
+        /* Notification Toast */
+        #toast { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background: #0095f6; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; display: none; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 
-  // Audio Playback & Music Selection State
-  const [selectedSong, setSelectedSong] = useState(INITIAL_SONGS[0]);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const [audioOffset, setAudioOffset] = useState(0); // Seek offset in seconds
-  const [isMusicModalVisible, setIsMusicModalVisible] = useState(false);
-  const [searchSongQuery, setSearchSongQuery] = useState('');
-  const [filteredSongsList, setFilteredSongsList] = useState(INITIAL_SONGS);
-  const audioPlayerRef = useRef(null);
+        /* Reels View */
+        .reel-container { width: 100%; height: 100%; position: relative; background: #000; display: none; }
+        .reel-video { width: 100%; height: 100%; object-fit: cover; }
+        .reel-sidebar { position: absolute; right: 15px; bottom: 80px; display: flex; flex-direction: column; align-items: center; gap: 20px; font-size: 24px; }
+        .reel-info { position: absolute; bottom: 30px; left: 15px; right: 80px; }
+        
+        /* Profile View */
+        .profile-container { padding: 15px; display: none; }
+        .profile-header { display: flex; align-items: center; gap: 20px; }
+        .profile-avatar { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; }
+        .profile-stats { display: flex; gap: 20px; text-align: center; flex: 1; justify-content: space-around; }
+        .stat-num { font-weight: bold; font-size: 16px; }
+        .stat-lbl { font-size: 11px; color: #aaa; }
+        .profile-bio { margin-top: 10px; font-size: 13px; }
+        .follow-btn { width: 100%; background: #0095f6; border: none; padding: 8px; border-radius: 6px; color: #fff; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 15px; }
+        .profile-grid img { width: 100%; height: 110px; object-fit: cover; }
+    </style>
+</head>
+<body>
 
-  // Calling Feature State
-  const [inCall, setInCall] = useState(false);
-  const [callType, setCallType] = useState('video'); // 'video' | 'audio'
-  const [callDuration, setCallDuration] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isCameraOff, setIsCameraOff] = useState(false);
+<div class="app-container" id="app">
+    <!-- SETUP OVERLAY FOR 4 API KEYS -->
+    <div class="setup-overlay" id="setupOverlay" style="display: none;">
+        <div class="setup-title">🚀 Tarun Instagram Setup</div>
+        <div class="setup-desc">अपने चारों API Credentials यहाँ दर्ज करें। एक बार सेव होने के बाद यह सेटअप विंडो दोबारा कभी नहीं खुलेगी।</div>
+        
+        <label style="font-size: 11px; color: #aaa;">1. Supabase URL:</label>
+        <input type="text" id="supaUrlInput" class="setup-input" placeholder="https://xyz.supabase.co">
+        
+        <label style="font-size: 11px; color: #aaa;">2. Supabase Anon Key:</label>
+        <input type="text" id="supaAnonInput" class="setup-input" placeholder="eyJhbGciOiJIUzI1Ni...">
+        
+        <label style="font-size: 11px; color: #aaa;">3. Grok API Key:</label>
+        <input type="text" id="grokApiInput" class="setup-input" placeholder="xai-xxxxxxxxxxxxxxxx">
+        
+        <label style="font-size: 11px; color: #aaa;">4. Agora API Key (App ID):</label>
+        <input type="text" id="agoraKeyInput" class="setup-input" placeholder="Agora App ID">
+        
+        <button class="setup-btn" onclick="saveAllApiKeys()">Save Keys & Launch App</button>
+    </div>
 
-  // Comments Bottom Sheet State
-  const [isCommentsVisible, setIsCommentsVisible] = useState(false);
-  const [activePostComments, setActivePostComments] = useState([]);
-  const [activePostId, setActivePostId] = useState(null);
-  const [newCommentText, setNewCommentText] = useState('');
+    <div id="toast">Notification</div>
 
-  // ------------------------------------------
-  // LIFECYCLE & STORAGE LOGIC
-  // ------------------------------------------
-  useEffect(() => {
-    loadSavedSettings();
-  }, []);
+    <!-- HEADER -->
+    <div class="header" id="mainHeader">
+        <div class="logo">Instagram</div>
+        <div class="header-icons">
+            <span onclick="openMusicModal()" title="Music Library">🎵</span>
+            <span onclick="startCall('audio')" title="Audio Call">📞</span>
+            <span onclick="startCall('video')" title="Video Call">📹</span>
+        </div>
+    </div>
 
-  // Call timer interval logic
-  useEffect(() => {
-    let timer;
-    if (inCall) {
-      timer = setInterval(() => {
-        setCallDuration((prev) => prev + 1);
-      }, 1000);
-    } else {
-      setCallDuration(0);
+    <!-- CONTENT SECTIONS -->
+    <div class="content-area" id="contentArea">
+        
+        <!-- HOME FEED TAB -->
+        <div id="tabHome">
+            <div class="stories-bar">
+                <div class="story-item" onclick="showToast('Your Story')">
+                    <div class="story-ring"><img src="https://picsum.photos/id/64/100/100" class="story-img"></div>
+                    <span class="story-name">Your Story</span>
+                </div>
+                <div class="story-item" onclick="showToast('Viewing viziag_global story')">
+                    <div class="story-ring"><img src="https://picsum.photos/id/1011/100/100" class="story-img"></div>
+                    <span class="story-name">viziag_global</span>
+                </div>
+                <div class="story-item" onclick="showToast('Viewing elight_cleaning story')">
+                    <div class="story-ring"><img src="https://picsum.photos/id/1025/100/100" class="story-img"></div>
+                    <span class="story-name">elight_clean</span>
+                </div>
+            </div>
+
+            <!-- Posts List Container -->
+            <div id="postsList"></div>
+        </div>
+
+        <!-- REELS TAB -->
+        <div id="tabReels" class="reel-container">
+            <video class="reel-video" src="https://www.w3schools.com/html/mov_bbb.mp4" autoplay loop muted></video>
+            <div class="reel-info">
+                <strong>@viziag_global</strong>
+                <p style="font-size: 13px; margin-top: 5px;">High Quality 8K Video Rendering 🚀 #AI #Faridabad</p>
+                <p style="font-size: 11px; color: #ccc; margin-top: 3px;" id="reelMusicTag">🎶 Original Sound - Tarun</p>
+            </div>
+            <div class="reel-sidebar">
+                <div onclick="showToast('Liked Reel ❤️')">❤️</div>
+                <div onclick="openMusicModal()">🎵</div>
+                <div onclick="showToast('Reel Shared ✈️')">✈️</div>
+            </div>
+        </div>
+
+        <!-- PROFILE TAB -->
+        <div id="tabProfile" class="profile-container">
+            <div class="profile-header">
+                <img src="https://picsum.photos/id/64/150/150" class="profile-avatar">
+                <div class="profile-stats">
+                    <div><div class="stat-num" id="postCountNum">18</div><div class="stat-lbl">Posts</div></div>
+                    <div><div class="stat-num" id="fCount">4,250</div><div class="stat-lbl">Followers</div></div>
+                    <div><div class="stat-num">350</div><div class="stat-lbl">Following</div></div>
+                </div>
+            </div>
+            <div class="profile-bio">
+                <strong>Tarun | Full-Stack App Developer</strong>
+                <p>🚀 Viziag Global & Elight Cleaning</p>
+                <p style="color: #0095f6;">📍 Faridabad, Haryana</p>
+            </div>
+            <button class="follow-btn" id="followBtn" onclick="toggleFollow()">Following</button>
+            <div class="profile-grid" id="profileGrid">
+                <img src="https://picsum.photos/id/210/300/300">
+                <img src="https://picsum.photos/id/211/300/300">
+                <img src="https://picsum.photos/id/212/300/300">
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="bottom-nav">
+        <span onclick="switchTab('Home')">🏠</span>
+        <span onclick="showToast('Search & Explore')">🔍</span>
+        <span onclick="openAddPostModal()" style="color: #0095f6; font-weight: bold;" title="Create Post">➕</span>
+        <span onclick="switchTab('Reels')">🎬</span>
+        <span onclick="switchTab('Profile')">👤</span>
+    </div>
+
+    <!-- CALL SCREEN OVERLAY (Agora Ready) -->
+    <div class="call-overlay" id="callOverlay">
+        <div>
+            <div class="call-title" id="callTitleText">Agora Video Call</div>
+            <div class="call-timer" id="callTimer">00:00</div>
+        </div>
+        <div class="call-avatar-box">
+            <img src="https://picsum.photos/id/1011/300/300" id="callMediaView">
+        </div>
+        <div class="call-controls">
+            <button class="call-btn" onclick="toggleMute()">🎙️</button>
+            <button class="end-call-btn" onclick="endCall()">📵</button>
+            <button class="call-btn" onclick="toggleCam()">📹</button>
+        </div>
+    </div>
+
+    <!-- MUSIC SELECTOR MODAL (Real Songs) -->
+    <div class="modal" id="musicModal">
+        <div class="modal-header">
+            <span>🎵 Real Song Library (SoundHelix)</span>
+            <span class="modal-close" onclick="closeMusicModal()">✕</span>
+        </div>
+        <input type="text" class="search-input" placeholder="Search real songs..." oninput="filterSongs(this.value)">
+        <div id="songsListContainer" style="overflow-y: auto; flex: 1;"></div>
+    </div>
+
+    <!-- ADD NEW POST / VIDEO MODAL (Gallery Picker) -->
+    <div class="modal" id="addPostModal">
+        <div class="modal-header">
+            <span>✨ Create New Post / Video</span>
+            <span class="modal-close" onclick="closeAddPostModal()">✕</span>
+        </div>
+        <div style="overflow-y: auto; flex: 1;">
+            <label style="font-size: 11px; color: #aaa;">सवाएं / गैलरी से फोटो या वीडियो चुनें:</label>
+            <input type="file" id="galleryFileInput" class="post-input" accept="image/*,video/*" onchange="previewSelectedFile(event)" style="padding: 8px;">
+            
+            <!-- Live Preview Area -->
+            <div id="mediaPreviewContainer" style="width: 100%; height: 160px; background: #111; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative;">
+                <span style="font-size: 12px; color: #666;" id="previewPlaceholder">No file chosen</span>
+            </div>
+
+            <label style="font-size: 11px; color: #aaa;">Location:</label>
+            <input type="text" id="newPostLocation" class="post-input" value="Faridabad, India">
+            
+            <label style="font-size: 11px; color: #aaa;">Caption & Tags:</label>
+            <textarea id="newPostCaption" class="post-input" rows="3" placeholder="Write a caption..."></textarea>
+            
+            <button class="post-submit-btn" onclick="submitNewPost()">Publish Post</button>
+        </div>
+    </div>
+
+    <!-- AUDIO PLAYER ELEMENT -->
+    <audio id="audioPlayer" loop></audio>
+</div>
+
+<script>
+    // 1. Check all 4 API Keys on Startup
+    window.addEventListener('DOMContentLoaded', () => {
+        let supaUrl = localStorage.getItem('tarun_supa_url');
+        let supaAnon = localStorage.getItem('tarun_supa_anon');
+        let grokKey = localStorage.getItem('tarun_grok_key');
+        let agoraKey = localStorage.getItem('tarun_agora_key');
+
+        if (!supaUrl || !supaAnon || !grokKey || !agoraKey) {
+            document.getElementById('setupOverlay').style.display = 'flex';
+        } else {
+            document.getElementById('setupOverlay').style.display = 'none';
+        }
+    });
+
+    function saveAllApiKeys() {
+        let u = document.getElementById('supaUrlInput').value.trim();
+        let a = document.getElementById('supaAnonInput').value.trim();
+        let g = document.getElementById('grokApiInput').value.trim();
+        let ag = document.getElementById('agoraKeyInput').value.trim();
+
+        if (!u || !a || !g || !ag) {
+            alert("कृपया चारों API Keys को सही से भरें!");
+            return;
+        }
+
+        localStorage.setItem('tarun_supa_url', u);
+        localStorage.setItem('tarun_supa_anon', a);
+        localStorage.setItem('tarun_grok_key', g);
+        localStorage.setItem('tarun_agora_key', ag);
+
+        document.getElementById('setupOverlay').style.display = 'none';
+        showToast("सभी 4 API Keys सफलतापूर्वक सेव हो गईं! 🎉");
     }
-    return () => clearInterval(timer);
-  }, [inCall]);
 
-  const loadSavedSettings = async () => {
-    try {
-      const savedAppId = await AsyncStorage.getItem('@app_id_key');
-      const savedToken = await AsyncStorage.getItem('@app_token_key');
-      const savedChannel = await AsyncStorage.getItem('@app_channel_key');
-      const savedApi = await AsyncStorage.getItem('@app_api_key');
+    // App State & Data
+    let currentSong = null;
+    let isFollowing = true;
+    let callInterval = null;
+    let secondsElapsed = 0;
+    let selectedFileUrl = "";
+    let isFileTypeVideo = false;
 
-      if (savedAppId) setAppIdKey(savedAppId);
-      if (savedToken) setTokenKey(savedToken);
-      if (savedChannel) setChannelKey(savedChannel);
-      if (savedApi) setApiKey(savedApi);
+    const realSongs = [
+        { title: "SoundHelix Pop Track 1", artist: "SoundHelix", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+        { title: "SoundHelix Electronic 2", artist: "SoundHelix", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+        { title: "SoundHelix Chill Beat 3", artist: "SoundHelix", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+        { title: "SoundHelix Ambient 4", artist: "SoundHelix", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" }
+    ];
 
-      if (!savedAppId) {
-        setIsSettingsVisible(true); // Popup on first launch if not configured
-      }
-    } catch (error) {
-      console.log('Error reading AsyncStorage:', error);
+    const postsData = [
+        { id: 1, user: "viziag_global", avatar: "https://picsum.photos/id/1011/100/100", location: "Faridabad", img: "https://picsum.photos/id/102/600/600", isVideo: false, likes: 1240, caption: "High resolution video upscaling service live now ✨ #AI", song: "Original Audio" },
+        { id: 2, user: "elight_cleaning", avatar: "https://picsum.photos/id/1025/100/100", location: "Sector 15", img: "https://picsum.photos/id/201/600/600", isVideo: false, likes: 856, caption: "Professional deep cleaning for luxury rooms 🧼", song: "SoundHelix Pop Track 1" },
+        { id: 3, user: "jet_black_india", avatar: "https://picsum.photos/id/1062/100/100", location: "Automotive Lab", img: "https://picsum.photos/id/111/600/600", isVideo: false, likes: 2310, caption: "Tire and dashboard polish chemical test 🚗💨", song: "SoundHelix Chill Beat 3" }
+    ];
+
+    // Handle Gallery File Selection
+    function previewSelectedFile(event) {
+        let file = event.target.files[0];
+        if (file) {
+            selectedFileUrl = URL.createObjectURL(file);
+            isFileTypeVideo = file.type.startsWith('video');
+            let container = document.getElementById('mediaPreviewContainer');
+            
+            if (isFileTypeVideo) {
+                container.innerHTML = `<video src="${selectedFileUrl}" style="width:100%; height:100%; object-fit:cover;" controls autoplay muted></video>`;
+            } else {
+                container.innerHTML = `<img src="${selectedFileUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+            }
+            showToast("File selected from gallery successfully!");
+        }
     }
-  };
 
-  const handleSaveSettings = async () => {
-    if (!appIdKey.trim() || !tokenKey.trim() || !channelKey.trim() || !apiKey.trim()) {
-      Alert.alert('फील्ड्स अधूरी हैं', 'कृपया चारों (App ID, Token, Channel, API Key) भरें!');
-      return;
+    // Render Feed
+    function renderPosts() {
+        let html = "";
+        postsData.forEach(p => {
+            let mediaContent = p.isVideo 
+                ? `<video src="${p.img}" class="post-media" controls autoplay loop muted></video>`
+                : `<img src="${p.img}" class="post-media">`;
+
+            html += `
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-user">
+                            <img src="${p.avatar}" class="post-avatar">
+                            <div>
+                                <div class="post-username">${p.user}</div>
+                                <div class="post-location">${p.location}</div>
+                            </div>
+                        </div>
+                        <div>•••</div>
+                    </div>
+                    <div class="post-media-box">
+                        ${mediaContent}
+                        <div class="music-badge" onclick="openMusicModal()">🎶 ${p.song || (currentSong ? currentSong.title : 'Original Audio')}</div>
+                    </div>
+                    <div class="post-actions">
+                        <div class="post-actions-left">
+                            <span onclick="showToast('Liked post ❤️')">❤️</span>
+                            <span onclick="showToast('Opened comments 💬')">💬</span>
+                            <span onclick="showToast('Post shared ✈️')">✈️</span>
+                        </div>
+                        <span>🔖</span>
+                    </div>
+                    <div class="post-info">
+                        <div class="likes-count">${p.likes} likes</div>
+                        <div class="caption"><span>${p.user}</span>${p.caption}</div>
+                        <span class="comments-link" onclick="showToast('Viewing all comments')">View all comments</span>
+                        <div class="time-ago">Just now</div>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('postsList').innerHTML = html;
+        document.getElementById('postCountNum').innerText = postsData.length + 15;
     }
-    try {
-      await AsyncStorage.setItem('@app_id_key', appIdKey);
-      await AsyncStorage.setItem('@app_token_key', tokenKey);
-      await AsyncStorage.setItem('@app_channel_key', channelKey);
-      await AsyncStorage.setItem('@app_api_key', apiKey);
-      setIsSettingsVisible(false);
-      Alert.alert('सेटिंग्स सेव हो गईं', 'आपकी API और Agora कीज़ सफलता से सेव हो गई हैं!');
-    } catch (error) {
-      Alert.alert('एरर', 'कीज़ सेव करने में दिक्कत आई।');
+
+    // Tab Switching
+    function switchTab(tabName) {
+        document.getElementById('tabHome').style.display = tabName === 'Home' ? 'block' : 'none';
+        document.getElementById('tabReels').style.display = tabName === 'Reels' ? 'block' : 'none';
+        document.getElementById('tabProfile').style.display = tabName === 'Profile' ? 'block' : 'none';
+        document.getElementById('mainHeader').style.display = tabName === 'Reels' ? 'none' : 'flex';
     }
-  };
 
-  // ------------------------------------------
-  // MUSIC & AUDIO SEARCH / SEEK HANDLERS
-  // ------------------------------------------
-  const handleSearchSong = (query) => {
-    setSearchSongQuery(query);
-    if (!query.trim()) {
-      setFilteredSongsList(INITIAL_SONGS);
-    } else {
-      const filtered = INITIAL_SONGS.filter(
-        (song) =>
-          song.title.toLowerCase().includes(query.toLowerCase()) ||
-          song.artist.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredSongsList(filtered);
+    // Add Post / Video Modal Handlers
+    function openAddPostModal() {
+        document.getElementById('addPostModal').style.display = 'flex';
     }
-  };
 
-  const handleSelectSong = (song) => {
-    setSelectedSong(song);
-    setIsPlayingAudio(true);
-    setAudioOffset(0);
-    setIsMusicModalVisible(false);
-    Alert.alert('म्यूजिक सिलेक्ट हुआ', `गाना '${song.title}' अब आपकी मीडिया पर बज रहा है!`);
-  };
-
-  const handleSeekAudio = (secondsDelta) => {
-    let nextTime = audioOffset + secondsDelta;
-    if (nextTime < 0) nextTime = 0;
-    setAudioOffset(nextTime);
-    if (audioPlayerRef.current) {
-      audioPlayerRef.current.seek(nextTime);
+    function closeAddPostModal() {
+        document.getElementById('addPostModal').style.display = 'none';
     }
-  };
 
-  // ------------------------------------------
-  // FEED INTERACTION HANDLERS
-  // ------------------------------------------
-  const toggleLikePost = (postId) => {
-    setLikedPosts((prev) => ({
-      ...prev,
-      [postId]: !prev[postId]
-    }));
-  };
+    function submitNewPost() {
+        let captionText = document.getElementById('newPostCaption').value || "New update from Tarun 🚀";
+        let locText = document.getElementById('newPostLocation').value || "Faridabad";
+        
+        // Use gallery picked file or default placeholder if not chosen
+        let finalMedia = selectedFileUrl || `https://picsum.photos/id/${Math.floor(Math.random() * 80) + 220}/600/600`;
 
-  const toggleSavePost = (postId) => {
-    setSavedPosts((prev) => ({
-      ...prev,
-      [postId]: !prev[postId]
-    }));
-  };
+        let newPost = {
+            id: postsData.length + 1,
+            user: "tarun_official",
+            avatar: "https://picsum.photos/id/64/100/100",
+            location: locText,
+            img: finalMedia,
+            isVideo: isFileTypeVideo,
+            likes: 1,
+            caption: captionText,
+            song: currentSong ? currentSong.title : 'Original Audio'
+        };
 
-  const openCommentsModal = (post) => {
-    setActivePostId(post.id);
-    setActivePostComments(post.comments);
-    setIsCommentsVisible(true);
-  };
+        postsData.unshift(newPost);
+        renderPosts();
+        closeAddPostModal();
+        switchTab('Home');
+        showToast("Post Published Successfully! 🎉");
 
-  const handleAddComment = () => {
-    if (!newCommentText.trim()) return;
-    const newCommentObj = {
-      id: `c_${Date.now()}`,
-      user: 'tarun_official',
-      text: newCommentText.trim()
-    };
-    const updatedComments = [...activePostComments, newCommentObj];
-    setActivePostComments(updatedComments);
+        // Reset fields
+        document.getElementById('newPostCaption').value = "";
+        document.getElementById('galleryFileInput').value = "";
+        document.getElementById('mediaPreviewContainer').innerHTML = '<span style="font-size: 12px; color: #666;" id="previewPlaceholder">No file chosen</span>';
+        selectedFileUrl = "";
+        isFileTypeVideo = false;
+    }
 
-    // Update main posts list state
-    setPosts((prevPosts) =>
-      prevPosts.map((p) => (p.id === activePostId ? { ...p, comments: updatedComments } : p))
-    );
+    // Notification Toast System
+    function showToast(msg) {
+        let t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2000);
+    }
 
-    setNewCommentText('');
-  };
+    // Follow / Unfollow System
+    function toggleFollow() {
+        isFollowing = !isFollowing;
+        let btn = document.getElementById('followBtn');
+        let countEl = document.getElementById('fCount');
+        let count = 4250;
+        if(isFollowing) {
+            btn.innerText = "Following";
+            btn.style.background = "#0095f6";
+            countEl.innerText = count.toLocaleString();
+            showToast("Started Following");
+        } else {
+            btn.innerText = "Follow";
+            btn.style.background = "#333";
+            countEl.innerText = (count - 1).toLocaleString();
+            showToast("Unfollowed");
+        }
+    }
 
-  const formatTime = (secs) => {
-    const mins = Math.floor(secs / 60);
-    const remSecs = secs % 60;
-    return `${mins < 10 ? '0' : ''}${mins}:${remSecs < 10 ? '0' : ''}${remSecs}`;
-  };
+    // Agora Call Handlers
+    function startCall(type) {
+        document.getElementById('callOverlay').style.display = 'flex';
+        document.getElementById('callTitleText').innerText = type === 'video' ? 'Agora Video Call' : 'Agora Voice Call';
+        secondsElapsed = 0;
+        callInterval = setInterval(() => {
+            secondsElapsed++;
+            let mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            let secs = (secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('callTimer').innerText = `${mins}:${secs}`;
+        }, 1000);
+        showToast(type === 'video' ? 'Connecting video call via Agora...' : 'Connecting voice call...');
+    }
 
-  // ==========================================
-  // RENDER UI COMPONENTS
-  // ==========================================
+    function endCall() {
+        clearInterval(callInterval);
+        document.getElementById('callOverlay').style.display = 'none';
+        showToast("Call Disconnected");
+    }
 
-  // 1. TOP HEADER BAR
-  const renderHeader = () => (
-    <View style={styles.headerContainer}>
-      <Text style={styles.headerLogoText}>Instagram</Text>
-      <View style={styles.headerIconsRow}>
-        <TouchableOpacity style={styles.iconButton} onPress={() => setIsMusicModalVisible(true)}>
-          <Text style={styles.emojiIcon}>🎵</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => {
-            setCallType('audio');
-            setInCall(true);
-          }}
-        >
-          <Text style={styles.emojiIcon}>📞</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => {
-            setCallType('video');
-            setInCall(true);
-          }}
-        >
-          <Text style={styles.emojiIcon}>📹</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton} onPress={() => setIsSettingsVisible(true)}>
-          <Text style={styles.emojiIcon}>⚙️</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+    function toggleMute() { showToast("Microphone Muted/Unmuted"); }
+    function toggleCam() { showToast("Camera Toggled"); }
 
-  // 2. STORIES TRAY
-  const renderStoriesBar = () => (
-    <View style={styles.storiesContainer}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {INITIAL_STORIES.map((story) => (
-          <View key={story.id} style={styles.storyWrapper}>
-            <View style={[styles.storyRing, story.isUser && styles.userStoryRing]}>
-              <Image source={{ uri: story.avatar }} style={styles.storyAvatar} />
-              {story.isUser && (
-                <View style={styles.addStoryPlus}>
-                  <Text style={styles.plusText}>+</Text>
-                </View>
-              )}
-            </View>
-            <Text style={styles.storyUsername} numberOfLines={1}>
-              {story.user}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
-    </View>
-  );
+    // Music Player & Library Handlers
+    function openMusicModal() {
+        document.getElementById('musicModal').style.display = 'flex';
+        renderSongsList(realSongs);
+    }
 
-  // 3. POST CARD COMPONENT
-  const renderPostCard = ({ item }) => {
-    const isLiked = !!likedPosts[item.id];
-    const isSaved = !!savedPosts[item.id];
+    function closeMusicModal() {
+        document.getElementById('musicModal').style.display = 'none';
+    }
 
-    return (
-      <View style={styles.postCardContainer}>
-        {/* Post Header */}
-        <View style={styles.postHeader}>
-          <View style={styles.userInfoRow}>
-            <Image source={{ uri: item.userAvatar }} style={styles.postUserAvatar} />
-            <View>
-              <Text style={styles.postUsernameText}>{item.username}</Text>
-              <Text style={styles.postLocationText}>{item.location}</Text>
-            </View>
-          </View>
-          <TouchableOpacity>
-            <Text style={styles.threeDotsText}>•••</Text>
-          </TouchableOpacity>
-        </View>
+    function renderSongsList(list) {
+        let html = "";
+        list.forEach(s => {
+            html += `
+                <div class="song-row" onclick="selectAndPlaySong('${s.url}', '${s.title}')">
+                    <div>
+                        <div style="font-weight:bold; font-size:13px;">🎶 ${s.title}</div>
+                        <div style="font-size:11px; color:#aaa;">${s.artist}</div>
+                    </div>
+                    <span style="color:#0095f6; font-size:12px; font-weight:bold;">Play & Apply</span>
+                </div>
+            `;
+        });
+        document.getElementById('songsListContainer').innerHTML = html;
+    }
 
-        {/* Media Player View (Video or Image) */}
-        <View style={styles.postMediaBox}>
-          {item.type === 'video' ? (
-            <Video
-              source={{ uri: item.mediaUrl }}
-              style={styles.postMedia}
-              resizeMode="cover"
-              repeat={true}
-              muted={false}
-            />
-          ) : (
-            <Image source={{ uri: item.mediaUrl }} style={styles.postMedia} resizeMode="cover" />
-          )}
+    function selectAndPlaySong(url, title) {
+        let player = document.getElementById('audioPlayer');
+        player.src = url;
+        player.play();
+        currentSong = { title };
+        closeMusicModal();
+        renderPosts();
+        document.getElementById('reelMusicTag').innerText = `🎶 ${title}`;
+        showToast(`Playing Real Track: ${title}`);
+    }
 
-          {/* Music Badge Overlay on Top Left of Media */}
-          {selectedSong && (
-            <View style={styles.mediaMusicOverlay}>
-              <Text style={styles.musicOverlayText}>
-                🎶 {selectedSong.title} • {selectedSong.artist}
-              </Text>
-            </View>
-          )}
-        </View>
+    function filterSongs(query) {
+        let filtered = realSongs.filter(s => s.title.toLowerCase().includes(query.toLowerCase()));
+        renderSongsList(filtered);
+    }
 
-        {/* Post Action Buttons */}
-        <View style={styles.postActionsRow}>
-          <View style={styles.leftActionsRow}>
-            <TouchableOpacity onPress={() => toggleLikePost(item.id)} style={styles.actionBtn}>
-              <Text style={styles.actionIcon}>{isLiked ? '❤️' : '🤍'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => openCommentsModal(item)} style={styles.actionBtn}>
-              <Text style={styles.actionIcon}>💬</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionBtn}>
-              <Text style={styles.actionIcon}>✈️</Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity onPress={() => toggleSavePost(item.id)}>
-            <Text style={styles.actionIcon}>{isSaved ? '🏷️' : '🔖'}</Text>
-          </TouchableOpacity>
-        </View>
+    // Initialize App Feed on load
+    renderPosts();
+</script>
 
-        {/* Post Caption & Details */}
-        <View style={styles.postDetailsContainer}>
-          <Text style={styles.likesText}>
-            {isLiked ? item.likesCount + 1 : item.likesCount} likes
-          </Text>
-          <Text style={styles.captionText}>
-            <Text style={styles.captionUsername}>{item.username} </Text>
-            {item.caption}
-          </Text>
-
-          {item.comments.length > 0 && (
-            <TouchableOpacity onPress={() => openCommentsModal(item)}>
-              <Text style={styles.viewCommentsText}>
-                View all {item.comments.length} comments
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          <Text style={styles.timestampText}>{item.timestamp}</Text>
-        </View>
-      </View>
-    );
-  };
-
-  // 4. REELS VIEW (FULL SCREEN REELS ENGINE)
-  const renderReelsTab = () => (
-    <FlatList
-      data={INITIAL_REELS}
-      keyExtractor={(item) => item.id}
-      pagingEnabled
-      showsVerticalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View style={styles.reelContainer}>
-          <Video
-            source={{ uri: item.videoUrl }}
-            style={styles.reelVideo}
-            resizeMode="cover"
-            repeat={true}
-          />
-          {/* Reel Overlay Info */}
-          <View style={styles.reelOverlayBottom}>
-            <View style={styles.reelUserRow}>
-              <Image source={{ uri: item.userAvatar }} style={styles.reelAvatar} />
-              <Text style={styles.reelUsername}>{item.username}</Text>
-              <TouchableOpacity style={styles.reelFollowBtn}>
-                <Text style={styles.reelFollowTxt}>Follow</Text>
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.reelCaption}>{item.caption}</Text>
-            <View style={styles.reelMusicRow}>
-              <Text style={styles.reelMusicText}>🎶 {item.songTitle}</Text>
-            </View>
-          </View>
-
-          {/* Reel Right Action Sidebar */}
-          <View style={styles.reelRightSidebar}>
-            <TouchableOpacity style={styles.reelActionItem}>
-              <Text style={styles.reelActionIcon}>❤️</Text>
-              <Text style={styles.reelActionCount}>{item.likes}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.reelActionItem}>
-              <Text style={styles.reelActionIcon}>💬</Text>
-              <Text style={styles.reelActionCount}>{item.commentsCount}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.reelActionItem}>
-              <Text style={styles.reelActionIcon}>✈️</Text>
-              <Text style={styles.reelActionCount}>Share</Text>
-            </TouchableOpacity>
-            <View style={styles.reelsDiskDisc}>
-              <Text style={styles.diskEmoji}>💿</Text>
-            </View>
-          </View>
-        </View>
-      )}
-    />
-  );
-
-  // 5. SEARCH & EXPLORE GRID VIEW
-  const renderSearchTab = () => {
-    const gridItems = Array.from({ length: 15 }).map((_, index) => ({
-      id: `grid_${index}`,
-      uri: `https://picsum.photos/id/${100 + index}/300/300`
-    }));
-
-    return (
-      <View style={styles.searchTabContainer}>
-        <View style={styles.searchBarBox}>
-          <Text style={styles.searchBarIcon}>🔍</Text>
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search accounts, tags, audio..."
-            placeholderTextColor="#888"
-          />
-        </View>
-
-        <FlatList
-          data={gridItems}
-          keyExtractor={(item) => item.id}
-          numColumns={3}
-          renderItem={({ item }) => (
-            <Image source={{ uri: item.uri }} style={styles.gridImageTile} />
-          )}
-        />
-      </View>
-    );
-  };
-
-  // 6. PROFILE TAB VIEW
-  const renderProfileTab = () => (
-    <ScrollView style={styles.profileContainer}>
-      <View style={styles.profileHeader}>
-        <Image source={{ uri: 'https://picsum.photos/id/64/150/150' }} style={styles.profileBigAvatar} />
-        <View style={styles.profileStatsRow}>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>18</Text>
-            <Text style={styles.statLabel}>Posts</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>4.2K</Text>
-            <Text style={styles.statLabel}>Followers</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>350</Text>
-            <Text style={styles.statLabel}>Following</Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.bioSection}>
-        <Text style={styles.profileNameText}>Tarun | Full-Stack AI Apps</Text>
-        <Text style={styles.bioText}>🚀 Founder at Viziag Global & Elight Cleaning</Text>
-        <Text style={styles.bioText}>💻 Mobile App Automation | Jet Black India</Text>
-        <Text style={styles.bioLink}>📍 Faridabad, Haryana</Text>
-      </View>
-
-      <View style={styles.profileButtonsRow}>
-        <TouchableOpacity style={styles.editProfileBtn}>
-          <Text style={styles.editProfileTxt}>Edit Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.editProfileBtn} onPress={() => setIsSettingsVisible(true)}>
-          <Text style={styles.editProfileTxt}>API Keys & Setup</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* User Post Grid */}
-      <View style={styles.profileGridHeader}>
-        <Text style={styles.gridTabTitleActive}>▦ Posts</Text>
-        <Text style={styles.gridTabTitle}>🎬 Reels</Text>
-        <Text style={styles.gridTabTitle}>🏷️ Tagged</Text>
-      </View>
-
-      <View style={styles.profileGridWrap}>
-        {Array.from({ length: 9 }).map((_, i) => (
-          <Image
-            key={i}
-            source={{ uri: `https://picsum.photos/id/${210 + i}/300/300` }}
-            style={styles.profileGridTile}
-          />
-        ))}
-      </View>
-    </ScrollView>
-  );
-
-  // ------------------------------------------
-  // RENDER MAIN SCREEN LAYOUT
-  // ------------------------------------------
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
-
-      {/* BACKGROUND REAL AUDIO PLAYER ENGINE */}
-      {selectedSong && (
-        <Video
-          ref={audioPlayerRef}
-          source={{ uri: selectedSong.url }}
-          audioOnly={true}
-          paused={!isPlayingAudio}
-          playInBackground={true}
-          ignoreSilentSwitch="ignore"
-        />
-      )}
-
-      {/* ACTIVE CALL OVERLAY SCREEN */}
-      {inCall ? (
-        <View style={styles.fullCallOverlay}>
-          <Text style={styles.callTypeTitle}>
-            {callType === 'video' ? '📹 Instagram Video Call' : '📞 Instagram Voice Call'}
-          </Text>
-          <Text style={styles.callTimerText}>{formatTime(callDuration)}</Text>
-
-          <View style={styles.callAvatarFrame}>
-            {callType === 'video' && !isCameraOff ? (
-              <Video
-                source={{ uri: 'https://www.w3schools.com/html/mov_bbb.mp4' }}
-                style={styles.fullCallVideo}
-                resizeMode="cover"
-                repeat={true}
-              />
-            ) : (
-              <Image
-                source={{ uri: 'https://picsum.photos/id/1011/300/300' }}
-                style={styles.callBigAvatar}
-              />
-            )}
-          </View>
-
-          <View style={styles.callControlsRow}>
-            <TouchableOpacity
-              style={[styles.callControlCircle, isMuted && styles.controlActiveRed]}
-              onPress={() => setIsMuted(!isMuted)}
-            >
-              <Text style={styles.callControlIcon}>{isMuted ? '🔇' : '🎙️'}</Text>
-            </TouchableOpacity>
-
-            {callType === 'video' && (
-              <TouchableOpacity
-                style={[styles.callControlCircle, isCameraOff && styles.controlActiveRed]}
-                onPress={() => setIsCameraOff(!isCameraOff)}
-              >
-                <Text style={styles.callControlIcon}>{isCameraOff ? '📷❌' : '📹'}</Text>
-              </TouchableOpacity>
-            )}
-
-            <TouchableOpacity style={styles.endCallCircle} onPress={() => setInCall(false)}>
-              <Text style={styles.endCallIcon}>📵</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      ) : (
-        /* MAIN NAVIGATION CONTROLLER */
-        <View style={styles.mainWrapper}>
-          {currentTab === 'Home' && (
-            <View style={{ flex: 1 }}>
-              {renderHeader()}
-
-              {/* MUSIC CONTROLLER BAR (If Song Selected) */}
-              {selectedSong && (
-                <View style={styles.musicStickyPlayerBar}>
-                  <Text style={styles.stickyMusicTitle} numberOfLines={1}>
-                    🎶 {selectedSong.title} (Offset: {audioOffset}s)
-                  </Text>
-                  <View style={styles.stickyControlsRow}>
-                    <TouchableOpacity style={styles.miniBtn} onPress={() => handleSeekAudio(-5)}>
-                      <Text style={styles.miniBtnTxt}>-5s</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.miniBtn}
-                      onPress={() => setIsPlayingAudio(!isPlayingAudio)}
-                    >
-                      <Text style={styles.miniBtnTxt}>{isPlayingAudio ? '⏸️' : '▶️'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.miniBtn} onPress={() => handleSeekAudio(5)}>
-                      <Text style={styles.miniBtnTxt}>+5s</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
-
-              <FlatList
-                data={posts}
-                keyExtractor={(item) => item.id}
-                ListHeaderComponent={renderStoriesBar}
-                renderItem={renderPostCard}
-                showsVerticalScrollIndicator={false}
-              />
-            </View>
-          )}
-
-          {currentTab === 'Search' && renderSearchTab()}
-          {currentTab === 'Reels' && renderReelsTab()}
-          {currentTab === 'Profile' && renderProfileTab()}
-
-          {/* BOTTOM TAB BAR */}
-          <View style={styles.bottomTabBar}>
-            <TouchableOpacity onPress={() => setCurrentTab('Home')}>
-              <Text style={styles.tabIcon}>{currentTab === 'Home' ? '🏠' : '🏚️'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setCurrentTab('Search')}>
-              <Text style={styles.tabIcon}>{currentTab === 'Search' ? '🔍' : '🔎'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setCurrentTab('Reels')}>
-              <Text style={styles.tabIcon}>{currentTab === 'Reels' ? '🎬' : '🎞️'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setCurrentTab('Profile')}>
-              <Text style={styles.tabIcon}>{currentTab === 'Profile' ? '👤' : '👤'}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-
-      {/* ========================================== */}
-      {/* MODAL 1: SEARCH & ADD MUSIC MODAL          */}
-      {/* ========================================== */}
-      <Modal visible={isMusicModalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalDarkOverlay}>
-          <View style={styles.musicModalSheet}>
-            <View style={styles.modalHeaderRow}>
-              <Text style={styles.modalTitleText}>🎵 Search & Add Music</Text>
-              <TouchableOpacity onPress={() => setIsMusicModalVisible(false)}>
-                <Text style={styles.closeModalTxt}>✕</Text>
-              </TouchableOpacity>
-            </View>
-
-            <TextInput
-              style={styles.modalSearchInput}
-              placeholder="Search MP3 tracks, artists..."
-              placeholderTextColor="#777"
-              value={searchSongQuery}
-              onChangeText={handleSearchSong}
-            />
-
-            <FlatList
-              data={filteredSongsList}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[
-                    styles.songCardRow,
-                    selectedSong?.id === item.id && styles.selectedSongCardRow
-                  ]}
-                  onPress={() => handleSelectSong(item)}
-                >
-                  <View style={styles.songMetaLeft}>
-                    <Text style={styles.songCardTitle}>🎶 {item.title}</Text>
-                    <Text style={styles.songCardArtist}>
-                      {item.artist} • {item.duration}
-                    </Text>
-                  </View>
-                  <Text style={styles.selectSongBadge}>
-                    {selectedSong?.id === item.id ? 'Playing 🎧' : 'Apply'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </View>
-      </Modal>
-
-      {/* ========================================== */}
-      {/* MODAL 2: COMMENTS BOTTOM SHEET MODAL       */}
-      {/* ========================================== */}
-      <Modal visible={isCommentsVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalDarkOverlay}>
-          <View style={styles.commentsModalSheet}>
-            <View style={styles.modalHeaderRow}>
-              <Text style={styles.modalTitleText}>💬 Comments</Text>
-              <TouchableOpacity onPress={() => setIsCommentsVisible(false)}>
-                <Text style={styles.closeModalTxt}>✕</Text>
-              </TouchableOpacity>
-            </View>
-
-            <FlatList
-              data={activePostComments}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={styles.commentRowItem}>
-                  <Text style={styles.commentUserText}>{item.user}</Text>
-                  <Text style={styles.commentBodyText}>{item.text}</Text>
-                </View>
-              )}
-            />
-
-            <View style={styles.addCommentBar}>
-              <TextInput
-                style={styles.commentInput}
-                placeholder="Add a comment as tarun_official..."
-                placeholderTextColor="#666"
-                value={newCommentText}
-                onChangeText={setNewCommentText}
-              />
-              <TouchableOpacity onPress={handleAddComment} style={styles.postCommentBtn}>
-                <Text style={styles.postCommentBtnTxt}>Post</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      {/* ========================================== */}
-      {/* MODAL 3: AGORA & API KEYS SETUP MODAL      */}
-      {/* ========================================== */}
-      <Modal visible={isSettingsVisible} animationType="fade" transparent={true}>
-        <View style={styles.modalDarkOverlay}>
-          <View style={styles.settingsModalCard}>
-            <Text style={styles.settingsTitle}>⚙️ Config & API Keys</Text>
-            <Text style={styles.settingsSubtitle}>
-              पहली बार सेटिंग्स भरें। यह आपके लोकल स्टोरेज (AsyncStorage) में सुरक्षित सेव रहेगा।
-            </Text>
-
-            <TextInput
-              style={styles.keyInput}
-              placeholder="Agora App ID"
-              placeholderTextColor="#888"
-              value={appIdKey}
-              onChangeText={setAppIdKey}
-            />
-            <TextInput
-              style={styles.keyInput}
-              placeholder="Agora Token Key"
-              placeholderTextColor="#888"
-              value={tokenKey}
-              onChangeText={setTokenKey}
-            />
-            <TextInput
-              style={styles.keyInput}
-              placeholder="Channel Name"
-              placeholderTextColor="#888"
-              value={channelKey}
-              onChangeText={setChannelKey}
-            />
-            <TextInput
-              style={styles.keyInput}
-              placeholder="Main AI / Backend API Key"
-              placeholderTextColor="#888"
-              value={apiKey}
-              onChangeText={setApiKey}
-              secureTextEntry={true}
-            />
-
-            <TouchableOpacity style={styles.saveKeysButton} onPress={handleSaveSettings}>
-              <Text style={styles.saveKeysBtnText}>Save Configuration</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.cancelKeysButton}
-              onPress={() => setIsSettingsVisible(false)}
-            >
-              <Text style={styles.cancelKeysBtnText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </SafeAreaView>
-  );
-}
-
-// ==========================================
-// COMPREHENSIVE INSTAGRAM DARK THEME STYLES
-// ==========================================
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#000000'
-  },
-  mainWrapper: {
-    flex: 1,
-    backgroundColor: '#000000'
-  },
-
-  // 1. Header Styles
-  headerContainer: {
-    height: 52,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    borderBottomWidth: 0.3,
-    borderBottomColor: '#262626',
-    backgroundColor: '#000000'
-  },
-  headerLogoText: {
-    color: '#ffffff',
-    fontSize: 24,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-    letterSpacing: -0.5
-  },
-  headerIconsRow: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  iconButton: {
-    marginLeft: 14
-  },
-  emojiIcon: {
-    fontSize: 20
-  },
-
-  // 2. Stories Bar Styles
-  storiesContainer: {
-    paddingVertical: 10,
-    borderBottomWidth: 0.3,
-    borderBottomColor: '#262626',
-    backgroundColor: '#000000'
-  },
-  storyWrapper: {
-    alignItems: 'center',
-    marginHorizontal: 8,
-    width: 72
-  },
-  storyRing: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    borderWidth: 2.5,
-    borderColor: '#c13584',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  userStoryRing: {
-    borderColor: '#333333'
-  },
-  storyAvatar: {
-    width: 58,
-    height: 58,
-    borderRadius: 29
-  },
-  addStoryPlus: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#0095f6',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#000000'
-  },
-  plusText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: 'bold'
-  },
-  storyUsername: {
-    color: '#cccccc',
-    fontSize: 11,
-    marginTop: 4,
-    textAlign: 'center'
-  },
-
-  // 3. Post Card Styles
-  postCardContainer: {
-    marginBottom: 15,
-    backgroundColor: '#000000'
-  },
-  postHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8
-  },
-  userInfoRow: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  postUserAvatar: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    marginRight: 10
-  },
-  postUsernameText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: 'bold'
-  },
-  postLocationText: {
-    color: '#999999',
-    fontSize: 11
-  },
-  threeDotsText: {
-    color: '#ffffff',
-    fontSize: 16,
-    letterSpacing: 2
-  },
-  postMediaBox: {
-    width: SCREEN_WIDTH,
-    height: 380,
-    backgroundColor: '#111111',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  postMedia: {
-    width: '100%',
-    height: '100%'
-  },
-  mediaMusicOverlay: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15
-  },
-  musicOverlayText: {
-    color: '#ffffff',
-    fontSize: 11,
-    fontWeight: '600'
-  },
-  postActionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 10
-  },
-  leftActionsRow: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  actionBtn: {
-    marginRight: 16
-  },
-  actionIcon: {
-    fontSize: 22
-  },
-  postDetailsContainer: {
-    paddingHorizontal: 12
-  },
-  likesText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 13,
-    marginBottom: 4
-  },
-  captionText: {
-    color: '#ffffff',
-    fontSize: 13,
-    lineHeight: 18
-  },
-  captionUsername: {
-    fontWeight: 'bold'
-  },
-  viewCommentsText: {
-    color: '#888888',
-    fontSize: 12,
-    marginTop: 5
-  },
-  timestampText: {
-    color: '#555555',
-    fontSize: 10,
-    marginTop: 4
-  },
-
-  // 4. Reels View Styles
-  reelContainer: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT - 110,
-    backgroundColor: '#000000',
-    justifyContent: 'flex-end'
-  },
-  reelVideo: {
-    ...StyleSheet.absoluteFillObject
-  },
-  reelOverlayBottom: {
-    padding: 15,
-    marginBottom: 20,
-    width: '80%'
-  },
-  reelUserRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8
-  },
-  reelAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 8
-  },
-  reelUsername: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginRight: 10
-  },
-  reelFollowBtn: {
-    borderWidth: 1,
-    borderColor: '#ffffff',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2
-  },
-  reelFollowTxt: {
-    color: '#ffffff',
-    fontSize: 11,
-    fontWeight: 'bold'
-  },
-  reelCaption: {
-    color: '#ffffff',
-    fontSize: 13,
-    marginBottom: 6
-  },
-  reelMusicRow: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  reelMusicText: {
-    color: '#dddddd',
-    fontSize: 12
-  },
-  reelRightSidebar: {
-    position: 'absolute',
-    right: 15,
-    bottom: 40,
-    alignItems: 'center'
-  },
-  reelActionItem: {
-    alignItems: 'center',
-    marginBottom: 20
-  },
-  reelActionIcon: {
-    fontSize: 26
-  },
-  reelActionCount: {
-    color: '#ffffff',
-    fontSize: 12,
-    marginTop: 3
-  },
-  reelsDiskDisc: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#222',
-    justify: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#fff'
-  },
-  diskEmoji: {
-    fontSize: 14
-  },
-
-  // 5. Search & Grid Styles
-  searchTabContainer: {
-    flex: 1,
-    backgroundColor: '#000000'
-  },
-  searchBarBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#262626',
-    margin: 10,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    height: 38
-  },
-  searchBarIcon: {
-    fontSize: 14,
-    marginRight: 8
-  },
-  searchBarInput: {
-    color: '#ffffff',
-    fontSize: 13,
-    flex: 1
-  },
-  gridImageTile: {
-    width: SCREEN_WIDTH / 3 - 2,
-    height: SCREEN_WIDTH / 3 - 2,
-    margin: 1
-  },
-
-  // 6. Profile Styles
-  profileContainer: {
-    flex: 1,
-    backgroundColor: '#000000'
-  },
-  profileHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingTop: 15
-  },
-  profileBigAvatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40
-  },
-  profileStatsRow: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginLeft: 15
-  },
-  statBox: {
-    alignItems: 'center'
-  },
-  statNumber: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold'
-  },
-  statLabel: {
-    color: '#aaaaaa',
-    fontSize: 12
-  },
-  bioSection: {
-    paddingHorizontal: 15,
-    paddingVertical: 10
-  },
-  profileNameText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 14
-  },
-  bioText: {
-    color: '#dddddd',
-    fontSize: 13,
-    marginTop: 2
-  },
-  bioLink: {
-    color: '#e0e0e0',
-    fontSize: 12,
-    marginTop: 2
-  },
-  profileButtonsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    marginVertical: 10
-  },
-  editProfileBtn: {
-    flex: 0.48,
-    backgroundColor: '#262626',
-    paddingVertical: 8,
-    borderRadius: 6,
-    alignItems: 'center'
-  },
-  editProfileTxt: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 13
-  },
-  profileGridHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    borderTopWidth: 0.3,
-    borderTopColor: '#262626',
-    borderBottomWidth: 0.3,
-    borderBottomColor: '#262626',
-    paddingVertical: 10,
-    marginTop: 10
-  },
-  gridTabTitleActive: {
-    color: '#0095f6',
-    fontWeight: 'bold'
-  },
-  gridTabTitle: {
-    color: '#777777'
-  },
-  profileGridWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap'
-  },
-  profileGridTile: {
-    width: SCREEN_WIDTH / 3 - 2,
-    height: SCREEN_WIDTH / 3 - 2,
-    margin: 1
-  },
-
-  // 7. Sticky Music Player & Controls
-  musicStickyPlayerBar: {
-    backgroundColor: '#1a1a1a',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#333333'
-  },
-  stickyMusicTitle: {
-    color: '#0095f6',
-    fontSize: 12,
-    fontWeight: 'bold',
-    flex: 0.6
-  },
-  stickyControlsRow: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  miniBtn: {
-    backgroundColor: '#333333',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginLeft: 6
-  },
-  miniBtnTxt: {
-    color: '#ffffff',
-    fontSize: 11,
-    fontWeight: 'bold'
-  },
-
-  // 8. Calling Overlay Styles
-  fullCallOverlay: {
-    flex: 1,
-    backgroundColor: '#111111',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 50
-  },
-  callTypeTitle: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: 'bold'
-  },
-  callTimerText: {
-    color: '#0095f6',
-    fontSize: 16,
-    marginTop: 5
-  },
-  callAvatarFrame: {
-    width: 250,
-    height: 350,
-    borderRadius: 20,
-    backgroundColor: '#222222',
-    overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  fullCallVideo: {
-    width: '100%',
-    height: '100%'
-  },
-  callBigAvatar: {
-    width: 140,
-    height: 140,
-    borderRadius: 70
-  },
-  callControlsRow: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  callControlCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#333333',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 12
-  },
-  controlActiveRed: {
-    backgroundColor: '#ff3b30'
-  },
-  callControlIcon: {
-    fontSize: 22
-  },
-  endCallCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#ff3b30',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 12
-  },
-  endCallIcon: {
-    fontSize: 26
-  },
-
-  // 9. Bottom Navigation Bar Styles
-  bottomTabBar: {
-    height: 48,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#000000',
-    borderTopWidth: 0.3,
-    borderTopColor: '#262626'
-  },
-  tabIcon: {
-    fontSize: 22
-  },
-
-  // 10. Modals Base Styles
-  modalDarkOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    justifyContent: 'flex-end'
-  },
-  musicModalSheet: {
-    height: '75%',
-    backgroundColor: '#1c1c1c',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 15
-  },
-  commentsModalSheet: {
-    height: '65%',
-    backgroundColor: '#1c1c1c',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 15
-  },
-  modalHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12
-  },
-  modalTitleText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold'
-  },
-  closeModalTxt: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: 'bold'
-  },
-  modalSearchInput: {
-    backgroundColor: '#2a2a2a',
-    color: '#ffffff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 40,
-    marginBottom: 12
-  },
-  songCardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#262626',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8
-  },
-  selectedSongCardRow: {
-    borderColor: '#0095f6',
-    borderWidth: 1,
-    backgroundColor: '#002244'
-  },
-  songMetaLeft: {
-    flex: 0.8
-  },
-  songCardTitle: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 13
-  },
-  songCardArtist: {
-    color: '#888888',
-    fontSize: 11,
-    marginTop: 2
-  },
-  selectSongBadge: {
-    color: '#0095f6',
-    fontWeight: 'bold',
-    fontSize: 12
-  },
-  commentRowItem: {
-    paddingVertical: 8,
-    borderBottomWidth: 0.3,
-    borderBottomColor: '#333'
-  },
-  commentUserText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 12
-  },
-  commentBodyText: {
-    color: '#dddddd',
-    fontSize: 13,
-    marginTop: 2
-  },
-  addCommentBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10
-  },
-  commentInput: {
-    flex: 1,
-    backgroundColor: '#2a2a2a',
-    color: '#ffffff',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    height: 40,
-    fontSize: 13
-  },
-  postCommentBtn: {
-    marginLeft: 10
-  },
-  postCommentBtnTxt: {
-    color: '#0095f6',
-    fontWeight: 'bold',
-    fontSize: 14
-  },
-
-  // 11. Key Settings Modal Styles
-  settingsModalCard: {
-    backgroundColor: '#1c1c1c',
-    margin: 20,
-    borderRadius: 12,
-    padding: 20,
-    alignSelf: 'center',
-    width: '90%'
-  },
-  settingsTitle: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 6,
-    textAlign: 'center'
-  },
-  settingsSubtitle: {
-    color: '#aaaaaa',
-    fontSize: 12,
-    marginBottom: 16,
-    textAlign: 'center'
-  },
-  keyInput: {
-    backgroundColor: '#2a2a2a',
-    color: '#ffffff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 42,
-    marginBottom: 10,
-    fontSize: 13
-  },
-  saveKeysButton: {
-    backgroundColor: '#0095f6',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10
-  },
-  saveKeysBtnText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 14
-  },
-  cancelKeysButton: {
-    paddingVertical: 10,
-    alignItems: 'center',
-    marginTop: 5
-  },
-  cancelKeysBtnText: {
-    color: '#888888',
-    fontSize: 13
-  }
-});
+</body>
+</html>
