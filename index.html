@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>मल्टी-वेंडर एआई स्टोर - व्हाट्सएप आर्डर इंटीग्रेशन</title>
-    <!-- Tailwind CSS CDN -->
+    <title>मदर चैट - डायरेक्ट कैमरा फोटो अपलोड</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -15,84 +14,110 @@
 </head>
 <body class="flex flex-col h-screen justify-between overflow-hidden">
 
-    <!-- SIDEBAR DRAWER (Secure Vendor Admin Panel) -->
+    <!-- SIDEBAR DRAWER: ADMIN PANEL -->
     <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden"></div>
-    <div id="sidebar" class="fixed inset-y-0 left-0 w-85 bg-[#111827] border-r border-slate-800 z-50 flex flex-col justify-between p-5 shadow-2xl overflow-y-auto">
+    <div id="sidebar" class="fixed inset-y-0 left-0 w-96 bg-[#111827] border-r border-slate-800 z-50 flex flex-col justify-between p-5 shadow-2xl overflow-y-auto">
         
-        <!-- STEP 1: PIN LOCK SCREEN -->
+        <!-- PIN LOCK -->
         <div id="admin-lock-screen" class="space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h2 class="text-sm font-bold text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-lock text-red-400"></i> वेंडर एडमिन लॉक
+                    <i class="fa-solid fa-lock text-red-400"></i> वेंडर एडमिन लॉक (PIN Protected)
                 </h2>
                 <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="bg-[#1F2937] p-4 rounded-2xl border border-slate-700 space-y-3 text-center">
-                <p class="text-xs text-slate-300">डुकानदार एडमिन पैनल खोलने के लिए अपना 4-अंकों का पिन दर्ज करें:</p>
+                <p class="text-xs text-slate-300">एडमिन पैनल खोलने के लिए अपना 4-अंकों का पिन दर्ज करें:</p>
                 <input type="password" id="admin-pin-input" maxlength="4" autocomplete="off" placeholder="****" 
                     class="w-32 mx-auto bg-[#0B0F19] text-center tracking-widest text-lg text-emerald-400 rounded-xl p-2.5 border border-slate-600 focus:outline-none">
                 <button onclick="verifyAdminPin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow">
                     पैनल खोलें
                 </button>
-                <p class="text-[10px] text-slate-400">डिफ़ॉल्ट पिन 1234 है।</p>
+                <p class="text-[10px] text-slate-400">डिफ़ॉल्ट पिन: 1234</p>
             </div>
         </div>
 
-        <!-- STEP 2: ACTUAL ADMIN DASHBOARD -->
+        <!-- FULL ADMIN DASHBOARD -->
         <div id="admin-dashboard" class="space-y-4 hidden">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h2 class="text-sm font-bold text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-store text-emerald-400"></i> एडमिन पैनल (डेटा सेटअप)
+                    <i class="fa-solid fa-store text-emerald-400"></i> दुकान एडमिन & कैमरा अपलोड
                 </h2>
-                <button onclick="lockAdminPanel()" class="text-red-400 hover:text-red-300 text-xs flex items-center gap-1"><i class="fa-solid fa-lock"></i> लॉक करें</button>
+                <button onclick="lockAdminPanel()" class="text-red-400 hover:text-red-300 text-xs flex items-center gap-1"><i class="fa-solid fa-lock"></i> लॉक</button>
             </div>
 
-            <!-- Shop Configuration Form -->
             <div class="space-y-3">
-                <div class="space-y-1">
-                    <label class="text-xs font-semibold text-emerald-400">🏪 दुकान का नाम:</label>
-                    <input type="text" id="shop-name-input" autocomplete="off" placeholder="जैसे: तरुण फ्रेश ग्रोसरी" 
-                        class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-xs font-semibold text-emerald-400">💬 व्हाट्सएप नंबर (नोटिफिकेशन के लिए):</label>
-                    <input type="text" id="shop-whatsapp-input" autocomplete="off" placeholder="जैसे: 919876543210" 
-                        class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-xs font-semibold text-amber-400">📂 कैटेगरी:</label>
-                    <select id="shop-category-select" class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
-                        <option value="ग्रोसरी & राशन">🛒 ग्रोसरी & राशन</option>
-                        <option value="ताजे फल & सब्जियां">🍎 ताजे फल & सब्जियां</option>
-                        <option value="डेयरी & बेकरी">🥛 डेयरी & बेकरी</option>
-                        <option value="कोल्ड ड्रिंक & स्नैक्स">🥤 कोल्ड ड्रिंक & स्नैक्स</option>
+                <!-- SHOP OPEN/CLOSE TOGGLE -->
+                <div class="bg-[#1F2937] p-3.5 rounded-2xl border border-slate-700 flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-200">🟢 दुकान की स्थिति (Status)</h4>
+                        <p class="text-[10px] text-slate-400">दुकान बंद करने पर कैटलॉग छिप जाएगा</p>
+                    </div>
+                    <select id="shop-status-toggle" class="bg-[#0B0F19] text-xs font-bold text-emerald-400 px-3 py-2 rounded-xl border border-slate-600 focus:outline-none">
+                        <option value="OPEN">🟢 खुली है (Open)</option>
+                        <option value="CLOSED">🔴 बंद है (Closed)</option>
                     </select>
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-xs font-semibold text-indigo-400">📋 आइटम और रेट लिस्ट (नाम - भाव):</label>
-                    <textarea id="shop-items-input" rows="4" autocomplete="off" placeholder="जैसे:
-Apple - ₹120 / किलो
-Banana - ₹60 / दर्जन
-Rice - ₹110 / किलो"
-                        class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none"></textarea>
+                    <label class="text-xs font-semibold text-emerald-400">🏪 दुकान का नाम:</label>
+                    <input type="text" id="shop-name-input" autocomplete="off" placeholder="जैसे: तरुण फ्रेश फ्रूट्स" 
+                        class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
                 </div>
 
-                <!-- PIN Save Option at Bottom -->
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-emerald-400">💬 व्हाट्सएप नंबर (आर्डर के लिए):</label>
+                    <input type="text" id="shop-whatsapp-input" autocomplete="off" placeholder="जैसे: 919876543210" 
+                        class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
+                </div>
+
+                <!-- Direct Camera / Gallery Upload for Shop & Owner -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-semibold text-amber-400">🖼️ दुकान की फोटो:</label>
+                        <input type="file" id="shop-photo-file" accept="image/*" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-700">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-semibold text-amber-400">👨‍💼 ओनर की फोटो:</label>
+                        <input type="file" id="owner-photo-file" accept="image/*" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-700">
+                    </div>
+                </div>
+
+                <!-- Product Adder with Direct Camera/Gallery Capture -->
+                <div class="bg-[#1F2937] p-3 rounded-2xl border border-slate-700 space-y-2.5">
+                    <label class="text-xs font-bold text-indigo-400 flex items-center gap-1">
+                        <i class="fa-solid fa-camera"></i> नया आइटम और कैमरा फोटो जोड़ें:
+                    </label>
+                    <input type="text" id="new-item-name" placeholder="आइटम नाम (जैसे: अनार)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="new-item-unit" placeholder="वजन (किलो/दर्जन)" class="bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
+                        <input type="text" id="new-item-price" placeholder="रेट (₹)" class="bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-semibold text-slate-300">📸 फोटो खींचें या गैलरी से चुनें:</label>
+                        <input type="file" id="new-item-img-file" accept="image/*" class="w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+                    </div>
+
+                    <input type="text" id="new-item-discount" placeholder="डिस्काउंट/ऑफर (जैसे: ₹10 छूट)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
+                    
+                    <button onclick="addItemWithCameraPhoto()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-xl transition shadow">
+                        कैटलॉग में जोड़ें (+)
+                    </button>
+                </div>
+
                 <div class="space-y-1 pt-2 border-t border-slate-800">
-                    <label class="text-xs font-semibold text-red-400">🔐 4-अंकों का पिन (PIN):</label>
+                    <label class="text-xs font-semibold text-red-400">🔐 नया 4-अंकों का पिन (PIN):</label>
                     <input type="password" id="new-admin-pin" maxlength="4" autocomplete="off" placeholder="उदा: 1234" 
                         class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
                 </div>
 
                 <button onclick="saveShopSettings()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow">
-                    डेटा और पिन सेव करें
+                    डेटा और स्टेटस सेव करें
                 </button>
             </div>
 
-            <!-- API Key Settings -->
+            <!-- API Key -->
             <div class="space-y-1.5 pt-3 border-t border-slate-800">
                 <label class="text-xs font-semibold text-slate-400">🔑 Groq API Key:</label>
                 <input type="password" id="groq-key-input" autocomplete="off" placeholder="gsk_..." 
@@ -104,7 +129,7 @@ Rice - ₹110 / किलो"
         </div>
 
         <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-slate-800 mt-4">
-            WhatsApp Order System • v5.0
+            Mother Chat Admin • v10.0 (Camera Direct)
         </div>
     </div>
 
@@ -114,63 +139,63 @@ Rice - ₹110 / किलो"
             <button onclick="toggleSidebar()" class="text-slate-300 hover:text-white p-2 rounded-lg hover:bg-slate-800" title="एडमिन पैनल">
                 <i class="fa-solid fa-bars text-lg"></i>
             </button>
-            <div>
-                <span class="text-sm font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent" id="header-shop-name">लोकल एआई स्टोर</span>
-                <p class="text-[10px] text-slate-400" id="header-category-text">ग्रोसरी & फ्रूट्स डिलीवरी</p>
+            <div class="flex items-center gap-2.5">
+                <div class="relative">
+                    <img id="header-shop-img" src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=100" class="w-9 h-9 rounded-xl object-cover border border-emerald-500/40">
+                    <img id="header-owner-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-4 h-4 rounded-full object-cover absolute -bottom-1 -right-1 border border-slate-900">
+                </div>
+                <div>
+                    <span class="text-sm font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent" id="header-shop-name">लोकल एआई स्टोर</span>
+                    <p class="text-[10px] text-slate-400" id="header-open-status-text">🟢 खुली हुई है</p>
+                </div>
             </div>
-        </div>
-        <button onclick="clearCurrentHistory()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800" title="चैट क्लियर करें">
-            <i class="fa-solid fa-rotate-right text-base"></i>
-        </button>
-    </header>
-
-    <!-- LIVE STATUS BANNER & CART BUTTON -->
-    <div class="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-b border-emerald-500/30 px-4 py-2 flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-basket-shopping text-emerald-400 text-sm"></i>
-            <span class="text-xs text-slate-200 font-medium" id="banner-status">आर्डर देने के लिए चैट करें</span>
         </div>
         <div class="flex items-center gap-2">
             <button onclick="openCartModal()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow flex items-center gap-1.5">
                 <i class="fa-solid fa-cart-shopping"></i> कार्ट (<span id="cart-count">0</span>)
             </button>
-            <button onclick="toggleSidebar()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow flex items-center gap-1">
-                <i class="fa-solid fa-lock"></i> वेंडर
+            <button onclick="clearCurrentHistory()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800" title="चैट क्लियर करें">
+                <i class="fa-solid fa-rotate-right text-base"></i>
             </button>
         </div>
-    </div>
+    </header>
 
-    <!-- MAIN CHAT AREA WITH LIVE INVENTORY & ADD TO CART -->
+    <!-- MAIN CHAT AREA -->
     <main id="chat-container" class="flex-1 overflow-y-auto px-4 py-3 space-y-4">
-        <!-- Live Catalog Widget inside Chat -->
-        <div id="live-catalog-box" class="bg-[#161F30] border border-slate-700 rounded-2xl p-3.5 space-y-2.5 shadow-lg">
+        
+        <!-- MOTHER CHAT LIVE STORE & CATALOG BANNER -->
+        <div id="mother-shop-banner-box" class="bg-[#161F30] border border-emerald-500/30 rounded-2xl p-3.5 space-y-3 shadow-xl">
             <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
-                <h3 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                    <i class="fa-solid fa-list-check"></i> दुकान की लाइव आइटम लिस्ट (Add to Cart करें):
-                </h3>
-                <span id="catalog-shop-badge" class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-800">शॉप सेट नहीं है</span>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-store text-emerald-400 text-base" id="banner-store-icon"></i>
+                    <div>
+                        <h3 class="text-xs font-bold text-emerald-300" id="chat-live-shop-name">लोकल स्टोर</h3>
+                        <p class="text-[10px] text-slate-400" id="banner-sub-status">लाइव कैटलॉग & रेट्स</p>
+                    </div>
+                </div>
+                <span id="badge-status-indicator" class="text-[10px] bg-emerald-950 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-800 animate-pulse">● लाइव</span>
             </div>
-            <div id="catalog-items-display" class="space-y-1.5 text-xs text-slate-300">
-                दुकानदार ने अभी तक आइटम नहीं जोड़े हैं।
+
+            <!-- Horizontal Scrollable Items or Closed Message -->
+            <div id="mother-chat-catalog-grid" class="flex gap-2.5 overflow-x-auto pb-1 scrollbar-thin">
+                <div class="text-xs text-slate-500 py-2">कोई आइटम उपलब्ध नहीं है।</div>
             </div>
         </div>
 
         <div id="chat-messages-list" class="space-y-4"></div>
     </main>
 
-    <!-- CART MODAL POPUP -->
+    <!-- CART MODAL -->
     <div id="cart-modal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-[#111827] border border-slate-700 w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-cart-shopping text-amber-400"></i> आपकी कार्ट (🛒 Cart Summary)
+                    <i class="fa-solid fa-cart-shopping text-amber-400"></i> आपकी कार्ट (Cart Summary)
                 </h3>
                 <button onclick="closeCartModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             
-            <div id="cart-items-list" class="max-h-48 overflow-y-auto space-y-2 text-xs text-slate-300">
-                <!-- Cart items dynamically inserted -->
-            </div>
+            <div id="cart-items-list" class="max-h-48 overflow-y-auto space-y-2 text-xs text-slate-300"></div>
 
             <div class="space-y-2 pt-2 border-t border-slate-800">
                 <input type="text" id="customer-name" placeholder="आपका नाम" class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
@@ -179,7 +204,7 @@ Rice - ₹110 / किलो"
             </div>
 
             <button onclick="sendOrderViaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 rounded-xl transition shadow flex items-center justify-center gap-2">
-                <i class="fa-brands fa-whatsapp text-base"></i> व्हाट्सएप पर आर्डर भेजें (Notification)
+                <i class="fa-brands fa-whatsapp text-base"></i> व्हाट्सएप पर आर्डर भेजें
             </button>
         </div>
     </div>
@@ -191,12 +216,11 @@ Rice - ₹110 / किलो"
         </div>
     </div>
 
-    <!-- BOTTOM INPUT -->
+    <!-- BOTTOM INPUT FOR CHAT -->
     <div class="px-4 pt-2 pb-5 bg-[#0B0F19]">
         <div class="bg-[#161F30] border border-slate-700/80 rounded-3xl p-2.5 flex items-center shadow-xl">
-            <input type="text" id="user-input" autocomplete="off" placeholder="जैसे: 2 किलो सेब और 1 किलो चावल पैक कर दो..." 
+            <input type="text" id="user-input" autocomplete="off" placeholder="जैसे: अनार क्या भाव है? या 2 किलो सेब पैक कर दो..." 
                 class="flex-1 bg-transparent text-slate-100 placeholder-slate-400 text-sm px-3 py-2 focus:outline-none">
-
             <button onclick="sendMessage()" class="bg-emerald-600 hover:bg-emerald-700 text-white w-10 h-10 rounded-full flex items-center justify-center transition shadow-md ml-1 flex-shrink-0">
                 <i class="fa-solid fa-arrow-up text-sm"></i>
             </button>
@@ -205,47 +229,64 @@ Rice - ₹110 / किलो"
 
     <script>
         let messages = [];
-        let shopName = "";
-        let shopCategory = "";
-        let shopItems = "";
+        let shopName = "लोकल एआई स्टोर";
         let shopWhatsApp = "";
+        let shopPhoto = "";
+        let ownerPhoto = "";
+        let shopStatus = "OPEN";
+        let productsList = [];
         let cart = [];
+        let tempItemImageBase64 = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200";
 
         window.onload = function() {
             const savedKey = localStorage.getItem('groq_api_key');
             if (savedKey) document.getElementById('groq-key-input').value = savedKey;
 
-            shopName = localStorage.getItem('ai_shop_name') || "";
-            shopCategory = localStorage.getItem('ai_shop_category') || "";
-            shopItems = localStorage.getItem('ai_shop_items') || "";
+            shopName = localStorage.getItem('ai_shop_name') || "लोकल एआई स्टोर";
             shopWhatsApp = localStorage.getItem('ai_shop_whatsapp') || "";
+            shopPhoto = localStorage.getItem('ai_shop_photo') || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=100";
+            ownerPhoto = localStorage.getItem('ai_owner_photo') || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100";
+            shopStatus = localStorage.getItem('ai_shop_status') || "OPEN";
+            
+            const savedProducts = localStorage.getItem('ai_shop_products_json');
+            if (savedProducts) {
+                productsList = JSON.parse(savedProducts);
+            }
 
             if (shopName) {
                 document.getElementById('shop-name-input').value = shopName;
                 document.getElementById('header-shop-name').innerText = shopName;
-                document.getElementById('banner-status').innerText = `लाइव शॉप: ${shopName}`;
-                document.getElementById('catalog-shop-badge').innerText = shopName;
+                document.getElementById('chat-live-shop-name').innerText = shopName;
             }
-            if (shopCategory) {
-                document.getElementById('shop-category-select').value = shopCategory;
-                document.getElementById('header-category-text').innerText = shopCategory;
-            }
-            if (shopWhatsApp) {
-                document.getElementById('shop-whatsapp-input').value = shopWhatsApp;
-            }
-            if (shopItems) {
-                document.getElementById('shop-items-input').value = shopItems;
-                renderCatalogItems(shopItems);
-            }
+            if (shopWhatsApp) document.getElementById('shop-whatsapp-input').value = shopWhatsApp;
+            document.getElementById('header-shop-img').src = shopPhoto;
+            document.getElementById('header-owner-img').src = ownerPhoto;
+            document.getElementById('shop-status-toggle').value = shopStatus;
 
             const savedPin = localStorage.getItem('vendor_admin_pin');
-            if (savedPin) {
-                document.getElementById('new-admin-pin').value = savedPin;
-            }
+            if (savedPin) document.getElementById('new-admin-pin').value = savedPin;
 
+            // Handle file inputs conversion to base64
+            setupImageUploadListeners();
+
+            updateShopStatusUI();
             loadHistory();
             renderChat();
         };
+
+        function setupImageUploadListeners() {
+            document.getElementById('new-item-img-file').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        tempItemImageBase64 = event.target.result;
+                        alert('✅ आइटम की फोटो कैप्चर हो गई!');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -270,70 +311,175 @@ Rice - ₹110 / किलो"
             document.getElementById('admin-lock-screen').classList.remove('hidden');
         }
 
+        async function addItemWithCameraPhoto() {
+            const name = document.getElementById('new-item-name').value.trim();
+            const unit = document.getElementById('new-item-unit').value.trim() || 'किलो';
+            const price = document.getElementById('new-item-price').value.trim();
+            const discount = document.getElementById('new-item-discount').value.trim();
+
+            if (!name || !price) {
+                alert('कृपया आइटम का नाम और रेट दर्ज करें!');
+                return;
+            }
+
+            productsList.push({ 
+                name, 
+                unit, 
+                price, 
+                img: tempItemImageBase64, 
+                discount 
+            });
+
+            document.getElementById('new-item-name').value = '';
+            document.getElementById('new-item-unit').value = '';
+            document.getElementById('new-item-price').value = '';
+            document.getElementById('new-item-discount').value = '';
+            document.getElementById('new-item-img-file').value = '';
+            tempItemImageBase64 = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200";
+
+            alert('✅ आइटम फोटो के साथ जुड़ गया! नीचे "डेटा और स्टेटस सेव करें" पर क्लिक करें।');
+        }
+
         function saveShopSettings() {
             const sName = document.getElementById('shop-name-input').value.trim();
             const sWhatsApp = document.getElementById('shop-whatsapp-input').value.trim();
-            const sCategory = document.getElementById('shop-category-select').value;
-            const sItems = document.getElementById('shop-items-input').value.trim();
+            const sStatus = document.getElementById('shop-status-toggle').value;
             const sPin = document.getElementById('new-admin-pin').value.trim();
 
             if (!sName) { alert('कृपया दुकान का नाम दर्ज करें!'); return; }
-            if (!sWhatsApp) { alert('कृपया दुकानदार का व्हाट्सएप नंबर दर्ज करें!'); return; }
-            if (!sItems) { alert('कृपया आइटम और रेट भरें!'); return; }
-            if (sPin.length !== 4) { alert('कृपया 4 अंकों का पिन दर्ज करें!'); return; }
-            
+            if (!sWhatsApp) { alert('कृपया व्हाट्सएप नंबर दर्ज करें!'); return; }
+            if (sPin.length !== 4) { alert('4 अंकों का पिन दर्ज करें!'); return; }
+
             shopName = sName;
-            shopCategory = sCategory;
-            shopItems = sItems;
             shopWhatsApp = sWhatsApp;
+            shopStatus = sStatus;
 
-            localStorage.setItem('ai_shop_name', sName);
-            localStorage.setItem('ai_shop_category', sCategory);
-            localStorage.setItem('ai_shop_items', sItems);
-            localStorage.setItem('ai_shop_whatsapp', sWhatsApp);
-            localStorage.setItem('vendor_admin_pin', sPin);
+            // Check if new shop or owner photo files were selected
+            const shopFile = document.getElementById('shop-photo-file').files[0];
+            const ownerFile = document.getElementById('owner-photo-file').files[0];
 
-            document.getElementById('header-shop-name').innerText = sName;
-            document.getElementById('header-category-text').innerText = sCategory;
-            document.getElementById('banner-status').innerText = `लाइव शॉप: ${sName}`;
-            document.getElementById('catalog-shop-badge').innerText = sName;
-            
-            renderCatalogItems(sItems);
-            alert('✅ दुकान का डेटा और व्हाट्सएप नंबर सेव हो गए!');
-            lockAdminPanel();
-            toggleSidebar();
-        }
+            let pendingSaves = 0;
+            let totalSaves = (shopFile ? 1 : 0) + (ownerFile ? 1 : 0);
 
-        function renderCatalogItems(itemsText) {
-            const container = document.getElementById('catalog-items-display');
-            container.innerHTML = '';
-            const lines = itemsText.split('\n');
+            function finalizeSave() {
+                if (pendingSaves === totalSaves) {
+                    localStorage.setItem('ai_shop_name', shopName);
+                    localStorage.setItem('ai_shop_whatsapp', shopWhatsApp);
+                    localStorage.setItem('ai_shop_photo', shopPhoto);
+                    localStorage.setItem('ai_owner_photo', ownerPhoto);
+                    localStorage.setItem('ai_shop_status', shopStatus);
+                    localStorage.setItem('ai_shop_products_json', JSON.stringify(productsList));
+                    localStorage.setItem('vendor_admin_pin', sPin);
 
-            lines.forEach(line => {
-                if (line.trim() !== '') {
-                    container.innerHTML += `
-                        <div class="flex items-center justify-between bg-[#1F2937] p-2 rounded-xl border border-slate-700">
-                            <span class="font-medium text-slate-200">${line}</span>
-                            <button onclick="addToCart('${line.replace(/'/g, "")}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
-                                <i class="fa-solid fa-plus"></i> Add to Cart
-                            </button>
-                        </div>
-                    `;
+                    document.getElementById('header-shop-name').innerText = shopName;
+                    document.getElementById('chat-live-shop-name').innerText = shopName;
+                    document.getElementById('header-shop-img').src = shopPhoto;
+                    document.getElementById('header-owner-img').src = ownerPhoto;
+
+                    updateShopStatusUI();
+                    alert('✅ दुकान, फोटो और कैटलॉग सफलतापूर्वक अपडेट हो गए!');
+                    lockAdminPanel();
+                    toggleSidebar();
                 }
-            });
+            }
+
+            if (totalSaves === 0) {
+                finalizeSave();
+            } else {
+                if (shopFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        shopPhoto = e.target.result;
+                        pendingSaves++;
+                        finalizeSave();
+                    };
+                    reader.readAsDataURL(shopFile);
+                }
+                if (ownerFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        ownerPhoto = e.target.result;
+                        pendingSaves++;
+                        finalizeSave();
+                    };
+                    reader.readAsDataURL(ownerFile);
+                }
+            }
         }
 
-        function addToCart(itemString) {
+        function updateShopStatusUI() {
+            const container = document.getElementById('mother-chat-catalog-grid');
+            const statusText = document.getElementById('header-open-status-text');
+            const bannerBox = document.getElementById('mother-shop-banner-box');
+            const badge = document.getElementById('badge-status-indicator');
+            const subStatus = document.getElementById('banner-sub-status');
+
+            if (shopStatus === "CLOSED") {
+                statusText.innerText = "🔴 दुकान बंद है";
+                statusText.className = "text-[10px] text-red-400 font-bold";
+                bannerBox.className = "bg-red-950/40 border border-red-500/40 rounded-2xl p-3.5 space-y-2 shadow-xl";
+                badge.className = "text-[10px] bg-red-900 text-red-200 px-2.5 py-1 rounded-full border border-red-700";
+                badge.innerText = "● बंद (Closed)";
+                subStatus.innerText = "फिलहाल आर्डर स्वीकार नहीं किए जा रहे हैं";
+                
+                container.innerHTML = `
+                    <div class="w-full text-center py-4 text-red-400 text-xs font-bold space-y-1">
+                        <i class="fa-solid fa-store-slash text-xl"></i>
+                        <p>यह दुकान अभी बंद (Closed) है।</p>
+                    </div>
+                `;
+            } else {
+                statusText.innerText = "🟢 खुली हुई है";
+                statusText.className = "text-[10px] text-emerald-400 font-bold";
+                bannerBox.className = "bg-[#161F30] border border-emerald-500/30 rounded-2xl p-3.5 space-y-3 shadow-xl";
+                badge.className = "text-[10px] bg-emerald-950 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-800 animate-pulse";
+                badge.innerText = "● लाइव";
+                subStatus.innerText = "लाइव कैटलॉग & रेट्स";
+
+                container.innerHTML = '';
+                if (productsList.length === 0) {
+                    container.innerHTML = '<div class="text-xs text-slate-500 py-2 px-1">एडमिन पैनल से आइटम और कैमरा फोटो जोड़ें।</div>';
+                } else {
+                    productsList.forEach((prod, index) => {
+                        container.innerHTML += `
+                            <div class="bg-[#111827] border border-slate-700 rounded-2xl p-2 flex-shrink-0 w-32 flex flex-col justify-between shadow">
+                                <div>
+                                    <img src="${prod.img}" class="w-full h-20 object-cover rounded-xl mb-1.5 border border-slate-700">
+                                    <h4 class="text-xs font-bold text-slate-100 truncate">${prod.name}</h4>
+                                    <p class="text-[10px] text-emerald-400 font-semibold">₹${prod.price} / ${prod.unit}</p>
+                                    ${prod.discount ? `<p class="text-[9px] text-amber-400">${prod.discount}</p>` : ''}
+                                </div>
+                                <button onclick="addProdToCart(${index})" class="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-2 rounded-lg transition flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-plus"></i> Add
+                                </button>
+                            </div>
+                        `;
+                    });
+                }
+            }
+        }
+
+        function addProdToCart(index) {
+            if (shopStatus === "CLOSED") {
+                alert('❌ दुकान बंद है, अभी आर्डर नहीं ले सकते!');
+                return;
+            }
+            const p = productsList[index];
+            const itemString = `${p.name} - ₹${p.price} / ${p.unit}`;
             cart.push(itemString);
             document.getElementById('cart-count').innerText = cart.length;
-            alert(`✅ "${itemString}" कार्ट में जोड़ दिया गया है!`);
+            alert(`✅ "${p.name}" कार्ट में जुड़ गया!`);
         }
 
         function openCartModal() {
+            if (shopStatus === "CLOSED") {
+                alert('❌ दुकान अभी बंद है!');
+                return;
+            }
             const listContainer = document.getElementById('cart-items-list');
             listContainer.innerHTML = '';
             if (cart.length === 0) {
-                listContainer.innerHTML = '<p class="text-center text-slate-500 py-4">आपकी कार्ट खाली है।</p>';
+                listContainer.innerHTML = '<p class="text-center text-slate-500 py-4">कार्ट खाली है।</p>';
             } else {
                 cart.forEach((item, index) => {
                     listContainer.innerHTML += `
@@ -362,30 +508,14 @@ Rice - ₹110 / किलो"
             const phone = document.getElementById('customer-phone').value.trim();
             const address = document.getElementById('customer-address').value.trim();
 
-            if (!name || !phone || !address) {
-                alert('कृपया अपना नाम, फोन नंबर और पता भरें!');
-                return;
-            }
-            if (cart.length === 0) {
-                alert('कार्ट खाली है!');
-                return;
-            }
-            if (!shopWhatsApp) {
-                alert('दुकानदार का व्हाट्सएप नंबर सेट नहीं है!');
-                return;
-            }
+            if (!name || !phone || !address) { alert('कृपया अपना नाम, फोन और पता भरें!'); return; }
+            if (cart.length === 0) { alert('कार्ट खाली है!'); return; }
+            if (!shopWhatsApp) { alert('दुकानदार का व्हाट्सएप नंबर सेट नहीं है!'); return; }
 
-            let orderText = `🛒 *नया आर्डर प्राप्त हुआ!* (${shopName})\n\n`;
-            orderText += `👤 *ग्राहक:* ${name}\n`;
-            orderText += `📞 *मोबाइल:* ${phone}\n`;
-            orderText += `📍 *पता:* ${address}\n\n`;
-            orderText += `📋 *आइटम लिस्ट:*\n`;
-            cart.forEach((item, idx) => {
-                orderText += `${idx + 1}. ${item}\n`;
-            });
+            let orderText = `🛒 *नया आर्डर प्राप्त हुआ!* (${shopName})\n\n👤 *ग्राहक:* ${name}\n📞 *मोबाइल:* ${phone}\n📍 *पता:* ${address}\n\n📋 *आइटम लिस्ट:*\n`;
+            cart.forEach((item, idx) => { orderText += `${idx + 1}. ${item}\n`; });
 
-            const encodedUrl = `https://wa.me/${shopWhatsApp}?text=${encodeURIComponent(orderText)}`;
-            window.open(encodedUrl, '_blank');
+            window.open(`https://wa.me/${shopWhatsApp}?text=${encodeURIComponent(orderText)}`, '_blank');
         }
 
         function saveApiKey() {
@@ -414,7 +544,7 @@ Rice - ₹110 / किलो"
                 const isUser = msg.sender === 'user';
                 container.innerHTML += `
                     <div class="flex ${isUser ? 'justify-end' : 'items-start space-x-3'} my-3">
-                        ${!isUser ? '<div class="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-xs text-white flex-shrink-0"><i class="fa-solid fa-store"></i></div>' : ''}
+                        ${!isUser ? '<div class="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-xs text-white flex-shrink-0"><i class="fa-solid fa-robot"></i></div>' : ''}
                         <div class="${isUser ? 'bg-emerald-600 text-white rounded-2xl rounded-tr-none' : 'bg-[#1F2937] text-slate-100 rounded-2xl rounded-tl-none'} p-3.5 max-w-[85%] text-sm shadow-md space-y-1.5">
                             <div class="leading-relaxed text-[13.5px]">${msg.text}</div>
                         </div>
@@ -428,7 +558,6 @@ Rice - ₹110 / किलो"
         async function sendMessage() {
             const inputField = document.getElementById('user-input');
             const userText = inputField.value.trim();
-
             if (!userText) return;
 
             messages.push({'sender': 'user', 'text': userText});
@@ -447,15 +576,19 @@ Rice - ₹110 / किलो"
                     return;
                 }
 
-                let sysPrompt = `You are an intelligent AI shop assistant for "${shopName || 'Local Store'}" under category "${shopCategory || 'Groceries & Fruits'}". 
-Available Inventory and Prices set by shop owner:
-"${shopItems || 'No items listed yet'}".
+                if (shopStatus === "CLOSED") {
+                    document.getElementById('loading-bar').classList.add('hidden');
+                    messages.push({'sender': 'ai', 'text': '❌ माफ कीजिए, यह दुकान अभी बंद (Closed) है। कृपया बाद में संपर्क करें।'});
+                    localStorage.setItem('ai_store_chat_history', JSON.stringify(messages));
+                    renderChat();
+                    return;
+                }
 
-Your job:
-1. Help customers order items from this list.
-2. Calculate exact bills based on quantities requested.
-3. If an item is not in the list, politely inform the customer.
-4. Reply politely, confirm the total bill, and ask to add items to cart or checkout via WhatsApp.`;
+                let itemsString = productsList.map(p => `${p.name} - ₹${p.price} / ${p.unit} (${p.discount || 'कोई ऑफर नहीं'})`).join(', ');
+
+                let sysPrompt = `You are an intelligent AI mother chat shop assistant for "${shopName || 'Local Store'}". 
+Inventory and Prices set in Admin Panel: "${itemsString || 'No items listed'}".
+Answer customer questions about prices, weights, and items politely in Hindi/Hinglish, and guide them to order via cart or WhatsApp.`;
                 
                 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
@@ -470,11 +603,9 @@ Your job:
 
                 if (response.ok) {
                     const data = await response.json();
-                    let aiResponse = data.choices[0].message.content;
-                    messages.push({'sender': 'ai', 'text': aiResponse});
+                    messages.push({'sender': 'ai', 'text': data.choices[0].message.content});
                 } else {
-                    const err = await response.text();
-                    messages.push({'sender': 'ai', 'text': `❌ एरर: ${err}`});
+                    messages.push({'sender': 'ai', 'text': `❌ एरर: ${await response.text()}`});
                 }
 
                 localStorage.setItem('ai_store_chat_history', JSON.stringify(messages));
