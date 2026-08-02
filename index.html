@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>मदर चैट - डायरेक्ट कैमरा फोटो अपलोड</title>
+    <title>मदर चैट - अनलिमिटेड ब्लैक लिस्ट कैटलॉग</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -41,7 +41,7 @@
         <div id="admin-dashboard" class="space-y-4 hidden">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h2 class="text-sm font-bold text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-store text-emerald-400"></i> दुकान एडमिन & कैमरा अपलोड
+                    <i class="fa-solid fa-store text-emerald-400"></i> दुकान एडमिन & अनलिमिटेड कैटलॉग
                 </h2>
                 <button onclick="lockAdminPanel()" class="text-red-400 hover:text-red-300 text-xs flex items-center gap-1"><i class="fa-solid fa-lock"></i> लॉक</button>
             </div>
@@ -71,7 +71,7 @@
                         class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
                 </div>
 
-                <!-- Direct Camera / Gallery Upload for Shop & Owner -->
+                <!-- Shop & Owner Photos -->
                 <div class="grid grid-cols-2 gap-2">
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-amber-400">🖼️ दुकान की फोटो:</label>
@@ -83,37 +83,49 @@
                     </div>
                 </div>
 
-                <!-- Product Adder with Direct Camera/Gallery Capture -->
+                <!-- UNLIMITED PRODUCTS ADDER SECTION -->
                 <div class="bg-[#1F2937] p-3 rounded-2xl border border-slate-700 space-y-2.5">
-                    <label class="text-xs font-bold text-indigo-400 flex items-center gap-1">
-                        <i class="fa-solid fa-camera"></i> नया आइटम और कैमरा फोटो जोड़ें:
+                    <label class="text-xs font-bold text-indigo-400 flex items-center justify-between">
+                        <span><i class="fa-solid fa-boxes-stacked"></i> अनलिमिटेड आइटम/कैटलॉग जोड़ें:</span>
+                        <span class="text-[10px] bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-700">जितने चाहें जोड़ें</span>
                     </label>
-                    <input type="text" id="new-item-name" placeholder="आइटम नाम (जैसे: अनार)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
+                    <input type="text" id="new-item-name" placeholder="आइटम नाम (जैसे: संतरा, दूध, चाय)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="new-item-unit" placeholder="वजन (किलो/दर्जन)" class="bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
+                        <input type="text" id="new-item-unit" placeholder="यूनिट (किलो/लीटर/पैकेट)" class="bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                         <input type="text" id="new-item-price" placeholder="रेट (₹)" class="bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     </div>
                     
                     <div class="space-y-1">
-                        <label class="text-[10px] font-semibold text-slate-300">📸 फोटो खींचें या गैलरी से चुनें:</label>
+                        <label class="text-[10px] font-semibold text-slate-300">📸 आइटम की फोटो (कैमरा/गैलरी):</label>
                         <input type="file" id="new-item-img-file" accept="image/*" class="w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
                     </div>
 
-                    <input type="text" id="new-item-discount" placeholder="डिस्काउंट/ऑफर (जैसे: ₹10 छूट)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
+                    <input type="text" id="new-item-discount" placeholder="ऑफर/डिस्काउंट (जैसे: 10% छूट या ₹20 ऑफ)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     
-                    <button onclick="addItemWithCameraPhoto()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-xl transition shadow">
-                        कैटलॉग में जोड़ें (+)
+                    <button onclick="addNewCatalogItem()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-plus-circle"></i> कैटलॉग में नया आइटम जोड़ें (+)
                     </button>
                 </div>
 
+                <!-- ADDED PRODUCTS LIST MANAGEMENT IN ADMIN -->
+                <div class="space-y-2 pt-2 border-t border-slate-800">
+                    <h4 class="text-xs font-bold text-slate-300 flex justify-between items-center">
+                        <span>📦 जुड़े हुए सभी कैटलॉग आइटम:</span>
+                        <span id="total-items-badge" class="text-[10px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">0 आइटम</span>
+                    </h4>
+                    <div id="admin-products-list-container" class="max-h-36 overflow-y-auto space-y-1.5 pr-1">
+                        <!-- Dynamic list of added products with delete options -->
+                    </div>
+                </div>
+
                 <div class="space-y-1 pt-2 border-t border-slate-800">
-                    <label class="text-xs font-semibold text-red-400">🔐 नया 4-अंकों का पिन (PIN):</label>
+                    <label class="text-xs font-semibold text-red-400">🔐 एडमिन पिन (PIN):</label>
                     <input type="password" id="new-admin-pin" maxlength="4" autocomplete="off" placeholder="उदा: 1234" 
                         class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
                 </div>
 
-                <button onclick="saveShopSettings()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow">
-                    डेटा और स्टेटस सेव करें
+                <button onclick="saveShopSettings()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 rounded-xl transition shadow">
+                    💾 सब कुछ सेव करें & लाइव करें
                 </button>
             </div>
 
@@ -129,12 +141,12 @@
         </div>
 
         <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-slate-800 mt-4">
-            Mother Chat Admin • v10.0 (Camera Direct)
+            Mother Chat Admin • v12.0 (Unlimited Catalogs)
         </div>
     </div>
 
     <!-- TOP HEADER -->
-    <header class="bg-[#0B0F19] border-b border-slate-800/60 px-4 py-3 flex justify-between items-center">
+    <header class="bg-[#0B0F19] border-b border-slate-800/60 px-4 py-3 flex justify-between items-center flex-shrink-0">
         <div class="flex items-center space-x-3">
             <button onclick="toggleSidebar()" class="text-slate-300 hover:text-white p-2 rounded-lg hover:bg-slate-800" title="एडमिन पैनल">
                 <i class="fa-solid fa-bars text-lg"></i>
@@ -160,25 +172,27 @@
         </div>
     </header>
 
-    <!-- MAIN CHAT AREA -->
+    <!-- MAIN CHAT & BLACK LIST CATALOG AREA -->
     <main id="chat-container" class="flex-1 overflow-y-auto px-4 py-3 space-y-4">
         
-        <!-- MOTHER CHAT LIVE STORE & CATALOG BANNER -->
-        <div id="mother-shop-banner-box" class="bg-[#161F30] border border-emerald-500/30 rounded-2xl p-3.5 space-y-3 shadow-xl">
-            <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-store text-emerald-400 text-base" id="banner-store-icon"></i>
+        <!-- MOTHER CHAT BLACK LIVE STORE & UNLIMITED CATALOG BANNER -->
+        <div id="mother-shop-banner-box" class="bg-[#111827] border border-slate-800 rounded-3xl p-4 space-y-3 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                        <i class="fa-solid fa-store text-sm"></i>
+                    </div>
                     <div>
-                        <h3 class="text-xs font-bold text-emerald-300" id="chat-live-shop-name">लोकल स्टोर</h3>
-                        <p class="text-[10px] text-slate-400" id="banner-sub-status">लाइव कैटलॉग & रेट्स</p>
+                        <h3 class="text-xs font-bold text-slate-100" id="chat-live-shop-name">लोकल एआई स्टोर</h3>
+                        <p class="text-[10px] text-slate-400" id="banner-sub-status">लाइव कैटलॉग & रेट्स लिस्ट</p>
                     </div>
                 </div>
                 <span id="badge-status-indicator" class="text-[10px] bg-emerald-950 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-800 animate-pulse">● लाइव</span>
             </div>
 
-            <!-- Horizontal Scrollable Items or Closed Message -->
-            <div id="mother-chat-catalog-grid" class="flex gap-2.5 overflow-x-auto pb-1 scrollbar-thin">
-                <div class="text-xs text-slate-500 py-2">कोई आइटम उपलब्ध नहीं है।</div>
+            <!-- Vertical Black List Catalog Grid / List (Unlimited Items) -->
+            <div id="mother-chat-catalog-grid" class="space-y-2 pt-1 max-h-64 overflow-y-auto pr-1">
+                <!-- Items will be injected here dynamically -->
             </div>
         </div>
 
@@ -217,7 +231,7 @@
     </div>
 
     <!-- BOTTOM INPUT FOR CHAT -->
-    <div class="px-4 pt-2 pb-5 bg-[#0B0F19]">
+    <div class="px-4 pt-2 pb-5 bg-[#0B0F19] flex-shrink-0">
         <div class="bg-[#161F30] border border-slate-700/80 rounded-3xl p-2.5 flex items-center shadow-xl">
             <input type="text" id="user-input" autocomplete="off" placeholder="जैसे: अनार क्या भाव है? या 2 किलो सेब पैक कर दो..." 
                 class="flex-1 bg-transparent text-slate-100 placeholder-slate-400 text-sm px-3 py-2 focus:outline-none">
@@ -234,7 +248,11 @@
         let shopPhoto = "";
         let ownerPhoto = "";
         let shopStatus = "OPEN";
-        let productsList = [];
+        let productsList = [
+            { name: "ताजा सेब (Fresh Apple)", unit: "किलो", price: "120", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=200", discount: "₹10 छूट" },
+            { name: "मीठे अनार (Pomegranate)", unit: "किलो", price: "160", img: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200", discount: "ताजा स्टॉक" },
+            { name: "पक्के केले (Banana)", unit: "दर्जन", price: "60", img: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=200", discount: "" }
+        ];
         let cart = [];
         let tempItemImageBase64 = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200";
 
@@ -266,10 +284,9 @@
             const savedPin = localStorage.getItem('vendor_admin_pin');
             if (savedPin) document.getElementById('new-admin-pin').value = savedPin;
 
-            // Handle file inputs conversion to base64
             setupImageUploadListeners();
-
             updateShopStatusUI();
+            renderAdminProductsList();
             loadHistory();
             renderChat();
         };
@@ -311,14 +328,15 @@
             document.getElementById('admin-lock-screen').classList.remove('hidden');
         }
 
-        async function addItemWithCameraPhoto() {
+        // UNLIMITED ITEM ADDER FUNCTION
+        function addNewCatalogItem() {
             const name = document.getElementById('new-item-name').value.trim();
             const unit = document.getElementById('new-item-unit').value.trim() || 'किलो';
             const price = document.getElementById('new-item-price').value.trim();
             const discount = document.getElementById('new-item-discount').value.trim();
 
             if (!name || !price) {
-                alert('कृपया आइटम का नाम और रेट दर्ज करें!');
+                alert('कृपया आइटम का नाम और रेट (₹) दर्ज करें!');
                 return;
             }
 
@@ -330,6 +348,7 @@
                 discount 
             });
 
+            // Reset input fields for next item
             document.getElementById('new-item-name').value = '';
             document.getElementById('new-item-unit').value = '';
             document.getElementById('new-item-price').value = '';
@@ -337,7 +356,41 @@
             document.getElementById('new-item-img-file').value = '';
             tempItemImageBase64 = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200";
 
-            alert('✅ आइटम फोटो के साथ जुड़ गया! नीचे "डेटा और स्टेटस सेव करें" पर क्लिक करें।');
+            renderAdminProductsList();
+            alert('✅ आइटम कैटलॉग में जुड़ गया! आप और भी आइटम जोड़ सकते हैं। सेव करने के लिए नीचे "सब कुछ सेव करें" पर क्लिक करें।');
+        }
+
+        function renderAdminProductsList() {
+            const container = document.getElementById('admin-products-list-container');
+            const badge = document.getElementById('total-items-badge');
+            container.innerHTML = '';
+            badge.innerText = `${productsList.length} आइटम`;
+
+            if (productsList.length === 0) {
+                container.innerHTML = '<p class="text-[10px] text-slate-500 text-center py-2">कोई आइटम नहीं जुड़ा है।</p>';
+                return;
+            }
+
+            productsList.forEach((item, idx) => {
+                container.innerHTML += `
+                    <div class="flex items-center justify-between bg-[#0B0F19] p-2 rounded-xl border border-slate-700">
+                        <div class="flex items-center space-x-2">
+                            <img src="${item.img}" class="w-8 h-8 rounded-lg object-cover">
+                            <div>
+                                <p class="text-xs font-bold text-slate-200">${item.name}</p>
+                                <p class="text-[10px] text-emerald-400">₹${item.price} / ${item.unit}</p>
+                            </div>
+                        </div>
+                        <button onclick="removeCatalogItem(${idx})" class="text-red-400 hover:text-red-300 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
+        }
+
+        function removeCatalogItem(index) {
+            productsList.splice(index, 1);
+            renderAdminProductsList();
+            alert('🗑️ आइटम हटा दिया गया है। सेव करने के लिए नीचे बटन दबाएं।');
         }
 
         function saveShopSettings() {
@@ -354,7 +407,6 @@
             shopWhatsApp = sWhatsApp;
             shopStatus = sStatus;
 
-            // Check if new shop or owner photo files were selected
             const shopFile = document.getElementById('shop-photo-file').files[0];
             const ownerFile = document.getElementById('owner-photo-file').files[0];
 
@@ -377,7 +429,7 @@
                     document.getElementById('header-owner-img').src = ownerPhoto;
 
                     updateShopStatusUI();
-                    alert('✅ दुकान, फोटो और कैटलॉग सफलतापूर्वक अपडेट हो गए!');
+                    alert('✅ दुकान, फोटो और आपके सभी कैटलॉग आइटम सफलतापूर्वक सेव हो गए!');
                     lockAdminPanel();
                     toggleSidebar();
                 }
@@ -417,40 +469,42 @@
             if (shopStatus === "CLOSED") {
                 statusText.innerText = "🔴 दुकान बंद है";
                 statusText.className = "text-[10px] text-red-400 font-bold";
-                bannerBox.className = "bg-red-950/40 border border-red-500/40 rounded-2xl p-3.5 space-y-2 shadow-xl";
+                bannerBox.className = "bg-red-950/40 border border-red-500/40 rounded-3xl p-4 space-y-2 shadow-xl";
                 badge.className = "text-[10px] bg-red-900 text-red-200 px-2.5 py-1 rounded-full border border-red-700";
                 badge.innerText = "● बंद (Closed)";
                 subStatus.innerText = "फिलहाल आर्डर स्वीकार नहीं किए जा रहे हैं";
                 
                 container.innerHTML = `
-                    <div class="w-full text-center py-4 text-red-400 text-xs font-bold space-y-1">
-                        <i class="fa-solid fa-store-slash text-xl"></i>
+                    <div class="w-full text-center py-6 text-red-400 text-xs font-bold space-y-1">
+                        <i class="fa-solid fa-store-slash text-2xl mb-1"></i>
                         <p>यह दुकान अभी बंद (Closed) है।</p>
                     </div>
                 `;
             } else {
                 statusText.innerText = "🟢 खुली हुई है";
                 statusText.className = "text-[10px] text-emerald-400 font-bold";
-                bannerBox.className = "bg-[#161F30] border border-emerald-500/30 rounded-2xl p-3.5 space-y-3 shadow-xl";
+                bannerBox.className = "bg-[#111827] border border-slate-800 rounded-3xl p-4 space-y-3 shadow-2xl";
                 badge.className = "text-[10px] bg-emerald-950 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-800 animate-pulse";
                 badge.innerText = "● लाइव";
-                subStatus.innerText = "लाइव कैटलॉग & रेट्स";
+                subStatus.innerText = `लाइव कैटलॉग (${productsList.length} आइटम्स)`;
 
                 container.innerHTML = '';
                 if (productsList.length === 0) {
-                    container.innerHTML = '<div class="text-xs text-slate-500 py-2 px-1">एडमिन पैनल से आइटम और कैमरा फोटो जोड़ें।</div>';
+                    container.innerHTML = '<div class="text-xs text-slate-500 py-3 text-center">कोई आइटम उपलब्ध नहीं है। एडमिन पैनल से जोड़ें।</div>';
                 } else {
                     productsList.forEach((prod, index) => {
                         container.innerHTML += `
-                            <div class="bg-[#111827] border border-slate-700 rounded-2xl p-2 flex-shrink-0 w-32 flex flex-col justify-between shadow">
-                                <div>
-                                    <img src="${prod.img}" class="w-full h-20 object-cover rounded-xl mb-1.5 border border-slate-700">
-                                    <h4 class="text-xs font-bold text-slate-100 truncate">${prod.name}</h4>
-                                    <p class="text-[10px] text-emerald-400 font-semibold">₹${prod.price} / ${prod.unit}</p>
-                                    ${prod.discount ? `<p class="text-[9px] text-amber-400">${prod.discount}</p>` : ''}
+                            <div class="bg-[#1F2937]/70 border border-slate-700/80 rounded-2xl p-2.5 flex items-center justify-between shadow-md">
+                                <div class="flex items-center space-x-3">
+                                    <img src="${prod.img}" class="w-12 h-12 object-cover rounded-xl border border-slate-700 flex-shrink-0">
+                                    <div>
+                                        <h4 class="text-xs font-bold text-slate-100">${prod.name}</h4>
+                                        <p class="text-[11px] text-emerald-400 font-semibold">₹${prod.price} <span class="text-slate-400 text-[10px]">/ ${prod.unit}</span></p>
+                                        ${prod.discount ? `<span class="text-[9px] bg-amber-950/80 text-amber-300 px-1.5 py-0.5 rounded border border-amber-800/60">${prod.discount}</span>` : ''}
+                                    </div>
                                 </div>
-                                <button onclick="addProdToCart(${index})" class="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1 px-2 rounded-lg transition flex items-center justify-center gap-1">
-                                    <i class="fa-solid fa-plus"></i> Add
+                                <button onclick="addProdToCart(${index})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-1.5 px-3 rounded-xl transition shadow flex items-center gap-1 flex-shrink-0">
+                                    <i class="fa-solid fa-plus text-[10px]"></i> Add
                                 </button>
                             </div>
                         `;
@@ -587,7 +641,7 @@
                 let itemsString = productsList.map(p => `${p.name} - ₹${p.price} / ${p.unit} (${p.discount || 'कोई ऑफर नहीं'})`).join(', ');
 
                 let sysPrompt = `You are an intelligent AI mother chat shop assistant for "${shopName || 'Local Store'}". 
-Inventory and Prices set in Admin Panel: "${itemsString || 'No items listed'}".
+Full Inventory Catalog set in Admin Panel: "${itemsString || 'No items listed'}".
 Answer customer questions about prices, weights, and items politely in Hindi/Hinglish, and guide them to order via cart or WhatsApp.`;
                 
                 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
