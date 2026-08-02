@@ -3,379 +3,1056 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viziya - Single File Web App with Uploads, Chat & Calls</title>
+    <title>Viziya - Instagram Style Complete Web App with Reels, Stories, Posts, DMs & API Configs</title>
     <!-- Supabase JS Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg-color: #05070b;
-            --surface-color: #0b0f19;
-            --neon-glow: #00f0ff;
-            --accent-purple: #b000ff;
-            --text-color: #ffffff;
-            --text-muted: #94a3b8;
-            --border-color: rgba(0, 240, 255, 0.3);
+            --ig-bg: #000000;
+            --ig-surface: #121212;
+            --ig-border: #262626;
+            --ig-text: #ffffff;
+            --ig-text-muted: #a8a8a8;
+            --ig-primary: #0095f6;
+            --ig-primary-hover: #1877f2;
+            --ig-danger: #ed4956;
+            --ig-gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        html, body { width: 100%; height: 100vh; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
-
-        .app-wrapper { width: 100%; min-height: 100vh; display: flex; flex-direction: column; position: relative; padding-bottom: 70px; }
-
-        .app-header {
-            width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            background: rgba(11, 15, 25, 0.95); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        .logo-title {
-            font-size: 20px; font-weight: 900; letter-spacing: 3px;
-            background: linear-gradient(45deg, var(--neon-glow), var(--accent-purple));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        html, body {
+            width: 100%;
+            height: 100vh;
+            background-color: var(--ig-bg);
+            color: var(--ig-text);
+            overflow-x: hidden;
         }
 
-        .header-icons { display: flex; gap: 10px; }
-        .icon-btn {
-            background: rgba(0, 240, 255, 0.1); border: 1px solid var(--border-color); color: var(--neon-glow);
-            width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer;
+        .app-wrapper {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: 60px;
+            max-width: 480px;
+            margin: 0 auto;
+            border-left: 1px solid var(--ig-border);
+            border-right: 1px solid var(--ig-border);
         }
 
-        .view-section { display: none; width: 100%; max-width: 600px; margin: 0 auto; padding: 15px; flex-direction: column; gap: 15px; }
-        .view-section.active { display: flex; }
-
-        .card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-        .card-title { font-size: 13px; color: var(--neon-glow); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 700; }
-
-        .input-field {
-            width: 100%; padding: 12px; background: #000; border: 1px solid var(--border-color);
-            border-radius: 10px; color: #fff; font-size: 14px; outline: none; margin-bottom: 10px;
+        /* Top Navigation Header */
+        .ig-header {
+            width: 100%;
+            height: 55px;
+            padding: 0 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.95);
+            border-bottom: 1px solid var(--ig-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
         }
-        .input-field:focus { border-color: var(--neon-glow); box-shadow: 0 0 8px rgba(0,240,255,0.3); }
 
-        .file-label {
-            display: block; border: 2px dashed var(--border-color); padding: 15px; border-radius: 10px; text-align: center;
-            cursor: pointer; color: var(--text-muted); font-size: 13px; margin-bottom: 10px; background: rgba(0,0,0,0.2);
+        .ig-logo {
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Billabong', cursive, sans-serif;
+            letter-spacing: 1px;
+            background: var(--ig-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .file-label:hover { border-color: var(--neon-glow); color: var(--neon-glow); }
 
-        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-primary { background: linear-gradient(135deg, var(--neon-glow), #0077ff); color: #000; box-shadow: 0 0 15px rgba(0,240,255,0.3); }
-        .btn-secondary { background: rgba(176,0,255,0.2); border: 1px solid var(--accent-purple); color: #e879f9; }
+        .ig-header-icons {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
 
-        /* Creator List Styles */
-        .creator-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 12px; margin-bottom: 8px; }
-        .follow-badge { font-size: 11px; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; border: 1px solid var(--neon-glow); background: rgba(0,240,255,0.1); color: var(--neon-glow); }
-        .follow-badge.accepted { background: #10b981; border-color: #10b981; color: #000; }
+        .ig-header-btn {
+            background: none;
+            border: none;
+            color: var(--ig-text);
+            font-size: 22px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
 
-        /* Media Feed Cards */
-        .media-feed-item { background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
-        .media-feed-title { font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 6px; }
+        .ig-header-btn:active {
+            opacity: 0.6;
+        }
 
-        /* DM Chat Modal with Video & Audio Calling Header Buttons */
-        #dmModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,7,11,0.96); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
-        .dm-container { width: 100%; max-width: 480px; background: var(--surface-color); border: 1px solid var(--neon-glow); border-radius: 20px; display: flex; flex-direction: column; height: 85vh; overflow: hidden; box-shadow: 0 0 30px rgba(0,240,255,0.3); }
-        
-        .dm-header { padding: 12px 15px; background: rgba(0,240,255,0.08); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .call-buttons-group { display: flex; gap: 8px; }
-        .call-action-btn { background: var(--neon-glow); border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; box-shadow: 0 0 10px rgba(0,240,255,0.4); }
-        .call-action-btn.audio { background: #10b981; }
-        
-        .dm-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.4; }
-        .chat-bubble.sent { background: rgba(0,240,255,0.2); border: 1px solid var(--border-color); align-self: flex-end; color: #fff; }
-        .chat-bubble.received { background: #1f2937; align-self: flex-start; color: #e2e8f0; }
-        .restriction-box { background: rgba(255,77,77,0.1); border: 1px solid #ff4d4d; border-radius: 12px; padding: 20px; text-align: center; margin: auto; }
+        /* View Sections */
+        .view-section {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            flex: 1;
+            padding-bottom: 10px;
+        }
 
-        /* Master Settings Modal Panel */
-        #settingsModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,7,11,0.95); z-index: 1000; justify-content: center; align-items: center; padding: 20px; overflow-y: auto; }
-        .modal-content { width: 100%; max-width: 440px; background: var(--surface-color); border: 1px solid var(--neon-glow); border-radius: 20px; padding: 20px; box-shadow: 0 0 35px rgba(0,240,255,0.3); margin: auto; max-height: 90vh; overflow-y: auto; }
-        .field-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; display: block; }
-        .section-divider { font-size: 12px; color: var(--neon-glow); border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin: 15px 0 10px 0; font-weight: bold; text-transform: uppercase; }
-        .save-msg { font-size: 11px; color: #10b981; text-align: center; margin-top: 8px; display: none; }
+        .view-section.active {
+            display: flex;
+        }
 
-        /* Bottom Navigation Bar */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(11,15,25,0.95); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 100; backdrop-filter: blur(10px); }
-        .nav-item { background: none; border: none; color: var(--text-muted); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 33%; }
-        .nav-item.active { color: var(--neon-glow); }
-        .nav-item span { font-size: 18px; }
+        /* Stories Bar */
+        .stories-container {
+            display: flex;
+            gap: 15px;
+            padding: 12px 15px;
+            background: var(--ig-bg);
+            border-bottom: 1px solid var(--ig-border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .stories-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .story-ring {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            padding: 2px;
+            background: var(--ig-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .story-avatar {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            background: var(--ig-surface);
+            border: 2px solid var(--ig-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            object-fit: cover;
+        }
+
+        .story-name {
+            font-size: 11px;
+            color: var(--ig-text);
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        /* Feed Posts */
+        .feed-post {
+            background: var(--ig-bg);
+            border-bottom: 1px solid var(--ig-border);
+            margin-bottom: 10px;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+        }
+
+        .post-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .post-user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--ig-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid var(--ig-border);
+        }
+
+        .post-username {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ig-text);
+        }
+
+        .post-media-box {
+            width: 100%;
+            background: #000;
+            max-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .post-media-box img, .post-media-box video {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+        }
+
+        .post-actions-left {
+            display: flex;
+            gap: 16px;
+        }
+
+        .action-icon {
+            background: none;
+            border: none;
+            color: var(--ig-text);
+            font-size: 22px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .action-icon:active {
+            transform: scale(1.2);
+        }
+
+        .action-icon.liked {
+            color: var(--ig-danger);
+        }
+
+        .post-likes {
+            padding: 0 15px 4px 15px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .post-caption {
+            padding: 0 15px 10px 15px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .post-caption span {
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        /* Reels View (TikTok / IG Reels Style) */
+        .reels-wrapper {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 115px);
+            background: #000;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
+
+        .reels-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .reel-card {
+            width: 100%;
+            height: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            background: #111;
+        }
+
+        .reel-video-element {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .reel-overlay {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            padding: 20px 15px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .reel-info {
+            max-width: 75%;
+        }
+
+        .reel-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .reel-author-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .reel-caption {
+            font-size: 13px;
+            color: #ddd;
+            line-height: 1.3;
+        }
+
+        .reel-sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+            padding-bottom: 10px;
+        }
+
+        .reel-action-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .reel-action-btn span {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Explore View (Grid) */
+        .explore-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            padding: 2px;
+        }
+
+        .explore-item {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: var(--ig-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .explore-item img, .explore-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Upload View Panel */
+        .upload-container {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .upload-card {
+            background: var(--ig-surface);
+            border: 1px solid var(--ig-border);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .upload-title {
+            font-size: 13px;
+            color: var(--ig-primary);
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .ig-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--ig-bg);
+            border: 1px solid var(--ig-border);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .ig-input:focus {
+            border-color: var(--ig-primary);
+        }
+
+        .file-dropzone {
+            display: block;
+            border: 2px dashed var(--ig-border);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--ig-text-muted);
+            font-size: 13px;
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .file-dropzone:hover {
+            border-color: var(--ig-primary);
+            color: var(--ig-primary);
+        }
+
+        .ig-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--ig-primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .ig-btn:active {
+            background: var(--ig-primary-hover);
+        }
+
+        /* Profile View Panel */
+        .profile-header {
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border-bottom: 1px solid var(--ig-border);
+        }
+
+        .profile-info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--ig-surface);
+            border: 2px solid var(--ig-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 25px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 16px;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--ig-text-muted);
+        }
+
+        .profile-bio {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* DM Chat & Call Modal */
+        #dmModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .dm-box {
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            background: var(--ig-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dm-topbar {
+            padding: 12px 15px;
+            background: var(--ig-surface);
+            border-bottom: 1px solid var(--ig-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dm-chat-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-bubble {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .chat-bubble.sent {
+            background: var(--ig-primary);
+            color: #fff;
+            align-self: flex-end;
+        }
+
+        .chat-bubble.received {
+            background: var(--ig-surface);
+            color: #fff;
+            align-self: flex-start;
+            border: 1px solid var(--ig-border);
+        }
+
+        /* Settings Modal Panel */
+        #settingsModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .settings-content {
+            width: 100%;
+            max-width: 420px;
+            background: var(--ig-surface);
+            border: 1px solid var(--ig-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .settings-divider {
+            font-size: 11px;
+            color: var(--ig-primary);
+            border-bottom: 1px solid var(--ig-border);
+            padding-bottom: 4px;
+            margin: 15px 0 10px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Bottom Tab Bar */
+        .ig-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            height: 55px;
+            background: var(--ig-bg);
+            border-top: 1px solid var(--ig-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-tab {
+            background: none;
+            border: none;
+            color: var(--ig-text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-tab.active {
+            color: var(--ig-text);
+        }
     </style>
 </head>
 <body>
 
     <div class="app-wrapper">
-        <header class="app-header">
-            <h1 class="logo-title">VIZIYA</h1>
-            <div class="header-icons">
-                <div class="icon-btn" onclick="openSettingsModal()" title="Master API Settings">⚙️</div>
+        <!-- Top Header -->
+        <header class="ig-header">
+            <h1 class="ig-logo">ViziyaGram</h1>
+            <div class="ig-header-icons">
+                <button class="ig-header-btn" onclick="openDmModal(1)" title="Direct Messages">💬</button>
+                <button class="ig-header-btn" onclick="openSettingsModal()" title="API Settings">⚙️</button>
             </div>
         </header>
 
-        <!-- VIEW 1: CREATORS & CHAT LIST -->
+        <!-- VIEW 1: HOME FEED & STORIES -->
         <div id="homeView" class="view-section active">
-            <div class="card">
-                <div class="card-title">👥 Viziya Creators & Direct Chat</div>
-                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-                    नोट: फॉलो रिक्वेस्ट स्वीकार होने के बाद ही चैट या कॉल संभव है!
-                </div>
-                <div id="creatorsListContainer"></div>
-            </div>
+            <!-- Stories Row -->
+            <div class="stories-container" id="storiesContainer"></div>
+            <!-- Main Feed Posts Container -->
+            <div id="mainFeedContainer"></div>
         </div>
 
-        <!-- VIEW 2: UPLOAD SECTION (Songs & Videos) -->
+        <!-- VIEW 2: EXPLORE GRID -->
+        <div id="exploreView" class="view-section">
+            <div style="padding: 10px 15px;">
+                <input type="text" class="ig-input" placeholder="🔍 Search creators, tags, music..." style="margin-bottom: 0;">
+            </div>
+            <div class="explore-grid" id="exploreGridContainer"></div>
+        </div>
+
+        <!-- VIEW 3: REELS -->
+        <div id="reelsView" class="view-section">
+            <div class="reels-wrapper" id="reelsContainer"></div>
+        </div>
+
+        <!-- VIEW 4: UPLOAD (Posts, Reels, Audio, Stories) -->
         <div id="uploadView" class="view-section">
-            <div class="card">
-                <div class="card-title">📤 Upload Song / Audio Track</div>
-                <input type="text" id="songTitle" class="input-field" placeholder="गाना/ऑडियो का शीर्षक (Song Title)">
-                <label class="file-label">
-                    🎵 गाना फाइल चुनें (MP3/WAV)
-                    <input type="file" id="songFile" accept="audio/*" style="display: none;" onchange="updateFileName(this, 'songFileName')">
-                </label>
-                <div id="songFileName" style="font-size: 11px; color: var(--neon-glow); margin-bottom: 10px;"></div>
-                <button class="btn btn-primary" onclick="uploadSongContent()">Upload Song Now</button>
-            </div>
-
-            <div class="card" style="margin-top: 10px;">
-                <div class="card-title">🎬 Upload Video Reel / Movie</div>
-                <input type="text" id="videoTitle" class="input-field" placeholder="वीडियो का शीर्षक (Video Title)">
-                <label class="file-label">
-                    📹 वीडियो फाइल चुनें (MP4/MOV)
-                    <input type="file" id="videoFile" accept="video/*" style="display: none;" onchange="updateFileName(this, 'videoFileName')">
-                </label>
-                <div id="videoFileName" style="font-size: 11px; color: var(--neon-glow); margin-bottom: 10px;"></div>
-                <button class="btn btn-primary" onclick="uploadVideoContent()">Upload Video Now</button>
-            </div>
-
-            <div class="card" style="margin-top: 10px;">
-                <div class="card-title">📂 Uploaded Media Feed</div>
-                <div id="mediaFeedContainer">
-                    <div style="font-size: 12px; color: var(--text-muted); text-align: center;">अभी कोई मीडिया अपलोड नहीं किया गया है।</div>
+            <div class="upload-container">
+                <div class="upload-card">
+                    <div class="upload-title">📸 Create New Post / Reel / Song</div>
+                    <input type="text" id="uploadCaption" class="ig-input" placeholder="Write a caption or song title...">
+                    <select id="uploadTypeSelect" class="ig-input" style="margin-bottom: 10px;">
+                        <option value="post">Feed Post (Image/Video)</option>
+                        <option value="reel">Reel Video</option>
+                        <option value="audio">Audio / Song Track (MP3)</option>
+                        <option value="story">Story Highlight</option>
+                    </select>
+                    <label class="file-dropzone">
+                        📂 Choose Media File from Device
+                        <input type="file" id="mediaFileInput" style="display: none;" onchange="handleFileSelection(this)">
+                    </label>
+                    <div id="selectedFileName" style="font-size: 11px; color: var(--ig-primary); margin-bottom: 10px;"></div>
+                    <button class="ig-btn" onclick="publishMediaContent()">Publish to ViziyaGram</button>
                 </div>
             </div>
         </div>
 
-        <!-- VIEW 3: PROFILE -->
+        <!-- VIEW 5: USER PROFILE -->
         <div id="profileView" class="view-section">
-            <div class="card" style="text-align: center; padding: 25px 15px;">
-                <div style="width: 75px; height: 75px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-glow), var(--accent-purple)); color: #000; font-size: 28px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; box-shadow: 0 0 20px rgba(0,240,255,0.4);">V</div>
-                <h2 style="font-size: 18px; color: #fff; margin-bottom: 2px;">Vidya Creator</h2>
-                <span style="font-size: 12px; color: var(--neon-glow); display: block; margin-bottom: 15px;">@vidya_user</span>
-                <button class="btn btn-primary" onclick="openSettingsModal()">⚙️ Update API Configurations</button>
+            <div class="profile-header">
+                <div class="profile-info-row">
+                    <div class="profile-avatar-large">V</div>
+                    <div class="profile-stats">
+                        <div>
+                            <span class="stat-number" id="profilePostCount">12</span>
+                            <span class="stat-label">Posts</span>
+                        </div>
+                        <div>
+                            <span class="stat-number">1.4K</span>
+                            <span class="stat-label">Followers</span>
+                        </div>
+                        <div>
+                            <span class="stat-number">340</span>
+                            <span class="stat-label">Following</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <strong style="font-size: 14px; display: block;">Vidya Creator Official</strong>
+                    <p class="profile-bio" style="color: var(--ig-text-muted); margin-top: 4px;">
+                        🚀 Building the ultimate single-file social network.<br>🎵 Songs, Reels & DMs enabled.
+                    </p>
+                </div>
+                <button class="ig-btn" onclick="openSettingsModal()" style="background: var(--ig-surface); border: 1px solid var(--ig-border);">Edit Profile / APIs</button>
             </div>
+            <div class="explore-grid" id="userProfileGrid"></div>
         </div>
 
-        <!-- DM Chat & Call Modal Panel -->
+        <!-- DM Chat Modal -->
         <div id="dmModal">
-            <div class="dm-container">
-                <div class="dm-header">
-                    <div>
-                        <strong id="dmChatUserTitle" style="font-size: 14px; color: #fff; display: block;">User</strong>
-                        <span id="dmStatusSubtitle" style="font-size: 10px; color: #10b981;">Connected</span>
+            <div class="dm-box">
+                <div class="dm-topbar">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--ig-surface); display: flex; align-items: center; justify-content: center; font-weight: bold;" id="dmModalAvatar">R</div>
+                        <div>
+                            <strong id="dmModalName" style="font-size: 13px; display: block;">Rahul Sharma</strong>
+                            <span style="font-size: 10px; color: #10b981;">Active Now</span>
+                        </div>
                     </div>
-                    
-                    <div class="call-buttons-group">
-                        <button onclick="startVideoCall()" class="call-action-btn" title="Video Call">🎥</button>
-                        <button onclick="startAudioCall()" class="call-action-btn audio" title="Audio Call">📞</button>
-                        <button onclick="closeDmModal()" style="background:none; border:none; color:#ff4d4d; font-size:20px; cursor:pointer; margin-left:8px;">✕</button>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <button onclick="startVideoCall()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">🎥</button>
+                        <button onclick="startAudioCall()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">📞</button>
+                        <button onclick="closeDmModal()" style="background:none; border:none; color:#ed4956; font-size:20px; cursor:pointer;">✕</button>
                     </div>
                 </div>
-
-                <div class="dm-body" id="dmChatBody"></div>
-
-                <div id="dmInputArea" style="padding: 10px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--border-color); display: flex; gap: 8px;">
-                    <input type="text" id="dmInputText" class="input-field" placeholder="Type a secure message..." style="margin-bottom: 0;">
-                    <button class="btn btn-primary" onclick="sendDmMessage()" style="width: 80px; padding: 10px;">Send</button>
+                <div class="dm-chat-body" id="dmChatMessages">
+                    <div class="chat-bubble received">Hello! Welcome to ViziyaGram DM chat. Secure messaging is active. 🎉</div>
+                </div>
+                <div style="padding: 10px; background: var(--ig-surface); border-top: 1px solid var(--ig-border); display: flex; gap: 8px;">
+                    <input type="text" id="dmInputText" class="ig-input" placeholder="Message..." style="margin-bottom: 0;">
+                    <button class="ig-btn" onclick="sendDmMessage()" style="width: 75px; padding: 10px;">Send</button>
                 </div>
             </div>
         </div>
 
-        <!-- Master Settings Modal (Supabase, Agora, Groq) -->
+        <!-- Master API Settings Modal -->
         <div id="settingsModal">
-            <div class="modal-content">
+            <div class="settings-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="color: var(--neon-glow); font-size: 15px;">⚙️ Master API Settings</h3>
-                    <button onclick="closeSettingsModal()" style="background:none; border:none; color:#ff4d4d; font-size:20px; cursor:pointer;">✕</button>
+                    <h3 style="font-size: 15px; color: var(--ig-primary);">⚙️ Master API Configurations</h3>
+                    <button onclick="closeSettingsModal()" style="background:none; border:none; color:#ed4956; font-size:20px; cursor:pointer;">✕</button>
                 </div>
                 
-                <div class="section-divider">☁️ Supabase Cloud Database</div>
+                <div class="settings-divider">☁️ Supabase Cloud Database</div>
                 <div style="margin-bottom: 10px;">
-                    <span class="field-label">Supabase Project URL</span>
-                    <input type="text" id="cfgSupabaseUrl" class="input-field" placeholder="https://xyz.supabase.co">
+                    <span style="font-size: 11px; color: var(--ig-text-muted); display: block; margin-bottom: 4px;">Supabase Project URL</span>
+                    <input type="text" id="cfgSupabaseUrl" class="ig-input" placeholder="https://xyz.supabase.co">
                 </div>
                 <div style="margin-bottom: 10px;">
-                    <span class="field-label">Supabase Anon / Public Key</span>
-                    <input type="text" id="cfgSupabaseKey" class="input-field" placeholder="eyJhbGciOiJIUzI1NiIsIn...">
+                    <span style="font-size: 11px; color: var(--ig-text-muted); display: block; margin-bottom: 4px;">Supabase Anon Key</span>
+                    <input type="text" id="cfgSupabaseKey" class="ig-input" placeholder="eyJhbGciOiJIUzI1NiIsIn...">
                 </div>
 
-                <div class="section-divider">🎙️ Agora Video/Audio Call API</div>
+                <div class="settings-divider">🎙️ Agora Video & Audio Call API</div>
                 <div style="margin-bottom: 15px;">
-                    <span class="field-label">Agora App ID (अरोरा की)</span>
-                    <input type="text" id="cfgAgoraAppId" class="input-field" placeholder="Enter Agora App ID">
+                    <span style="font-size: 11px; color: var(--ig-text-muted); display: block; margin-bottom: 4px;">Agora App ID</span>
+                    <input type="text" id="cfgAgoraAppId" class="ig-input" placeholder="Enter Agora App ID">
                 </div>
 
-                <div class="section-divider">⚡ Groq / Groww API Key</div>
-                <div style="margin-bottom: 15px;">
-                    <span class="field-label">API Key / Secret Token</span>
-                    <input type="text" id="cfgGroqKey" class="input-field" placeholder="Enter Groq or Groww API Key">
-                </div>
-
-                <button class="btn btn-primary" onclick="saveAllConfigs()">Save All API Configs</button>
-                <div id="saveMsg" class="save-msg">✓ Configurations Saved Successfully!</div>
+                <button class="ig-btn" onclick="saveAllConfigs()">Save Configurations</button>
+                <div id="saveConfirmMsg" style="font-size: 11px; color: #10b981; text-align: center; margin-top: 8px; display: none;">✓ Saved Successfully!</div>
             </div>
         </div>
 
-        <!-- Bottom Navigation Bar with Upload Tab Added -->
-        <nav class="bottom-nav">
-            <button class="nav-item active" id="navHome" onclick="switchTab('home', this)"><span>💬</span>Chats</button>
-            <button class="nav-item" id="navUpload" onclick="switchTab('upload', this)"><span>📤</span>Uploads</button>
-            <button class="nav-item" id="navProfile" onclick="switchTab('profile', this)"><span>👤</span>Profile</button>
+        <!-- Bottom Tab Navigation -->
+        <nav class="ig-bottom-nav">
+            <button class="nav-tab active" onclick="switchTab('home', this)" title="Home">🏠</button>
+            <button class="nav-tab" onclick="switchTab('explore', this)" title="Explore">🔍</button>
+            <button class="nav-tab" onclick="switchTab('reels', this)" title="Reels">🎬</button>
+            <button class="nav-tab" onclick="switchTab('upload', this)" title="Upload">➕</button>
+            <button class="nav-tab" onclick="switchTab('profile', this)" title="Profile">👤</button>
         </nav>
     </div>
 
     <script>
-        let supabaseClient = null;
-        let mockCreators = [
-            { id: 1, name: "Rahul Sharma", handle: "@rahul_viziya", isFollowing: true, isAccepted: true },
-            { id: 2, name: "Priya Singh", handle: "@priya_creator", isFollowing: true, isAccepted: false },
-            { id: 3, name: "Amit Verma", handle: "@amit_tech", isFollowing: false, isAccepted: false }
+        // Mock Data for Instagram Clone State
+        let storiesData = [
+            { id: 1, name: "Your Story", avatar: "V", isLive: false },
+            { id: 2, name: "rahul_v", avatar: "R", isLive: true },
+            { id: 3, name: "priya_s", avatar: "P", isLive: false },
+            { id: 4, name: "amit_tech", avatar: "A", isLive: false },
+            { id: 5, name: "neha_music", avatar: "N", isLive: false }
         ];
-        let uploadedMediaList = [];
-        let activeDmCreator = null;
 
+        let feedPosts = [
+            {
+                id: 1,
+                username: "rahul_viziya",
+                avatar: "R",
+                mediaUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
+                type: "image",
+                likesCount: 1245,
+                isLiked: false,
+                caption: "Exploring neon cyberpunk vibes with ViziyaGram! 🚀✨"
+            },
+            {
+                id: 2,
+                username: "priya_creator",
+                avatar: "P",
+                mediaUrl: "https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?w=600&auto=format&fit=crop&q=80",
+                type: "image",
+                likesCount: 890,
+                isLiked: true,
+                caption: "New acoustic song recording session today! 🎵🎸"
+            }
+        ];
+
+        let reelsList = [
+            {
+                id: 1,
+                username: "amit_tech",
+                avatar: "A",
+                videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-lights-41555-large.mp4",
+                caption: "Late night coding sessions are pure magic ✨💻 #coding #viziya",
+                likesCount: 4320,
+                isLiked: false
+            },
+            {
+                id: 2,
+                username: "neha_music",
+                avatar: "N",
+                videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-dj-mixing-music-in-a-club-41314-large.mp4",
+                caption: "New beat drop! Let me know how it sounds 🎧🔥 #music #dj",
+                likesCount: 9810,
+                isLiked: true
+            }
+        ];
+
+        let selectedFileObject = null;
+
+        // Tab Switching Functionality
         function switchTab(tabName, btnElement) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ig-bottom-nav .nav-tab').forEach(el => el.classList.remove('active'));
 
             if (tabName === 'home') {
                 document.getElementById('homeView').classList.add('active');
                 if(btnElement) btnElement.classList.add('active');
-                renderCreatorsList();
+                renderStories();
+                renderFeedPosts();
+            } else if (tabName === 'explore') {
+                document.getElementById('exploreView').classList.add('active');
+                if(btnElement) btnElement.classList.add('active');
+                renderExploreGrid();
+            } else if (tabName === 'reels') {
+                document.getElementById('reelsView').classList.add('active');
+                if(btnElement) btnElement.classList.add('active');
+                renderReels();
             } else if (tabName === 'upload') {
                 document.getElementById('uploadView').classList.add('active');
                 if(btnElement) btnElement.classList.add('active');
-                renderMediaFeed();
             } else if (tabName === 'profile') {
                 document.getElementById('profileView').classList.add('active');
                 if(btnElement) btnElement.classList.add('active');
+                renderProfileGrid();
             }
         }
 
-        function updateFileName(input, targetId) {
-            if (input.files && input.files[0]) {
-                document.getElementById(targetId).innerText = "Selected: " + input.files[0].name;
+        // Render Stories
+        function renderStories() {
+            const container = document.getElementById('storiesContainer');
+            container.innerHTML = '';
+            storiesData.forEach(story => {
+                container.innerHTML += `
+                    <div class="story-item">
+                        <div class="story-ring">
+                            <div class="story-avatar">${story.avatar}</div>
+                        </div>
+                        <span class="story-name">${story.name}</span>
+                    </div>
+                `;
+            });
+        }
+
+        // Render Feed Posts
+        function renderFeedPosts() {
+            const container = document.getElementById('mainFeedContainer');
+            container.innerHTML = '';
+            feedPosts.forEach(post => {
+                let likeClass = post.isLiked ? "action-icon liked" : "action-icon";
+                let heartIcon = post.isLiked ? "❤️" : "🤍";
+                container.innerHTML += `
+                    <div class="feed-post">
+                        <div class="post-header">
+                            <div class="post-user-info">
+                                <div class="post-user-avatar">${post.avatar}</div>
+                                <span class="post-username">${post.username}</span>
+                            </div>
+                            <span style="color: var(--ig-text-muted); font-size: 16px; cursor: pointer;">•••</span>
+                        </div>
+                        <div class="post-media-box">
+                            <img src="${post.mediaUrl}" alt="Post Media">
+                        </div>
+                        <div class="post-actions">
+                            <div class="post-actions-left">
+                                <button class="${likeClass}" onclick="togglePostLike(${post.id})">${heartIcon}</button>
+                                <button class="action-icon" onclick="alert('Open comments section')">💬</button>
+                                <button class="action-icon" onclick="alert('Post shared successfully!')">✈️</button>
+                            </div>
+                            <button class="action-icon">🔖</button>
+                        </div>
+                        <div class="post-likes">${post.likesCount.toLocaleString()} likes</div>
+                        <div class="post-caption"><span>${post.username}</span>${post.caption}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function togglePostLike(id) {
+            let post = feedPosts.find(p => p.id === id);
+            if(post) {
+                post.isLiked = !post.isLiked;
+                post.likesCount += post.isLiked ? 1 : -1;
+                renderFeedPosts();
             }
         }
 
-        function uploadSongContent() {
-            const title = document.getElementById('songTitle').value.trim();
-            const fileInput = document.getElementById('songFile');
-            if(!title) { alert("कृपया गाने का शीर्षक दर्ज करें!"); return; }
-            if(fileInput.files.length === 0) { alert("कृपया गाने की फाइल चुनें!"); return; }
-
-            uploadedMediaList.unshift({ type: 'audio', title: title, fileName: fileInput.files[0].name });
-            document.getElementById('songTitle').value = '';
-            fileInput.value = '';
-            document.getElementById('songFileName').innerText = '';
-            alert("🎵 गाना सफलताપूर्वक अपलोड हो गया है!");
-            renderMediaFeed();
+        // Render Explore Grid
+        function renderExploreGrid() {
+            const container = document.getElementById('exploreGridContainer');
+            container.innerHTML = '';
+            feedPosts.concat(feedPosts).forEach((item, idx) => {
+                container.innerHTML += `
+                    <div class="explore-item" onclick="alert('Opening explore media #${idx+1}')">
+                        <img src="${item.mediaUrl}" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                `;
+            });
         }
 
-        function uploadVideoContent() {
-            const title = document.getElementById('videoTitle').value.trim();
-            const fileInput = document.getElementById('videoFile');
-            if(!title) { alert("कृपया वीडियो का शीर्षक दर्ज करें!"); return; }
-            if(fileInput.files.length === 0) { alert("कृपया वीडियो फाइल चुनें!"); return; }
-
-            uploadedMediaList.unshift({ type: 'video', title: title, fileName: fileInput.files[0].name });
-            document.getElementById('videoTitle').value = '';
-            fileInput.value = '';
-            document.getElementById('videoFileName').innerText = '';
-            alert("📹 वीडियो सफलताપूर्वक अपलोड हो गया है!");
-            renderMediaFeed();
+        // Render Reels
+        function renderReels() {
+            const container = document.getElementById('reelsContainer');
+            container.innerHTML = '';
+            reelsList.forEach(reel => {
+                let likeHeart = reel.isLiked ? "❤️" : "🤍";
+                container.innerHTML += `
+                    <div class="reel-card">
+                        <video class="reel-video-element" src="${reel.videoUrl}" loop autoplay muted playsinline></video>
+                        <div class="reel-overlay">
+                            <div class="reel-info">
+                                <div class="reel-author">
+                                    <div class="post-user-avatar">${reel.avatar}</div>
+                                    <span class="reel-author-name">@${reel.username}</span>
+                                    <button style="background:transparent; border:1px solid #fff; color:#fff; font-size:11px; padding:2px 8px; border-radius:4px; cursor:pointer;">Follow</button>
+                                </div>
+                                <div class="reel-caption">${reel.caption}</div>
+                            </div>
+                            <div class="reel-sidebar">
+                                <button class="reel-action-btn" onclick="toggleReelLike(${reel.id})">${likeHeart}<span>${reel.likesCount}</span></button>
+                                <button class="reel-action-btn" onclick="alert('Comments')">💬<span>124</span></button>
+                                <button class="reel-action-btn" onclick="alert('Shared')">✈️</button>
+                                <button class="reel-action-btn">🎵</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
-        function renderMediaFeed() {
-            const container = document.getElementById('mediaFeedContainer');
-            if(uploadedMediaList.length === 0) {
-                container.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); text-align: center;">अभी कोई मीडिया अपलोड नहीं किया गया है।</div>`;
+        function toggleReelLike(id) {
+            let reel = reelsList.find(r => r.id === id);
+            if(reel) {
+                reel.isLiked = !reel.isLiked;
+                reel.likesCount += reel.isLiked ? 1 : -1;
+                renderReels();
+            }
+        }
+
+        // Render Profile Grid
+        function renderProfileGrid() {
+            const container = document.getElementById('userProfileGrid');
+            container.innerHTML = '';
+            for(let i=0; i<9; i++) {
+                container.innerHTML += `
+                    <div class="explore-item">
+                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&auto=format&fit=crop&q=80" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                `;
+            }
+        }
+
+        // File Selection & Upload Handling
+        function handleFileSelection(input) {
+            if(input.files && input.files[0]) {
+                selectedFileObject = input.files[0];
+                document.getElementById('selectedFileName').innerText = "Selected File: " + selectedFileObject.name;
+            }
+        }
+
+        function publishMediaContent() {
+            const caption = document.getElementById('uploadCaption').value.trim();
+            const type = document.getElementById('uploadTypeSelect').value;
+
+            if(!caption && !selectedFileObject) {
+                alert("कृपया कैप्शन लिखें या मीडिया फाइल चुनें!");
                 return;
             }
-            container.innerHTML = '';
-            uploadedMediaList.forEach(item => {
-                let icon = item.type === 'audio' ? '🎵' : '📹';
-                container.innerHTML += `
-                    <div class="media-feed-item">
-                        <div class="media-feed-title">${icon} ${item.title}</div>
-                        <div style="font-size: 11px; color: var(--text-muted);">File: ${item.fileName}</div>
-                    </div>
-                `;
-            });
-        }
 
-        function renderCreatorsList() {
-            const container = document.getElementById('creatorsListContainer');
-            container.innerHTML = '';
-            mockCreators.forEach(creator => {
-                let badgeText = creator.isAccepted ? "Accepted ✓" : (creator.isFollowing ? "Pending ⏳" : "+ Follow");
-                let badgeClass = creator.isAccepted ? "follow-badge accepted" : "follow-badge";
-
-                container.innerHTML += `
-                    <div class="creator-item">
-                        <div>
-                            <strong style="font-size: 13px; color: #fff; display: block;">${creator.name}</strong>
-                            <span style="font-size: 11px; color: var(--neon-glow);">${creator.handle}</span>
-                        </div>
-                        <div style="display: flex; gap: 6px; align-items: center;">
-                            <button class="${badgeClass}" onclick="handleFollowClick(${creator.id})">${badgeText}</button>
-                            <button class="btn btn-secondary" onclick="openDmModal(${creator.id})" style="padding: 6px 12px; font-size: 11px; width: auto;">Chat 💬</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function handleFollowClick(id) {
-            let creator = mockCreators.find(c => c.id === id);
-            if (!creator.isFollowing) {
-                creator.isFollowing = true;
-                creator.isAccepted = false;
-                alert("Follow request sent to " + creator.name);
-            } else if (creator.isFollowing && !creator.isAccepted) {
-                creator.isAccepted = true;
-                alert(creator.name + " accepted your follow request!");
+            if(type === 'reel') {
+                reelsList.unshift({
+                    id: Date.now(),
+                    username: "vidya_user",
+                    avatar: "V",
+                    videoUrl: selectedFileObject ? URL.createObjectURL(selectedFileObject) : "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-lights-41555-large.mp4",
+                    caption: caption || "New Reel uploaded via ViziyaGram 🎬",
+                    likesCount: 1,
+                    isLiked: false
+                });
+                alert("🎬 रील सफलतापूर्व अपलोड हो गई है!");
+                switchTab('reels');
             } else {
-                creator.isFollowing = false;
-                creator.isAccepted = false;
-                alert("Unfollowed " + creator.name);
+                feedPosts.unshift({
+                    id: Date.now(),
+                    username: "vidya_user",
+                    avatar: "V",
+                    mediaUrl: selectedFileObject ? URL.createObjectURL(selectedFileObject) : "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
+                    type: type === 'audio' ? 'audio' : 'image',
+                    likesCount: 1,
+                    isLiked: false,
+                    caption: caption || "New post uploaded successfully! ✨"
+                });
+                alert("📸 पोस्ट या गाना सफलतापूर्व अपलोड हो गया है!");
+                switchTab('home');
             }
-            renderCreatorsList();
+
+            document.getElementById('uploadCaption').value = '';
+            document.getElementById('selectedFileName').innerText = '';
+            selectedFileObject = null;
         }
 
+        // DM Modal & Messaging
         function openDmModal(id) {
-            activeDmCreator = mockCreators.find(c => c.id === id);
-            document.getElementById('dmChatUserTitle').innerText = activeDmCreator.name + " (" + activeDmCreator.handle + ")";
             document.getElementById('dmModal').style.display = 'flex';
-            
-            const chatBody = document.getElementById('dmChatBody');
-            const inputArea = document.getElementById('dmInputArea');
-
-            if (!activeDmCreator.isAccepted) {
-                document.getElementById('dmStatusSubtitle').innerText = "Restricted (Follow pending)";
-                chatBody.innerHTML = `
-                    <div class="restriction-box">
-                        <div style="font-size: 30px; margin-bottom: 8px;">🔒</div>
-                        <h4 style="color: #ff4d4d; font-size: 14px; margin-bottom: 6px;">मैसेज भेजना प्रतिबंधित है</h4>
-                        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
-                            जब तक ${activeDmCreator.name} आपकी फॉलो रिक्वेस्ट स्वीकार नहीं करते, आप चैट या कॉल नहीं कर सकते।
-                        </p>
-                    </div>
-                `;
-                inputArea.style.display = 'none';
-            } else {
-                document.getElementById('dmStatusSubtitle').innerText = "Connected & Active";
-                chatBody.innerHTML = `
-                    <div class="chat-bubble received">Hello! Follow request is accepted. You can now chat or call. 🎉</div>
-                `;
-                inputArea.style.display = 'flex';
-            }
         }
 
         function closeDmModal() {
@@ -386,36 +1063,27 @@
             const input = document.getElementById('dmInputText');
             const text = input.value.trim();
             if(!text) return;
-            if(!activeDmCreator || !activeDmCreator.isAccepted) return;
 
-            const chatBody = document.getElementById('dmChatBody');
+            const chatBody = document.getElementById('dmChatMessages');
             chatBody.innerHTML += `<div class="chat-bubble sent">${text}</div>`;
             input.value = '';
             chatBody.scrollTop = chatBody.scrollHeight;
         }
 
         function startVideoCall() {
-            if (!activeDmCreator || !activeDmCreator.isAccepted) {
-                alert("फॉलो रिक्वेस्ट स्वीकार होने के बाद ही वीडियो कॉल की जा सकती है!");
-                return;
-            }
-            alert(`🎥 वीडियो कॉल शुरू हो रही है... Target: ${activeDmCreator.name}`);
+            alert("🎥 वीडियो कॉल कनेक्ट हो रही है (Agora RTC Ready)...");
         }
 
         function startAudioCall() {
-            if (!activeDmCreator || !activeDmCreator.isAccepted) {
-                alert("फॉलो रिक्वेस्ट स्वीकार होने के बाद ही ऑडियो कॉल की जा सकती है!");
-                return;
-            }
-            alert(`📞 ऑडियो कॉल कनेक्ट हो रही है... Target: ${activeDmCreator.name}`);
+            alert("📞 ऑडियो कॉल कनेक्ट हो रही है...");
         }
 
+        // Settings Modal
         function openSettingsModal() {
             document.getElementById('settingsModal').style.display = 'flex';
             document.getElementById('cfgSupabaseUrl').value = localStorage.getItem('viziya_supabase_url') || '';
             document.getElementById('cfgSupabaseKey').value = localStorage.getItem('viziya_supabase_key') || '';
             document.getElementById('cfgAgoraAppId').value = localStorage.getItem('viziya_agora_appid') || '';
-            document.getElementById('cfgGroqKey').value = localStorage.getItem('viziya_groq_key') || '';
         }
 
         function closeSettingsModal() {
@@ -426,15 +1094,19 @@
             localStorage.setItem('viziya_supabase_url', document.getElementById('cfgSupabaseUrl').value.trim());
             localStorage.setItem('viziya_supabase_key', document.getElementById('cfgSupabaseKey').value.trim());
             localStorage.setItem('viziya_agora_appid', document.getElementById('cfgAgoraAppId').value.trim());
-            localStorage.setItem('viziya_groq_key', document.getElementById('cfgGroqKey').value.trim());
 
-            const msg = document.getElementById('saveMsg');
+            const msg = document.getElementById('saveConfirmMsg');
             msg.style.display = 'block';
-            setTimeout(() => { msg.style.display = 'none'; closeSettingsModal(); }, 1200);
+            setTimeout(() => {
+                msg.style.display = 'none';
+                closeSettingsModal();
+            }, 1200);
         }
 
+        // Initial Load
         window.onload = () => {
-            renderCreatorsList();
+            renderStories();
+            renderFeedPosts();
         };
     </script>
 </body>
