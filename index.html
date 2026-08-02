@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>तरुण एआई - Pro</title>
+    <title>तरुण एआई - Ultimate Scam Shield & Pro</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #0B0F19; color: #F8FAFC; font-family: sans-serif; }
-        /* Smooth Drawer Slide */
         #sidebar {
             transform: translateX(-100%);
             transition: transform 0.3s ease-in-out;
@@ -33,17 +32,18 @@
         <div class="space-y-5 overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h2 class="text-sm font-bold text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-indigo-400"></i> सेटिंग्स और मेनू
+                    <i class="fa-solid fa-shield-halved text-indigo-400"></i> तरुण एआई मेनू
                 </h2>
                 <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <!-- Mode Selector -->
             <div class="space-y-1.5">
-                <label class="text-xs font-semibold text-slate-400">🤖 काम करने का मोड:</label>
+                <label class="text-xs font-semibold text-slate-400">🛡️ एआई का काम करने का मोड:</label>
                 <select id="app-mode-select" onchange="changeAppMode()" class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
                     <option value="chat">💬 सामान्य चैट मोड (General Chat)</option>
-                    <option value="business">🏢 बिजनेस & सलाहकार मोड (Business AI)</option>
+                    <option value="scam_guard">🚨 स्कैम & फ्रॉड गार्ड (Scam Shield)</option>
+                    <option value="business">🏢 बिजनेस & दुकान सलाहकार मोड</option>
                 </select>
             </div>
 
@@ -51,12 +51,9 @@
             <div class="space-y-1.5">
                 <label class="text-xs font-semibold text-slate-400">🌐 बातचीत की भाषा (Language):</label>
                 <select id="app-lang-select" onchange="saveLanguage()" class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
-                    <option value="Auto (Detect and reply in user's language)">🔄 ऑटो-डिटेक्ट (यूजर की भाषा में जवाब)</option>
+                    <option value="Auto (Detect and reply in user's language)">🔄 ऑटो-डिटेक्ट (यूजर की भाषा)</option>
                     <option value="Hindi">🇮🇳 हिंदी (Hindi)</option>
                     <option value="English">🇬🇧 अंग्रेजी (English)</option>
-                    <option value="Marathi">🇮🇳 मराठी (Marathi)</option>
-                    <option value="Punjabi">🇮🇳 पंजाबी (Punjabi)</option>
-                    <option value="Gujarati">🇮🇳 गुजराती (Gujarati)</option>
                     <option value="Haryanvi">🇮🇳 हरियाणवी / लोकल टोन</option>
                 </select>
             </div>
@@ -64,23 +61,18 @@
             <!-- Business & Prompt Settings -->
             <div id="business-config-section" class="space-y-3 pt-2 border-t border-slate-800">
                 <div class="space-y-1">
-                    <label class="text-xs font-semibold text-green-400">🏢 बिजनेस / दुकान का नाम:</label>
-                    <input type="text" id="business-type-input" autocomplete="off" placeholder="जैसे: Kirana Store..." 
+                    <label class="text-xs font-semibold text-green-400">🏢 दुकान / बिजनेस का नाम:</label>
+                    <input type="text" id="business-type-input" autocomplete="off" placeholder="जैसे: General Store..." 
                         class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
                 </div>
                 <div class="space-y-1">
-                    <label class="text-xs font-semibold text-indigo-400">✍️ बिजनेस प्रॉम्प्ट / रेट लिस्ट / नियम:</label>
-                    <textarea id="custom-prompt-input" rows="3" autocomplete="off" placeholder="यहाँ रेट लिस्ट या नियम लिखें..."
+                    <label class="text-xs font-semibold text-indigo-400">✍️ कस्टम नियम या रेट लिस्ट:</label>
+                    <textarea id="custom-prompt-input" rows="2" autocomplete="off" placeholder="यहाँ नियम लिखें..."
                         class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none"></textarea>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="saveBusinessConfig()" class="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 rounded-xl transition">
-                        सेव करें
-                    </button>
-                    <button onclick="loadPeacemakerPrompt()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition" title="शांति मोड">
-                        🤝 शांति मोड
-                    </button>
-                </div>
+                <button onclick="saveBusinessConfig()" class="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 rounded-xl transition">
+                    सेव करें
+                </button>
             </div>
 
             <!-- API Key Settings -->
@@ -94,7 +86,7 @@
             </div>
         </div>
         <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-slate-800">
-            तरुण एआई Pro v2.4 • Llama 3.3
+            तरुण एआई Pro v3.0 • Scam Shield Active
         </div>
     </div>
 
@@ -120,17 +112,17 @@
     <main id="chat-container" class="flex-1 overflow-y-auto px-4 py-3 space-y-4">
         <!-- Initial Greeting Message -->
         <div id="welcome-screen" class="flex flex-col items-center justify-center h-full text-center space-y-3">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 via-indigo-500 to-pink-500 flex items-center justify-center shadow-lg animate-pulse">
-                <i class="fa-solid fa-sparkles text-white text-lg"></i>
+            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-red-500 via-indigo-500 to-pink-500 flex items-center justify-center shadow-lg animate-pulse">
+                <i class="fa-solid fa-shield-virus text-white text-lg"></i>
             </div>
-            <h2 id="greeting-text" class="text-lg font-medium text-slate-200">नमस्ते, दुकानदार भाई! आज आपका क्या प्लान है?</h2>
+            <h2 id="greeting-text" class="text-lg font-medium text-slate-200">नमस्ते! स्कैम गार्ड और तरुण एआई तैयार है।</h2>
         </div>
     </main>
 
     <!-- Loading Bar -->
     <div id="loading-bar" class="hidden px-4">
         <div class="w-full bg-slate-800 h-1 rounded overflow-hidden">
-            <div class="bg-indigo-400 h-full w-1/2 animate-pulse"></div>
+            <div class="bg-red-500 h-full w-1/2 animate-pulse"></div>
         </div>
     </div>
 
@@ -138,7 +130,7 @@
     <div id="image-preview-container" class="hidden px-4 py-2 bg-[#111827] border-t border-slate-800 flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <img id="preview-img" src="" class="w-10 h-10 object-cover rounded-lg border border-slate-700">
-            <span class="text-xs text-slate-300">फोटो संलग्न (Attached)</span>
+            <span class="text-xs text-slate-300">स्कैन के लिए फोटो संलग्न</span>
         </div>
         <button onclick="removeImage()" class="text-red-400 hover:text-red-300 text-xs font-bold px-2 py-1"><i class="fa-solid fa-xmark"></i> हटाएं</button>
     </div>
@@ -149,17 +141,17 @@
             <!-- Hidden File Input -->
             <input type="file" id="image-file-input" accept="image/*" class="hidden" onchange="handleImageSelection(event)">
             
-            <!-- Photo Button -->
-            <button onclick="document.getElementById('image-file-input').click()" class="text-slate-400 hover:text-indigo-400 px-3 py-1 rounded-full transition" title="फोटो अपलोड करें">
-                <i class="fa-solid fa-plus text-lg"></i>
+            <!-- Photo / Screenshot Upload Button -->
+            <button onclick="document.getElementById('image-file-input').click()" class="text-slate-400 hover:text-indigo-400 px-3 py-1 rounded-full transition" title="संदिग्ध फोटो या स्क्रीनशॉट अपलोड करें">
+                <i class="fa-solid fa-camera text-lg"></i>
             </button>
 
             <!-- Text Input -->
-            <input type="text" id="user-input" autocomplete="off" placeholder="तरुण एआई से कहें या भाषा बदलें..." 
+            <input type="text" id="user-input" autocomplete="off" placeholder="संदिग्ध मैसेज यहाँ पेस्ट करें या पूछें..." 
                 class="flex-1 bg-transparent text-slate-100 placeholder-slate-400 text-sm px-3 py-2 focus:outline-none">
 
             <!-- Mic Voice Live Button -->
-            <button onclick="openVoiceOverlay()" class="text-indigo-400 hover:text-indigo-300 px-3 py-1 rounded-full transition" title="तरुण एआई वॉइस बोलें">
+            <button onclick="openVoiceOverlay()" class="text-indigo-400 hover:text-indigo-300 px-3 py-1 rounded-full transition" title="वॉइस बोलकर पूछें">
                 <i class="fa-solid fa-microphone-lines text-xl"></i>
             </button>
 
@@ -184,7 +176,7 @@
                     <i class="fa-solid fa-microphone"></i>
                 </div>
             </div>
-            <div id="voice-transcript" class="text-sm text-slate-400 italic max-w-xs">यहाँ आपकी बोली हुई आवाज़ दिखेगी...</div>
+            <div id="voice-transcript" class="text-sm text-slate-400 italic max-w-xs">बोलिए, तरुण एआई सुन रहा है...</div>
         </div>
         <div class="flex justify-center pb-4">
             <button onclick="closeVoiceOverlay()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-6 py-3 rounded-full font-bold transition">
@@ -193,7 +185,7 @@
         </div>
     </div>
 
-    <!-- Hidden Silent Audio Player for Keep-Alive Loop -->
+    <!-- Hidden Silent Audio Player -->
     <audio id="silent-audio" loop preload="auto">
         <source src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
     </audio>
@@ -202,6 +194,7 @@
     <script>
         let currentMode = 'chat'; 
         let chatMessages = [];
+        let scamMessages = [];
         let bizMessages = [];
         let activeBusinessName = "";
         let activeSystemPrompt = "";
@@ -247,11 +240,7 @@
                         sendMessage();
                     }
                 };
-
-                recognition.onerror = () => {
-                    document.getElementById('voice-status-text').innerText = "आवाज़ सुनाई नहीं दी, दोबारा बोलें।";
-                };
-
+                recognition.onerror = () => { document.getElementById('voice-status-text').innerText = "दोबारा बोलें।"; };
                 recognition.onend = () => {};
             }
 
@@ -266,15 +255,6 @@
             if (savedLang) {
                 selectedLanguage = savedLang;
                 document.getElementById('app-lang-select').value = savedLang;
-            }
-
-            const savedBiz = localStorage.getItem('biz_type');
-            const savedPrompt = localStorage.getItem('biz_prompt');
-            if (savedBiz && savedPrompt) {
-                activeBusinessName = savedBiz;
-                activeSystemPrompt = savedPrompt;
-                document.getElementById('business-type-input').value = activeBusinessName;
-                document.getElementById('custom-prompt-input').value = activeSystemPrompt;
             }
 
             loadHistoryData();
@@ -307,10 +287,14 @@
             const greetingText = document.getElementById('greeting-text');
             const userInput = document.getElementById('user-input');
 
-            if (currentMode === 'business') {
-                headerTitle.innerText = activeBusinessName ? `Business: ${activeBusinessName}` : "Business AI Mode";
-                greetingText.innerText = activeBusinessName ? `नमस्ते! "${activeBusinessName}" मोड एक्टिव है।` : "नमस्ते! साइड मेनू से अपना बिजनेस प्रॉम्प्ट सेट करें।";
-                userInput.placeholder = "ग्राहक का सवाल पूछें या बोलें...";
+            if (currentMode === 'scam_guard') {
+                headerTitle.innerText = "🚨 स्कैम & फ्रॉड गार्ड";
+                greetingText.innerText = "कोई भी संदिग्ध मैसेज या पेमेंट स्क्रीनशॉट यहाँ चेक करें!";
+                userInput.placeholder = "संदिग्ध SMS, लिंक या पेमेंट का स्क्रीनशॉट दें...";
+            } else if (currentMode === 'business') {
+                headerTitle.innerText = activeBusinessName ? `Business: ${activeBusinessName}` : "Business Mode";
+                greetingText.innerText = "नमस्ते! दुकान और बिजनेस मोड एक्टिव है।";
+                userInput.placeholder = "ग्राहक का सवाल या हिसाब पूछें...";
             } else {
                 headerTitle.innerText = "तरुण एआई";
                 greetingText.innerText = "नमस्ते! आज आपका क्या प्लान है?";
@@ -318,60 +302,36 @@
             }
         }
 
-        function loadPeacemakerPrompt() {
-            document.getElementById('business-type-input').value = "शांति दूत व सलाहकार";
-            document.getElementById('custom-prompt-input').value = "तू एक बहुत ही समझदार और सुलझे हुए सलाहकार हो। यदि कोई यूजर किसी से लड़ाई, तनाव या बहस की बात बताए, तो उसे बहुत प्यार से समझाओ। बोल, 'भैया, तुम तो खामा-खां लड़ रहे हो! लड़ाई में कोई फायदा नहीं होता, चुप हो जाने में ही भलाई है।' हमेशा शांति और भाईचारे की बात करो।";
-            alert('🤝 शांति और सलाह देने वाला प्रॉम्प्ट भर दिया गया है!');
-        }
-
         function saveBusinessConfig() {
             const bizName = document.getElementById('business-type-input').value.trim();
             const prompt = document.getElementById('custom-prompt-input').value.trim();
-
-            if (!bizName || !prompt) {
-                alert('⚠️ कृपया बिजनेस का नाम और प्रॉम्प्ट दोनों भरें!');
-                return;
-            }
-
+            if (!bizName) { alert('दुकान का नाम भरें!'); return; }
             activeBusinessName = bizName;
             activeSystemPrompt = prompt;
-
             localStorage.setItem('biz_type', bizName);
             localStorage.setItem('biz_prompt', prompt);
-
             updateUIState();
-            alert('✅ बिजनेस सेटिंग्स सेव हो गई हैं!');
+            alert('✅ बिजनेस सेटिंग्स सेव हो गई!');
             toggleSidebar();
         }
 
         function saveApiKey() {
             const key = document.getElementById('groq-key-input').value.trim();
-            if (!key) {
-                alert('कृपया वैध API Key दर्ज करें!');
-                return;
-            }
+            if (!key) { alert('वैध API Key दर्ज करें!'); return; }
             localStorage.setItem('groq_api_key', key);
-            alert('✅ API Key सफलतापूर्वक सेव हो गई है!');
+            alert('✅ API Key सेव हो गई!');
             toggleSidebar();
         }
 
         function openVoiceOverlay() {
-            if (!recognition) {
-                alert('⚠️ आपका ब्राउज़र स्पीच रिकग्निशन सपोर्ट नहीं करता।');
-                return;
-            }
+            if (!recognition) { alert('स्पीच रिकग्निशन सपोर्ट नहीं है।'); return; }
             document.getElementById('voice-overlay').classList.remove('hidden');
             document.getElementById('voice-status-text').innerText = "सुन रहा हूँ, बोलिए...";
-            document.getElementById('voice-transcript').innerText = "...";
-            try {
-                recognition.start();
-            } catch(e) { console.log(e); }
+            try { recognition.start(); } catch(e) {}
         }
 
         function closeVoiceOverlay() {
-            if (recognition) {
-                try { recognition.stop(); } catch(e) {}
-            }
+            if (recognition) { try { recognition.stop(); } catch(e) {} }
             document.getElementById('voice-overlay').classList.add('hidden');
         }
 
@@ -395,7 +355,7 @@
         }
 
         function speakOutLoud(text) {
-            if ('speechSynthesis' in window && currentMode === 'business') {
+            if ('speechSynthesis' in window && (currentMode === 'business' || currentMode === 'scam_guard')) {
                 window.speechSynthesis.cancel();
                 let utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'hi-IN';
@@ -404,41 +364,42 @@
             }
         }
 
+        function getActiveList() {
+            if (currentMode === 'scam_guard') return scamMessages;
+            if (currentMode === 'business') return bizMessages;
+            return chatMessages;
+        }
+
         function loadHistoryData() {
-            if (currentMode === 'chat') {
-                const saved = localStorage.getItem('chat_history');
-                chatMessages = saved ? JSON.parse(saved) : [];
-            } else {
-                const saved = localStorage.getItem('biz_history');
-                bizMessages = saved ? JSON.parse(saved) : [];
-            }
+            const sChat = localStorage.getItem('chat_history');
+            const sScam = localStorage.getItem('scam_history');
+            const sBiz = localStorage.getItem('biz_history');
+            chatMessages = sChat ? JSON.parse(sChat) : [];
+            scamMessages = sScam ? JSON.parse(sScam) : [];
+            bizMessages = sBiz ? JSON.parse(sBiz) : [];
             renderChat();
         }
 
         function clearCurrentHistory() {
-            if (currentMode === 'chat') {
-                chatMessages = [];
-                localStorage.removeItem('chat_history');
-            } else {
-                bizMessages = [];
-                localStorage.removeItem('biz_history');
-            }
+            if (currentMode === 'chat') { chatMessages = []; localStorage.removeItem('chat_history'); }
+            else if (currentMode === 'scam_guard') { scamMessages = []; localStorage.removeItem('scam_history'); }
+            else { bizMessages = []; localStorage.removeItem('biz_history'); }
             renderChat();
         }
 
         function renderChat() {
             const container = document.getElementById('chat-container');
-            const list = currentMode === 'chat' ? chatMessages : bizMessages;
+            const list = getActiveList();
             
             if (list.length === 0) {
                 updateUIState();
                 container.innerHTML = `
-                    <div id="welcome-screen" class="flex flex-col items-center justify-center h-full text-center space-y-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 via-indigo-500 to-pink-500 flex items-center justify-center shadow-lg animate-pulse">
-                            <i class="fa-solid fa-sparkles text-white text-lg"></i>
+                    <div class="flex flex-col items-center justify-center h-full text-center space-y-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-red-500 via-indigo-500 to-pink-500 flex items-center justify-center shadow-lg animate-pulse">
+                            <i class="fa-solid fa-shield-halved text-white text-lg"></i>
                         </div>
-                        <h2 id="greeting-text" class="text-lg font-medium text-slate-200">
-                            ${currentMode === 'business' ? (activeBusinessName ? `नमस्ते! "${activeBusinessName}" मोड तैयार है।` : "साइड मेनू से बिजनेस प्रॉम्प्ट सेट करें।") : "नमस्ते! आज आपका क्या प्लान है?"}
+                        <h2 class="text-lg font-medium text-slate-200">
+                            ${currentMode === 'scam_guard' ? '🚨 स्कैम गार्ड एक्टिव: कोई भी संदिग्ध लिंक या पेमेंट चेक करें।' : 'नमस्ते! आज आपका क्या प्लान है?'}
                         </h2>
                     </div>
                 `;
@@ -451,7 +412,7 @@
                 let imgTag = msg.image ? `<img src="${msg.image}" class="w-32 h-32 object-cover rounded-xl mb-2 border border-slate-700">` : '';
                 container.innerHTML += `
                     <div class="flex ${isUser ? 'justify-end' : 'items-start space-x-3'} my-3">
-                        ${!isUser ? '<div class="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs text-white flex-shrink-0"><i class="fa-solid fa-robot"></i></div>' : ''}
+                        ${!isUser ? '<div class="w-7 h-7 rounded-full bg-red-600 flex items-center justify-center text-xs text-white flex-shrink-0"><i class="fa-solid fa-shield-halved"></i></div>' : ''}
                         <div class="${isUser ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-none' : 'bg-[#1F2937] text-slate-100 rounded-2xl rounded-tl-none'} p-3.5 max-w-[85%] text-sm shadow-md space-y-1.5">
                             ${imgTag}
                             <div class="leading-relaxed text-[13.5px]">${msg.text}</div>
@@ -470,14 +431,13 @@
 
             if (!userText && !currentImage) return;
 
-            const list = currentMode === 'chat' ? chatMessages : bizMessages;
-            let userMsg = {'sender': 'user', 'text': userText || '[फोटो भेजी गई]'};
+            const list = getActiveList();
+            let userMsg = {'sender': 'user', 'text': userText || '[फोटो/स्क्रीनशॉट भेजा गया]'};
             if (currentImage) userMsg.image = currentImage;
 
             list.push(userMsg);
             inputField.value = '';
             removeImage();
-            
             saveHistory();
             renderChat();
 
@@ -488,23 +448,15 @@
                 if (!groqKey) {
                     document.getElementById('loading-bar').classList.add('hidden');
                     list.push({'sender': 'ai', 'text': '⚠️ कृपया पहले साइड मेनू (☰) खोलकर अपनी Groq API Key सेव करें!'});
-                    saveHistory();
-                    renderChat();
-                    toggleSidebar();
+                    saveHistory(); renderChat(); toggleSidebar();
                     return;
                 }
 
-                let sysPrompt = `You are a helpful AI assistant named Tarun AI. Always reply in the following language: ${selectedLanguage}.`;
-                if (currentMode === 'business') {
-                    if (!activeSystemPrompt) {
-                        document.getElementById('loading-bar').classList.add('hidden');
-                        list.push({'sender': 'ai', 'text': '⚠️ कृपया पहले साइड मेनू खोलकर अपना बिजनेस प्रॉम्प्ट सेव करें!'});
-                        saveHistory();
-                        renderChat();
-                        toggleSidebar();
-                        return;
-                    }
-                    sysPrompt = `${activeSystemPrompt}. Note: Reply to the user strictly in this language/format setting: ${selectedLanguage}.`;
+                let sysPrompt = `You are Tarun AI, a helpful assistant. Reply in: ${selectedLanguage}.`;
+                if (currentMode === 'scam_guard') {
+                    sysPrompt = `You are an expert Fraud and Scam Detector Shield. Analyze the user's message, SMS, link, or payment screenshot. Tell them clearly whether it is 100% FRAUD/SCAM or SAFE. Give reasons why, and warn them if it's dangerous. Reply strictly in: ${selectedLanguage}.`;
+                } else if (currentMode === 'business') {
+                    sysPrompt = `${activeSystemPrompt || 'You are a business helper.'} Reply in: ${selectedLanguage}.`;
                 }
 
                 let userContent = [];
@@ -534,13 +486,10 @@
                     const data = await response.json();
                     let aiResponse = data.choices[0].message.content;
                     list.push({'sender': 'ai', 'text': aiResponse});
-                    
-                    if (currentMode === 'business') {
-                        speakOutLoud(aiResponse);
-                    }
+                    speakOutLoud(aiResponse);
                 } else {
                     const errBody = await response.text();
-                    list.push({'sender': 'ai', 'text': `❌ API एरर (${response.status}): ${errBody}`});
+                    list.push({'sender': 'ai', 'text': `❌ API एरर: ${errBody}`});
                 }
 
                 saveHistory();
@@ -555,11 +504,9 @@
         }
 
         function saveHistory() {
-            if (currentMode === 'chat') {
-                localStorage.setItem('chat_history', JSON.stringify(chatMessages));
-            } else {
-                localStorage.setItem('biz_history', JSON.stringify(bizMessages));
-            }
+            if (currentMode === 'chat') localStorage.setItem('chat_history', JSON.stringify(chatMessages));
+            else if (currentMode === 'scam_guard') localStorage.setItem('scam_history', JSON.stringify(scamMessages));
+            else localStorage.setItem('biz_history', JSON.stringify(bizMessages));
         }
     </script>
 </body>
