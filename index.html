@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viziya - 2050 Living Mirror</title>
+    <title>Viziya - Real Media Feed</title>
     <style>
         :root {
             --bg-color: #05070b;
@@ -12,7 +12,7 @@
             --accent-purple: #b000ff;
             --text-color: #ffffff;
             --text-muted: #94a3b8;
-            --border-color: rgba(0, 240, 255, 0.2);
+            --border-color: rgba(0, 240, 255, 0.3);
         }
 
         * {
@@ -30,13 +30,11 @@
             overflow-x: hidden;
         }
 
-        /* Full Screen App Shell */
         .app-wrapper {
             width: 100%;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background: var(--bg-color);
             position: relative;
         }
 
@@ -66,8 +64,7 @@
 
         .header-icons {
             display: flex;
-            gap: 12px;
-            align-items: center;
+            gap: 10px;
         }
 
         .icon-btn {
@@ -84,7 +81,7 @@
             cursor: pointer;
         }
 
-        /* Scrollable Main Content Area */
+        /* Main Scrollable View */
         .main-content {
             flex: 1;
             width: 100%;
@@ -94,17 +91,15 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            padding-bottom: 70px;
+            padding-bottom: 80px;
         }
 
-        /* Card Section */
         .card {
-            width: 100%;
             background: var(--surface-color);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
         }
 
         .card-title {
@@ -112,11 +107,29 @@
             color: var(--neon-glow);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-weight: 700;
         }
 
-        /* Inputs & Buttons */
+        .camera-box {
+            width: 100%;
+            height: 240px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid var(--neon-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #realCameraStream {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .input-field {
             width: 100%;
             padding: 12px;
@@ -152,10 +165,10 @@
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
         }
 
-        /* Feed Post Layout */
+        /* Post Card Styles */
         .post-card {
-            background: #0b0f19;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
             border-radius: 14px;
             overflow: hidden;
             margin-bottom: 15px;
@@ -165,14 +178,8 @@
             padding: 10px 12px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .post-user-info {
-            display: flex;
-            align-items: center;
             gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .avatar-circle {
@@ -190,9 +197,10 @@
 
         .post-media {
             width: 100%;
-            max-height: 320px;
-            object-fit: cover;
+            max-height: 400px;
+            object-fit: contain;
             display: block;
+            background: #000;
         }
 
         .post-footer {
@@ -201,7 +209,44 @@
             color: #e2e8f0;
         }
 
-        /* Bottom Navigation Bar (Real App Style) */
+        /* Working Settings Modal Panel */
+        #settingsModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 11, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 400px;
+            background: var(--surface-color);
+            border: 1px solid var(--neon-glow);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.3);
+        }
+
+        .field-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .save-msg {
+            font-size: 11px;
+            color: #10b981;
+            text-align: center;
+            margin-top: 8px;
+            display: none;
+        }
+
+        /* Bottom Real Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -213,15 +258,15 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            backdrop-filter: blur(10px);
             z-index: 100;
+            backdrop-filter: blur(10px);
         }
 
         .nav-item {
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 12px;
+            font-size: 11px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -241,90 +286,179 @@
 <body>
 
     <div class="app-wrapper">
-        <!-- Top App Bar -->
+        <!-- Top App Bar with Working Settings Icon -->
         <header class="app-header">
             <h1 class="logo-title">VIZIYA</h1>
             <div class="header-icons">
-                <div class="icon-btn" onclick="alert('Mirror Call Gateway Active')">⚡</div>
-                <div class="icon-btn" onclick="alert('Settings Panel')">⚙️</div>
+                <div class="icon-btn" onclick="initRealCamera()" title="Start Camera">📷</div>
+                <div class="icon-btn" onclick="openSettingsModal()" title="API Settings">⚙️</div>
             </div>
         </header>
 
-        <!-- Main Dynamic Feed & Controls -->
+        <!-- Main Content Area -->
         <div class="main-content">
-            <!-- Create Post Box -->
+            
+            <!-- 1. Real Camera Mirror Box -->
             <div class="card">
-                <div class="card-title">✨ Create Live Feed Post</div>
-                <input type="text" id="postMediaUrl" class="input-field" placeholder="Paste Image / Video URL...">
-                <input type="text" id="postCaption" class="input-field" placeholder="Write caption for 2050 feed...">
-                <button class="btn btn-primary" onclick="publishPost()">Publish Real Post</button>
+                <div class="card-title">🪞 Live Empathic Mirror Stream</div>
+                <div class="camera-box">
+                    <video id="realCameraStream" autoplay playsinline muted></video>
+                </div>
+                <button class="btn btn-primary" style="margin-top: 12px;" onclick="initRealCamera()">Start Camera Feed</button>
             </div>
 
-            <!-- Feed Stream -->
-            <div id="liveFeedStream">
-                <!-- Dynamically loaded posts -->
+            <!-- 2. Real Direct Gallery Upload (Instagram Style) -->
+            <div class="card">
+                <div class="card-title">✨ Direct Gallery Media Upload</div>
+                <input type="file" id="realMediaFile" class="input-field" accept="image/*,video/*" style="padding: 10px; background: #000; border-style: dashed;">
+                <input type="text" id="postCaption" class="input-field" placeholder="Write caption for your media...">
+                <button class="btn btn-primary" onclick="publishDirectMedia()">Post to Feed</button>
+            </div>
+
+            <!-- 3. Live Feed Stream -->
+            <div id="realFeedContainer"></div>
+        </div>
+
+        <!-- Dedicated Settings Modal Panel with API Inputs -->
+        <div id="settingsModal">
+            <div class="modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="color: var(--neon-glow); font-size: 15px;">⚙️ Master API Gateway</h3>
+                    <button onclick="closeSettingsModal()" style="background:none; border:none; color:#ff4d4d; font-size:20px; cursor:pointer;">✕</button>
+                </div>
+                
+                <div style="margin-bottom: 10px;">
+                    <span class="field-label">1. WebRTC Signaling API Key</span>
+                    <input type="text" id="cfgSignaling" class="input-field" placeholder="Enter signaling key...">
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <span class="field-label">2. AI Vibe Token</span>
+                    <input type="text" id="cfgAi" class="input-field" placeholder="Enter AI token...">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <span class="field-label">3. Enterprise SDK Key</span>
+                    <input type="text" id="cfgSdk" class="input-field" placeholder="Enter SDK key...">
+                </div>
+
+                <button class="btn btn-primary" onclick="saveAllApiKeys()">Save Keys Permanently</button>
+                <div id="saveMsg" class="save-msg">✓ All API Keys saved permanently!</div>
             </div>
         </div>
 
-        <!-- Bottom Navigation Bar -->
+        <!-- Bottom Navigation -->
         <nav class="bottom-nav">
             <button class="nav-item active"><span>🏠</span>Home</button>
-            <button class="nav-item" onclick="alert('Discover / Search')"><span>🔍</span>Explore</button>
-            <button class="nav-item" onclick="alert('Mirror Calls')"><span>🪞</span>Mirror</button>
-            <button class="nav-item" onclick="alert('User Profile')"><span>👤</span>Profile</button>
+            <button class="nav-item" onclick="initRealCamera()"><span>🪞</span>Mirror</button>
+            <button class="nav-item" onclick="openSettingsModal()"><span>⚙️</span>Settings</button>
         </nav>
     </div>
 
     <script>
-        let posts = JSON.parse(localStorage.getItem('vizia_real_posts')) || [
-            { user: 'Tarun Viziya', handle: '@viziya_global', media: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600', caption: 'Full screen real layout active! 2050 Vibe 🚀' }
-        ];
+        // --- Working Settings Modal Logic ---
+        function openSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'flex';
+            document.getElementById('cfgSignaling').value = localStorage.getItem('viziya_signaling_key') || '';
+            document.getElementById('cfgAi').value = localStorage.getItem('viziya_ai_token') || '';
+            document.getElementById('cfgSdk').value = localStorage.getItem('viziya_sdk_key') || '';
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function saveAllApiKeys() {
+            localStorage.setItem('viziya_signaling_key', document.getElementById('cfgSignaling').value.trim());
+            localStorage.setItem('viziya_ai_token', document.getElementById('cfgAi').value.trim());
+            localStorage.setItem('viziya_sdk_key', document.getElementById('cfgSdk').value.trim());
+
+            const msg = document.getElementById('saveMsg');
+            msg.style.display = 'block';
+            setTimeout(() => {
+                msg.style.display = 'none';
+                closeSettingsModal();
+            }, 1500);
+        }
+
+        // --- Real Camera Stream Logic ---
+        async function initRealCamera() {
+            try {
+                const videoElement = document.getElementById('realCameraStream');
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                videoElement.srcObject = stream;
+            } catch (err) {
+                alert("Camera access error: " + err.message);
+            }
+        }
+
+        // --- Direct Gallery File Upload Logic (Instagram Style) ---
+        let realPosts = JSON.parse(localStorage.getItem('vizia_direct_media_posts')) || [];
 
         window.onload = () => {
-            renderFeed();
+            renderRealFeed();
+            initRealCamera();
         };
 
-        function publishPost() {
-            const mediaUrl = document.getElementById('postMediaUrl').value.trim();
+        function publishDirectMedia() {
+            const fileInput = document.getElementById('realMediaFile');
             const caption = document.getElementById('postCaption').value.trim();
 
-            if(!mediaUrl && !caption) {
-                alert("Please enter media URL or caption.");
+            if (fileInput.files.length === 0) {
+                alert("Please select a photo or video from your device storage!");
                 return;
             }
 
-            const newPost = {
-                user: 'Tarun Viziya',
-                handle: '@viziya_global',
-                media: mediaUrl || 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=600',
-                caption: caption || 'Viziya Live Stream Drop'
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const base64Data = e.target.result;
+                const isVideo = file.type.startsWith('video');
+
+                const newPost = {
+                    user: 'Tarun Viziya',
+                    handle: '@viziya_global',
+                    media: base64Data,
+                    type: isVideo ? 'video' : 'image',
+                    caption: caption || 'Direct live gallery drop 🚀'
+                };
+
+                realPosts.unshift(newPost);
+                localStorage.setItem('vizia_direct_media_posts', JSON.stringify(realPosts));
+
+                document.getElementById('postCaption').value = '';
+                fileInput.value = '';
+                renderRealFeed();
             };
 
-            posts.unshift(newPost);
-            localStorage.setItem('vizia_real_posts', JSON.stringify(posts));
-
-            document.getElementById('postMediaUrl').value = '';
-            document.getElementById('postCaption').value = '';
-            renderFeed();
+            reader.readAsDataURL(file);
         }
 
-        function renderFeed() {
-            const container = document.getElementById('liveFeedStream');
+        function renderRealFeed() {
+            const container = document.getElementById('realFeedContainer');
             container.innerHTML = '';
-            posts.forEach(p => {
+            
+            if(realPosts.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">No posts yet. Select a photo/video above to post!</div>`;
+                return;
+            }
+
+            realPosts.forEach(p => {
+                let mediaHtml = p.type === 'video' 
+                    ? `<video src="${p.media}" class="post-media" controls autoplay loop muted playsinline></video>`
+                    : `<img src="${p.media}" class="post-media">`;
+
                 container.innerHTML += `
                     <div class="post-card">
                         <div class="post-header">
-                            <div class="post-user-info">
-                                <div class="avatar-circle">${p.user.charAt(0)}</div>
-                                <div>
-                                    <strong style="font-size: 13px; display: block; color: #fff;">${p.user}</strong>
-                                    <span style="font-size: 10px; color: var(--neon-glow);">${p.handle}</span>
-                                </div>
+                            <div class="avatar-circle">${p.user.charAt(0)}</div>
+                            <div>
+                                <strong style="font-size: 13px; display: block; color: #fff;">${p.user}</strong>
+                                <span style="font-size: 10px; color: var(--neon-glow);">${p.handle}</span>
                             </div>
-                            <span style="color: var(--text-muted); font-size: 12px;">• • •</span>
                         </div>
-                        <img src="${p.media}" class="post-media" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600'">
+                        ${mediaHtml}
                         <div class="post-footer">
                             <strong style="color: #fff; margin-right: 6px;">${p.user}</strong>${p.caption}
                         </div>
