@@ -160,7 +160,7 @@
         </div>
 
         <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-slate-800 mt-4">
-            Mother Chat Admin • v24.0 (Fixed Catalog & Saving)
+            Mother Chat Admin • v25.0 (Auto-Save Catalog Fixed)
         </div>
     </div>
 
@@ -373,7 +373,7 @@
             document.getElementById('admin-lock-screen').classList.remove('hidden');
         }
 
-        function addNewCatalogItem() {
+        async function addNewCatalogItem() {
             const name = document.getElementById('new-item-name').value.trim();
             const unit = document.getElementById('new-item-unit').value.trim() || 'किलो';
             const price = document.getElementById('new-item-price').value.trim();
@@ -394,7 +394,14 @@
             tempItemImg = "";
 
             renderAdminProductsList();
-            alert('✅ आइटम जुड़ गया! (सेव करने के लिए नीचे "हमेशा के लिए सेव करें" बटन दबाएं)');
+
+            // Auto-save instantly so data doesn't get lost
+            await saveShopSettingsSilently();
+            alert('✅ आइटम तुरंत जुड़ गया और परमानेंट सेव हो गया!');
+
+            if (isShoppingOpen) {
+                renderShoppingPageInChat();
+            }
         }
 
         function renderAdminProductsList() {
@@ -424,21 +431,17 @@
             });
         }
 
-        function removeCatalogItem(index) {
+        async function removeCatalogItem(index) {
             productsList.splice(index, 1);
             renderAdminProductsList();
+            await saveShopSettingsSilently();
         }
 
-        async function saveShopSettings() {
+        async function saveShopSettingsSilently() {
             shopName = document.getElementById('shop-name-input').value.trim() || shopName;
             shopAddress = document.getElementById('shop-address-input').value.trim() || shopAddress;
             shopWhatsApp = document.getElementById('shop-whatsapp-input').value.trim() || shopWhatsApp;
             shopStatus = document.getElementById('shop-status-toggle').value;
-            const sPin = document.getElementById('new-admin-pin').value.trim();
-
-            if (sPin.length === 4) {
-                localStorage.setItem('vendor_admin_pin', sPin);
-            }
 
             const shopDataObject = { 
                 shop_name: shopName, 
@@ -450,15 +453,21 @@
                 products: productsList 
             };
             
-            // Save to LocalStorage immediately
             localStorage.setItem('local_shop_cache', JSON.stringify(shopDataObject));
 
-            // Save to Supabase if available
             const sb = getSupabaseClient();
             if (sb) {
                 try {
                     await sb.from('shop_data').insert([shopDataObject]);
                 } catch (e) {}
+            }
+        }
+
+        async function saveShopSettings() {
+            await saveShopSettingsSilently();
+            const sPin = document.getElementById('new-admin-pin').value.trim();
+            if (sPin.length === 4) {
+                localStorage.setItem('vendor_admin_pin', sPin);
             }
 
             document.getElementById('header-shop-name').innerText = shopName;
