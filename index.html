@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>मदर चैट - लाइव कैटलॉग</title>
+    <title>मदर चैट - परमानेंट Supabase लाइव कैटलॉग</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #0B0F19; color: #F8FAFC; font-family: sans-serif; }
         #sidebar { transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
@@ -60,8 +61,14 @@
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-xs font-semibold text-emerald-400">🏪 दुकान का नाम (जैसे: तरुण स्टोर):</label>
-                    <input type="text" id="shop-name-input" autocomplete="off" placeholder="जैसे: तरुण" 
+                    <label class="text-xs font-semibold text-emerald-400">🏪 दुकान का नाम:</label>
+                    <input type="text" id="shop-name-input" autocomplete="off" placeholder="जैसे: तरुण स्टोर" 
+                        class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-emerald-400">📍 दुकान का एड्रेस (लोकेशन):</label>
+                    <input type="text" id="shop-address-input" autocomplete="off" placeholder="जैसे: फरीदाबाद, हरियाणा" 
                         class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
                 </div>
 
@@ -74,12 +81,12 @@
                 <!-- Shop & Owner Photos -->
                 <div class="grid grid-cols-2 gap-2">
                     <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-amber-400">🖼️ दुकान की फोटो:</label>
-                        <input type="file" id="shop-photo-file" accept="image/*" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-700">
+                        <label class="text-[11px] font-semibold text-amber-400">🖼️ दुकान की फोटो लिंक:</label>
+                        <input type="text" id="shop-photo-input" placeholder="Image URL" class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2 border border-slate-700 focus:outline-none">
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-amber-400">👨‍💼 ओनर की फोटो:</label>
-                        <input type="file" id="owner-photo-file" accept="image/*" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-700">
+                        <label class="text-[11px] font-semibold text-amber-400">👨‍💼 ओनर फोटो लिंक:</label>
+                        <input type="text" id="owner-photo-input" placeholder="Image URL" class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2 border border-slate-700 focus:outline-none">
                     </div>
                 </div>
 
@@ -93,12 +100,7 @@
                         <input type="text" id="new-item-unit" placeholder="यूनिट (किलो/ पीस)" class="bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                         <input type="text" id="new-item-price" placeholder="रेट (₹)" class="bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     </div>
-                    
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-semibold text-slate-300">📸 आइटम की फोटो:</label>
-                        <input type="file" id="new-item-img-file" accept="image/*" class="w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
-                    </div>
-
+                    <input type="text" id="new-item-img" placeholder="आइटम फोटो URL (Image Link)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     <input type="text" id="new-item-discount" placeholder="ऑफर/डिस्काउंट (जैसे: ताजा स्टॉक)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     
                     <button onclick="addNewCatalogItem()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow flex items-center justify-center gap-1.5">
@@ -122,7 +124,7 @@
                 </div>
 
                 <button onclick="saveShopSettings()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 rounded-xl transition shadow">
-                    💾 सब कुछ सेव करें & लाइव करें
+                    💾 Supabase में ऑनलाइन सेव करें
                 </button>
             </div>
 
@@ -155,7 +157,7 @@
         </div>
 
         <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-slate-800 mt-4">
-            Mother Chat Admin • v19.0 (Live Default Catalog)
+            Mother Chat Admin • v20.0 (Supabase Database Synced)
         </div>
     </div>
 
@@ -171,12 +173,16 @@
                     <img id="header-owner-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-4 h-4 rounded-full object-cover absolute -bottom-1 -right-1 border border-slate-900">
                 </div>
                 <div>
-                    <span class="text-sm font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent" id="header-shop-name">तरुण</span>
+                    <span class="text-sm font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent" id="header-shop-name">तरुण स्टोर</span>
                     <p class="text-[10px] text-slate-400" id="header-open-status-text">🟢 खुली हुई है</p>
                 </div>
             </div>
         </div>
         <div class="flex items-center gap-2">
+            <!-- SHOPPING TOGGLE BUTTON -->
+            <button onclick="toggleShoppingMode()" id="shop-toggle-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow flex items-center gap-1.5">
+                <i class="fa-solid fa-store"></i> <span id="shop-btn-text">शॉपिंग: बंद</span>
+            </button>
             <button onclick="openCartModal()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow flex items-center gap-1.5">
                 <i class="fa-solid fa-cart-shopping"></i> कार्ट (<span id="cart-count">0</span>)
             </button>
@@ -235,17 +241,21 @@
 
     <script>
         let messages = [];
-        let shopName = "तरुण";
-        let shopWhatsApp = "";
-        let shopPhoto = "";
-        let ownerPhoto = "";
+        let shopName = "तरुण स्टोर";
+        let shopAddress = "फरीदाबाद, हरियाणा";
+        let shopWhatsApp = "919971968060";
+        let shopPhoto = "https://images.unsplash.com/photo-1542838132-92c53300491e?w=100";
+        let ownerPhoto = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100";
         let shopStatus = "OPEN";
+        let isShoppingOpen = false; // Toggle state for catalog
         
-        let productsList = [];
+        let productsList = [
+            { name: "ताजा सेब (Fresh Apple)", unit: "किलो", price: "120", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=200", discount: "₹10 छूट" },
+            { name: "मीठे अनार (Pomegranate)", unit: "किलो", price: "160", img: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200", discount: "ताजा स्टॉक" }
+        ];
         let cart = [];
-        let tempItemImageBase64 = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200";
 
-        window.onload = function() {
+        window.onload = async function() {
             const savedKey = localStorage.getItem('groq_api_key');
             if (savedKey) document.getElementById('groq-key-input').value = savedKey;
 
@@ -255,68 +265,65 @@
             const savedSupabaseKey = localStorage.getItem('supabase_key');
             if (savedSupabaseKey) document.getElementById('supabase-key-input').value = savedSupabaseKey;
 
-            shopName = localStorage.getItem('ai_shop_name') || "तरुण";
-            shopWhatsApp = localStorage.getItem('ai_shop_whatsapp') || "";
-            shopPhoto = localStorage.getItem('ai_shop_photo') || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=100";
-            ownerPhoto = localStorage.getItem('ai_owner_photo') || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100";
-            shopStatus = localStorage.getItem('ai_shop_status') || "OPEN";
-            
-            const savedProducts = localStorage.getItem('ai_shop_products_json');
-            if (savedProducts) {
-                try {
-                    let parsed = JSON.parse(savedProducts);
-                    if (parsed && parsed.length > 0) {
-                        productsList = parsed;
-                    }
-                } catch(e) {
-                    console.error("Error parsing saved products", e);
-                }
-            }
-
-            if (productsList.length === 0) {
-                productsList = [
-                    { name: "ताजा सेब (Fresh Apple)", unit: "किलो", price: "120", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=200", discount: "₹10 छूट" },
-                    { name: "मीठे अनार (Pomegranate)", unit: "किलो", price: "160", img: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200", discount: "ताजा स्टॉक" }
-                ];
-            }
-
-            if (shopName) {
-                document.getElementById('shop-name-input').value = shopName;
-                document.getElementById('header-shop-name').innerText = shopName;
-            }
-            if (shopWhatsApp) document.getElementById('shop-whatsapp-input').value = shopWhatsApp;
-            document.getElementById('header-shop-img').src = shopPhoto;
-            document.getElementById('header-owner-img').src = ownerPhoto;
-            document.getElementById('shop-status-toggle').value = shopStatus;
-
             const savedPin = localStorage.getItem('vendor_admin_pin');
             if (savedPin) document.getElementById('new-admin-pin').value = savedPin;
 
-            setupImageUploadListeners();
-            renderAdminProductsList();
-            updateShopStatusUI();
+            // Fetch Data from Supabase Database
+            await loadDataFromSupabase();
 
-            // 🚀 AUTOMATIC INITIAL MESSAGE WITH CATALOG CARDS DIRECTLY SHOWN ON LOAD
-            let initialWelcomeHtml = `नमस्ते! **${shopName}** की दुकान में आपका स्वागत है। 🍎<br><br>यह रहा हमारा लाइव कैटलॉग और रेट्स:${getCatalogCardsHTML()}`;
             messages.push({
                 'sender': 'ai', 
-                'html': initialWelcomeHtml
+                'text': `नमस्ते! **${shopName}** में आपका स्वागत है। ऊपर दिए गए **'शॉपिंग'** बटन को दबाकर आप दुकान का पूरा कैटलॉग और डिटेल्स देख सकते हैं!`
             });
             renderChat();
         };
 
-        function setupImageUploadListeners() {
-            document.getElementById('new-item-img-file').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        tempItemImageBase64 = event.target.result;
-                        alert('✅ आइटम की फोटो कैप्चर हो गई!');
-                    };
-                    reader.readAsDataURL(file);
+        // Supabase Client Helper
+        function getSupabaseClient() {
+            const url = localStorage.getItem('supabase_url');
+            const key = localStorage.getItem('supabase_key');
+            if (!url || !key) return null;
+            return supabase.createClient(url, key);
+        }
+
+        async function loadDataFromSupabase() {
+            const sb = getSupabaseClient();
+            if (!sb) return;
+
+            try {
+                let { data, error } = await sb.from('shop_data').select('*').order('id', { ascending: false }).limit(1);
+                if (data && data.length > 0) {
+                    let row = data[0];
+                    shopName = row.shop_name || shopName;
+                    shopAddress = row.shop_address || shopAddress;
+                    shopWhatsApp = row.whatsapp || shopWhatsApp;
+                    shopStatus = row.shop_status || shopStatus;
+                    shopPhoto = row.shop_photo || shopPhoto;
+                    ownerPhoto = row.owner_photo || ownerPhoto;
+                    if (row.products && Array.isArray(row.products)) {
+                        productsList = row.products;
+                    }
                 }
-            });
+            } catch (e) {
+                console.error("Error loading from Supabase:", e);
+            }
+
+            updateUIWithShopData();
+        }
+
+        function updateUIWithShopData() {
+            document.getElementById('shop-name-input').value = shopName;
+            document.getElementById('shop-address-input').value = shopAddress;
+            document.getElementById('shop-whatsapp-input').value = shopWhatsApp;
+            document.getElementById('shop-status-toggle').value = shopStatus;
+            document.getElementById('shop-photo-input').value = shopPhoto;
+            document.getElementById('owner-photo-input').value = ownerPhoto;
+
+            document.getElementById('header-shop-name').innerText = shopName;
+            document.getElementById('header-shop-img').src = shopPhoto;
+            document.getElementById('header-owner-img').src = ownerPhoto;
+            updateShopStatusUI();
+            renderAdminProductsList();
         }
 
         function toggleSidebar() {
@@ -346,6 +353,7 @@
             const name = document.getElementById('new-item-name').value.trim();
             const unit = document.getElementById('new-item-unit').value.trim() || 'किलो';
             const price = document.getElementById('new-item-price').value.trim();
+            const img = document.getElementById('new-item-img').value.trim() || 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200';
             const discount = document.getElementById('new-item-discount').value.trim();
 
             if (!name || !price) {
@@ -353,18 +361,16 @@
                 return;
             }
 
-            productsList.push({ name, unit, price, img: tempItemImageBase64, discount });
-            localStorage.setItem('ai_shop_products_json', JSON.stringify(productsList));
+            productsList.push({ name, unit, price, img, discount });
 
             document.getElementById('new-item-name').value = '';
             document.getElementById('new-item-unit').value = '';
             document.getElementById('new-item-price').value = '';
+            document.getElementById('new-item-img').value = '';
             document.getElementById('new-item-discount').value = '';
-            document.getElementById('new-item-img-file').value = '';
-            tempItemImageBase64 = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200";
 
             renderAdminProductsList();
-            alert('✅ आइटम सफलतापूर्वक जुड़ गया!');
+            alert('✅ आइटम जुड़ गया! (सेव करने के लिए नीचे "सब कुछ सेव करें" दबाएं)');
         }
 
         function renderAdminProductsList() {
@@ -396,73 +402,72 @@
 
         function removeCatalogItem(index) {
             productsList.splice(index, 1);
-            localStorage.setItem('ai_shop_products_json', JSON.stringify(productsList));
             renderAdminProductsList();
-            alert('🗑️ आइटम हटा दिया गया है।');
         }
 
-        function saveShopSettings() {
-            const sName = document.getElementById('shop-name-input').value.trim();
-            const sWhatsApp = document.getElementById('shop-whatsapp-input').value.trim();
-            const sStatus = document.getElementById('shop-status-toggle').value;
+        async function saveShopSettings() {
+            shopName = document.getElementById('shop-name-input').value.trim() || shopName;
+            shopAddress = document.getElementById('shop-address-input').value.trim() || shopAddress;
+            shopWhatsApp = document.getElementById('shop-whatsapp-input').value.trim() || shopWhatsApp;
+            shopStatus = document.getElementById('shop-status-toggle').value;
+            shopPhoto = document.getElementById('shop-photo-input').value.trim() || shopPhoto;
+            ownerPhoto = document.getElementById('owner-photo-input').value.trim() || ownerPhoto;
             const sPin = document.getElementById('new-admin-pin').value.trim();
 
-            if (!sName) { alert('कृपया दुकान का नाम दर्ज करें!'); return; }
-            if (!sWhatsApp) { alert('कृपया व्हाट्सएप नंबर दर्ज करें!'); return; }
-            if (sPin.length !== 4) { alert('4 अंकों का पिन दर्ज करें!'); return; }
-
-            shopName = sName;
-            shopWhatsApp = sWhatsApp;
-            shopStatus = sStatus;
-
-            const shopFile = document.getElementById('shop-photo-file').files[0];
-            const ownerFile = document.getElementById('owner-photo-file').files[0];
-
-            let pendingSaves = 0;
-            let totalSaves = (shopFile ? 1 : 0) + (ownerFile ? 1 : 0);
-
-            function finalizeSave() {
-                if (pendingSaves === totalSaves) {
-                    localStorage.setItem('ai_shop_name', shopName);
-                    localStorage.setItem('ai_shop_whatsapp', shopWhatsApp);
-                    localStorage.setItem('ai_shop_photo', shopPhoto);
-                    localStorage.setItem('ai_owner_photo', ownerPhoto);
-                    localStorage.setItem('ai_shop_status', shopStatus);
-                    localStorage.setItem('ai_shop_products_json', JSON.stringify(productsList));
-                    localStorage.setItem('vendor_admin_pin', sPin);
-
-                    document.getElementById('header-shop-name').innerText = shopName;
-                    document.getElementById('header-shop-img').src = shopPhoto;
-                    document.getElementById('header-owner-img').src = ownerPhoto;
-
-                    updateShopStatusUI();
-                    
-                    // Reset and update welcome message with new shop name and catalog
-                    messages = [{
-                        'sender': 'ai',
-                        'html': `नमस्ते! **${shopName}** की दुकान में आपका स्वागत है। 🍎<br><br>यह रहा हमारा लाइव कैटलॉग और रेट्स:${getCatalogCardsHTML()}`
-                    }];
-                    renderChat();
-
-                    alert('✅ सब कुछ सफलतापूर्वक सेव हो गया!');
-                    lockAdminPanel();
-                    toggleSidebar();
-                }
+            if (sPin.length === 4) {
+                localStorage.setItem('vendor_admin_pin', sPin);
             }
 
-            if (totalSaves === 0) { finalizeSave(); } 
-            else {
-                if (shopFile) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) { shopPhoto = e.target.result; pendingSaves++; finalizeSave(); };
-                    reader.readAsDataURL(shopFile);
-                }
-                if (ownerFile) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) { ownerPhoto = e.target.result; pendingSaves++; finalizeSave(); };
-                    reader.readAsDataURL(ownerFile);
-                }
+            // Save to Supabase Database permanently
+            const sb = getSupabaseClient();
+            if (!sb) {
+                alert('⚠️ कृपया पहले Supabase URL और Key भरकर "कनेक्शन सेटिंग्स सेव करें" बटन दबाएं!');
+                return;
             }
+
+            try {
+                // Insert new record to table
+                const { error } = await sb.from('shop_data').insert([
+                    { 
+                        shop_name: shopName, 
+                        shop_address: shopAddress,
+                        whatsapp: shopWhatsApp, 
+                        shop_status: shopStatus, 
+                        shop_photo: shopPhoto,
+                        owner_photo: ownerPhoto,
+                        products: productsList 
+                    }
+                ]);
+
+                if (error) {
+                    alert('❌ डेटाबेस सेव एरर: ' + error.message);
+                    return;
+                }
+
+                document.getElementById('header-shop-name').innerText = shopName;
+                document.getElementById('header-shop-img').src = shopPhoto;
+                document.getElementById('header-owner-img').src = ownerPhoto;
+                updateShopStatusUI();
+
+                alert('✅ Supabase डेटाबेस में सब कुछ हमेशा के लिए सेव हो गया!');
+                lockAdminPanel();
+                toggleSidebar();
+                if (isShoppingOpen) renderShoppingPageInChat();
+            } catch (e) {
+                alert('❌ एरर: ' + e);
+            }
+        }
+
+        function saveApiAndSupabaseKeys() {
+            const groqKey = document.getElementById('groq-key-input').value.trim();
+            const supabaseUrl = document.getElementById('supabase-url-input').value.trim();
+            const supabaseKey = document.getElementById('supabase-key-input').value.trim();
+
+            if (groqKey) localStorage.setItem('groq_api_key', groqKey);
+            if (supabaseUrl) localStorage.setItem('supabase_url', supabaseUrl);
+            if (supabaseKey) localStorage.setItem('supabase_key', supabaseKey);
+
+            alert('✅ API और Supabase कनेक्शन सेटिंग्स सेव हो गईं!');
         }
 
         function updateShopStatusUI() {
@@ -476,34 +481,69 @@
             }
         }
 
-        function getCatalogCardsHTML() {
-            if (shopStatus === "CLOSED") {
-                return `<div class="text-red-400 font-bold text-xs py-2 text-center"><i class="fa-solid fa-store-slash"></i> दुकान अभी बंद (Closed) है।</div>`;
+        // TOGGLE SHOPPING MODE (ON/OFF)
+        function toggleShoppingMode() {
+            isShoppingOpen = !isShoppingOpen;
+            const btn = document.getElementById('shop-toggle-btn');
+            const btnText = document.getElementById('shop-btn-text');
+
+            if (isShoppingOpen) {
+                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow flex items-center gap-1.5";
+                btnText.innerText = "शॉपिंग: चालू";
+                renderShoppingPageInChat();
+            } else {
+                btn.className = "bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow flex items-center gap-1.5";
+                btnText.innerText = "शॉपिंग: बंद";
+                messages.push({ 'sender': 'ai', 'text': '🛒 शॉपिंग कैटलॉग बंद कर दिया गया है। आप नॉर्मल चैट जारी रख सकते हैं।' });
+                renderChat();
             }
-            if (productsList.length === 0) {
-                return `<div class="text-slate-400 text-xs py-2 text-center">फिलहाल कोई आइटम लिस्टेड नहीं है।</div>`;
+        }
+
+        function renderShoppingPageInChat() {
+            let productsHTML = '';
+            if (shopStatus === "CLOSED") {
+                productsHTML = `<div class="text-red-400 font-bold text-xs py-3 text-center"><i class="fa-solid fa-store-slash"></i> दुकान अभी बंद (Closed) है।</div>`;
+            } else if (productsList.length === 0) {
+                productsHTML = `<div class="text-slate-400 text-xs py-3 text-center">फिलहाल कोई आइटम उपलब्ध नहीं है।</div>`;
+            } else {
+                productsList.forEach((prod, index) => {
+                    productsHTML += `
+                        <div class="bg-[#0B0F19] border border-slate-700 rounded-2xl p-2.5 flex items-center justify-between shadow-sm my-2">
+                            <div class="flex items-center space-x-2.5">
+                                <img src="${prod.img}" class="w-10 h-10 object-cover rounded-xl border border-slate-700 flex-shrink-0">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-100">${prod.name}</h4>
+                                    <p class="text-[11px] text-emerald-400 font-semibold">₹${prod.price} <span class="text-slate-400 text-[10px]">/ ${prod.unit}</span></p>
+                                    ${prod.discount ? `<span class="text-[9px] bg-amber-950 text-amber-300 px-1 py-0.5 rounded border border-amber-800">${prod.discount}</span>` : ''}
+                                </div>
+                            </div>
+                            <button onclick="addProdToCart(${index})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-1.5 px-3 rounded-xl transition shadow flex items-center gap-1 flex-shrink-0">
+                                <i class="fa-solid fa-plus text-[10px]"></i> Add
+                            </button>
+                        </div>
+                    `;
+                });
             }
 
-            let html = `<div class="space-y-2 mt-2 pt-2 border-t border-slate-700">`;
-            productsList.forEach((prod, index) => {
-                html += `
-                    <div class="bg-[#0B0F19] border border-slate-700 rounded-2xl p-2.5 flex items-center justify-between shadow-sm">
-                        <div class="flex items-center space-x-2.5">
-                            <img src="${prod.img}" class="w-10 h-10 object-cover rounded-xl border border-slate-700 flex-shrink-0">
-                            <div>
-                                <h4 class="text-xs font-bold text-slate-100">${prod.name}</h4>
-                                <p class="text-[11px] text-emerald-400 font-semibold">₹${prod.price} <span class="text-slate-400 text-[10px]">/ ${prod.unit}</span></p>
-                                ${prod.discount ? `<span class="text-[9px] bg-amber-950 text-amber-300 px-1 py-0.5 rounded border border-amber-800">${prod.discount}</span>` : ''}
-                            </div>
+            let shopPageHTML = `
+                <div class="bg-[#111827] border border-emerald-500/40 rounded-2xl p-4 space-y-3 shadow-xl">
+                    <div class="flex items-center space-x-3 border-b border-slate-800 pb-3">
+                        <img src="${shopPhoto}" class="w-12 h-12 rounded-2xl object-cover border border-emerald-500">
+                        <div>
+                            <h3 class="text-sm font-bold text-emerald-400">🏪 ${shopName}</h3>
+                            <p class="text-[11px] text-slate-300"><i class="fa-solid fa-location-dot text-red-400"></i> ${shopAddress}</p>
+                            <p class="text-[10px] ${shopStatus === 'OPEN' ? 'text-emerald-400 font-bold' : 'text-red-400 font-bold'}">${shopStatus === 'OPEN' ? '🟢 दुकान खुली है' : '🔴 दुकान बंद है'}</p>
                         </div>
-                        <button onclick="addProdToCart(${index})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-1.5 px-3 rounded-xl transition shadow flex items-center gap-1 flex-shrink-0">
-                            <i class="fa-solid fa-plus text-[10px]"></i> Add
-                        </button>
                     </div>
-                `;
-            });
-            html += `</div>`;
-            return html;
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-200 mb-1"><i class="fa-solid fa-boxes-stacked text-amber-400"></i> लाइव कैटलॉग (Products):</h4>
+                        ${productsHTML}
+                    </div>
+                </div>
+            `;
+
+            messages.push({ 'sender': 'ai', 'html': shopPageHTML });
+            renderChat();
         }
 
         function addProdToCart(index) {
@@ -557,22 +597,13 @@
             window.open(`https://wa.me/${shopWhatsApp}?text=${encodeURIComponent(orderText)}`, '_blank');
         }
 
-        function saveApiAndSupabaseKeys() {
-            const groqKey = document.getElementById('groq-key-input').value.trim();
-            const supabaseUrl = document.getElementById('supabase-url-input').value.trim();
-            const supabaseKey = document.getElementById('supabase-key-input').value.trim();
-
-            if (groqKey) localStorage.setItem('groq_api_key', groqKey);
-            if (supabaseUrl) localStorage.setItem('supabase_url', supabaseUrl);
-            if (supabaseKey) localStorage.setItem('supabase_key', supabaseKey);
-
-            alert('✅ API और Supabase सेटिंग्स सफलतापूर्वक सेव हो गईं!');
-        }
-
         function clearCurrentHistory() {
+            isShoppingOpen = false;
+            document.getElementById('shop-toggle-btn').className = "bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow flex items-center gap-1.5";
+            document.getElementById('shop-btn-text').innerText = "शॉपिंग: बंद";
             messages = [{
                 'sender': 'ai', 
-                'html': `नमस्ते! **${shopName}** की दुकान में आपका स्वागत है। 🍎<br><br>यह रहा हमारा लाइव कैटलॉग और रेट्स:${getCatalogCardsHTML()}`
+                'text': `नमस्ते! **${shopName}** में आपका स्वागत है। आप ऊपर दिए गए शॉपिंग बटन से कैटलॉग देख सकते हैं!`
             }];
             renderChat();
         }
@@ -627,7 +658,7 @@
 
                 let itemsString = productsList.map(p => `${p.name} - ₹${p.price} / ${p.unit} (${p.discount || 'कोई ऑफर नहीं'})`).join(', ');
 
-                let sysPrompt = `You are an intelligent AI shop assistant for "${shopName}". 
+                let sysPrompt = `You are an intelligent AI shop assistant for "${shopName}" located at "${shopAddress}". 
 Current Inventory Catalog: [${itemsString || 'No items listed'}].
 Answer customer questions about prices, availability and items accurately and politely in Hindi/Hinglish based strictly on this catalog.`;
                 
