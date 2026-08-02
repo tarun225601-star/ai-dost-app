@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viziya - Ultimate AI & Live Media Mirror with Music</title>
+    <title>Viziya - Fixed & Working Ultimate App</title>
     <!-- Supabase JS Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -38,6 +38,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            padding-bottom: 70px;
         }
 
         /* Top App Bar */
@@ -83,17 +84,19 @@
             cursor: pointer;
         }
 
-        /* Main Scrollable View */
-        .main-content {
-            flex: 1;
+        /* Views Pages */
+        .view-section {
+            display: none;
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
             padding: 15px;
-            display: flex;
             flex-direction: column;
             gap: 15px;
-            padding-bottom: 80px;
+        }
+
+        .view-section.active {
+            display: flex;
         }
 
         .card {
@@ -115,7 +118,7 @@
 
         .camera-box {
             width: 100%;
-            height: 240px;
+            height: 300px;
             background: #000;
             border-radius: 12px;
             overflow: hidden;
@@ -130,6 +133,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transform: scaleX(-1); /* Mirror effect */
         }
 
         .input-field {
@@ -205,16 +209,15 @@
             background: #000;
         }
 
-        .song-tag {
+        .song-player-bar {
             background: rgba(176, 0, 255, 0.15);
             border-top: 1px solid rgba(176, 0, 255, 0.3);
             border-bottom: 1px solid rgba(176, 0, 255, 0.3);
-            padding: 8px 12px;
-            font-size: 12px;
-            color: #e879f9;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            gap: 10px;
         }
 
         .post-footer {
@@ -306,48 +309,57 @@
         <header class="app-header">
             <h1 class="logo-title">VIZIYA</h1>
             <div class="header-icons">
-                <div class="icon-btn" onclick="initRealCamera()" title="Start Camera">📷</div>
+                <div class="icon-btn" onclick="switchTab('mirror', document.getElementById('navMirror'))" title="Camera Mirror">📷</div>
                 <div class="icon-btn" onclick="openSettingsModal()" title="Master Settings">⚙️</div>
             </div>
         </header>
 
-        <!-- Main Content Area -->
-        <div class="main-content">
-            
-            <!-- 1. Real Camera Mirror Box -->
+        <!-- VIEW 1: HOME (Feed & Media Upload) -->
+        <div id="homeView" class="view-section active">
+            <!-- Direct Media Upload with Real Music Player & Search -->
+            <div class="card">
+                <div class="card-title">✨ Direct Media & Real Song Upload</div>
+                <input type="file" id="realMediaFile" class="input-field" accept="image/*,video/*" style="padding: 10px; background: #000; border-style: dashed;">
+                <input type="text" id="postCaption" class="input-field" placeholder="Write caption for your post...">
+                
+                <!-- Real Song Search & Audio Selection Component -->
+                <div style="position: relative; margin-bottom: 10px;">
+                    <input type="text" id="songSearchInput" class="input-field" placeholder="🔍 Search real song (e.g. Animal, Kesariya...)" oninput="filterRealSongs(this.value)" style="margin-bottom: 2px;">
+                    <div id="songDropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; max-height:160px; overflow-y:auto; background:#111827; border:1px solid var(--neon-glow); border-radius:8px; z-index:50;"></div>
+                </div>
+
+                <!-- Selected Song Playable Preview -->
+                <div id="selectedSongBox" style="display: none; background: rgba(176, 0, 255, 0.2); border: 1px solid #b000ff; border-radius: 10px; padding: 10px; margin-bottom: 10px; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 11px; color: #e879f9;">🎵 Attached Song:</div>
+                        <div id="selectedSongTitle" style="font-size: 13px; font-weight: bold; color: #fff;"></div>
+                    </div>
+                    <button type="button" onclick="previewSelectedSong()" class="btn btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;">▶ Play / Pause</button>
+                </div>
+
+                <button class="btn btn-primary" onclick="publishDirectMedia()">Post to Cloud Feed</button>
+            </div>
+
+            <!-- Live Cloud Feed Stream -->
+            <div id="realFeedContainer"></div>
+        </div>
+
+        <!-- VIEW 2: MIRROR (Live Camera Stream) -->
+        <div id="mirrorView" class="view-section">
             <div class="card">
                 <div class="card-title">🪞 Live Empathic Mirror Stream</div>
                 <div class="camera-box">
                     <video id="realCameraStream" autoplay playsinline muted></video>
                 </div>
-                <button class="btn btn-primary" style="margin-top: 12px;" onclick="initRealCamera()">Start Camera Feed</button>
+                <button class="btn btn-primary" style="margin-top: 12px;" onclick="initRealCamera()">Restart Camera Feed</button>
             </div>
-
-            <!-- 2. Direct Media Upload with Song Search Feature -->
-            <div class="card">
-                <div class="card-title">✨ Direct Media & Song Upload (Supabase Cloud)</div>
-                <input type="file" id="realMediaFile" class="input-field" accept="image/*,video/*" style="padding: 10px; background: #000; border-style: dashed;">
-                <input type="text" id="postCaption" class="input-field" placeholder="Write caption for your post...">
-                
-                <!-- Song Search & Select Component -->
-                <div style="position: relative; margin-bottom: 10px;">
-                    <input type="text" id="songSearchInput" class="input-field" placeholder="🔍 Search song (e.g. Animal, Arjit Singh...)" oninput="filterSongs(this.value)" style="margin-bottom: 2px;">
-                    <div id="songDropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; max-height:150px; overflow-y:auto; background:#111827; border:1px solid var(--neon-glow); border-radius:8px; z-index:50;"></div>
-                </div>
-                <div id="selectedSongBadge" style="font-size: 12px; color: #e879f9; margin-bottom: 10px; display: none;">🎵 Selected Song: <span id="songNameDisplay">None</span></div>
-
-                <button class="btn btn-primary" onclick="publishDirectMedia()">Post to Cloud Feed</button>
-            </div>
-
-            <!-- 3. Live Cloud Feed Stream -->
-            <div id="realFeedContainer"></div>
         </div>
 
-        <!-- Master Settings Modal Panel -->
+        <!-- Master Settings Modal Panel (4 Keys) -->
         <div id="settingsModal">
             <div class="modal-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="color: var(--neon-glow); font-size: 15px;">⚙️ Master API Gateway</h3>
+                    <h3 style="color: var(--neon-glow); font-size: 15px;">⚙️ Master API Gateway (4 Keys)</h3>
                     <button onclick="closeSettingsModal()" style="background:none; border:none; color:#ff4d4d; font-size:20px; cursor:pointer;">✕</button>
                 </div>
                 
@@ -361,62 +373,100 @@
                     <input type="text" id="cfgSupabaseKey" class="input-field" placeholder="eyJhbGciOiJIUzI1NiIsIn...">
                 </div>
 
-                <button class="btn btn-primary" onclick="saveAllMasterKeys()">Save All Keys Permanently</button>
-                <div id="saveMsg" class="save-msg">✓ Master Keys Saved Successfully!</div>
+                <div style="margin-bottom: 10px;">
+                    <span class="field-label">3. Agora App ID / SDK Key</span>
+                    <input type="text" id="cfgAgoraId" class="input-field" placeholder="Enter Agora App ID...">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <span class="field-label">4. Grok AI API Key</span>
+                    <input type="text" id="cfgGrokKey" class="input-field" placeholder="xai-...">
+                </div>
+
+                <button class="btn btn-primary" onclick="saveAllMasterKeys()">Save All 4 Keys Permanently</button>
+                <div id="saveMsg" class="save-msg">✓ All 4 Master Keys Saved Successfully!</div>
             </div>
         </div>
 
-        <!-- Bottom Navigation -->
+        <!-- Bottom Navigation Bar -->
         <nav class="bottom-nav">
-            <button class="nav-item active"><span>🏠</span>Home</button>
-            <button class="nav-item" onclick="initRealCamera()"><span>🪞</span>Mirror</button>
-            <button class="nav-item" onclick="openSettingsModal()"><span>⚙️</span>Settings</button>
+            <button class="nav-item active" id="navHome" onclick="switchTab('home', this)"><span>🏠</span>Home</button>
+            <button class="nav-item" id="navMirror" onclick="switchTab('mirror', this)"><span>🪞</span>Mirror</button>
+            <button class="nav-item" id="navSettings" onclick="openSettingsModal()"><span>⚙️</span>Settings</button>
         </nav>
     </div>
 
     <script>
         let supabaseClient = null;
-        let selectedSong = "";
+        let activeSongName = "";
+        let activeSongUrl = "";
+        let previewAudio = null;
+        let activeCameraStream = null;
 
-        // Sample song library for search
-        const popularSongs = [
-            "Arjan Vailly - Animal",
-            "Pehle Bhi Main - Animal",
-            "Kesariya - Brahmastra",
-            "Heeriye - Jasleen Royal & Arijit Singh",
-            "Naa Ready - Leo",
-            "Chaleya - Jawan",
-            "Sajni - Laapataa Ladies",
-            "Tauba Tauba - Bad News",
-            "Ayi Nai - Stree 2",
-            "Millionaire - Honey Singh"
+        // Real playable audio library
+        const realMusicLibrary = [
+            { name: "Arjan Vailly - Animal", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { name: "Pehle Bhi Main - Animal", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { name: "Kesariya - Brahmastra", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+            { name: "Heeriye - Jasleen Royal & Arijit Singh", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+            { name: "Tauba Tauba - Bad News", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
+            { name: "Ayi Nai - Stree 2", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3" }
         ];
 
-        function filterSongs(query) {
+        // Tab Switching Logic
+        function switchTab(tabName, btnElement) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
+
+            if (tabName === 'home') {
+                document.getElementById('homeView').classList.add('active');
+                if(btnElement) btnElement.classList.add('active');
+                stopCameraStream();
+            } else if (tabName === 'mirror') {
+                document.getElementById('mirrorView').classList.add('active');
+                if(btnElement) btnElement.classList.add('active');
+                setTimeout(initRealCamera, 300);
+            }
+        }
+
+        function filterRealSongs(query) {
             const dropdown = document.getElementById('songDropdown');
             if (!query.trim()) {
                 dropdown.style.display = 'none';
                 return;
             }
-            const filtered = popularSongs.filter(s => s.toLowerCase().includes(query.toLowerCase()));
+            const filtered = realMusicLibrary.filter(s => s.name.toLowerCase().includes(query.toLowerCase()));
             if (filtered.length === 0) {
                 dropdown.style.display = 'none';
                 return;
             }
             dropdown.style.display = 'block';
             dropdown.innerHTML = filtered.map(song => `
-                <div onclick="selectSong('${song}')" style="padding: 10px; font-size: 13px; color: #fff; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#1f2937'" onmouseout="this.style.background='transparent'">
-                    🎵 ${song}
+                <div onclick="selectRealSong('${song.name}', '${song.url}')" style="padding: 10px; font-size: 13px; color: #fff; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#1f2937'" onmouseout="this.style.background='transparent'">
+                    🎵 ${song.name}
                 </div>
             `).join('');
         }
 
-        function selectSong(songName) {
-            selectedSong = songName;
-            document.getElementById('songSearchInput').value = songName;
+        function selectRealSong(name, url) {
+            activeSongName = name;
+            activeSongUrl = url;
+            document.getElementById('songSearchInput').value = name;
             document.getElementById('songDropdown').style.display = 'none';
-            document.getElementById('songNameDisplay').innerText = songName;
-            document.getElementById('selectedSongBadge').style.display = 'block';
+            document.getElementById('selectedSongTitle').innerText = name;
+            document.getElementById('selectedSongBox').style.display = 'flex';
+
+            if (previewAudio) { previewAudio.pause(); }
+            previewAudio = new Audio(activeSongUrl);
+        }
+
+        function previewSelectedSong() {
+            if (!previewAudio) return;
+            if (previewAudio.paused) {
+                previewAudio.play();
+            } else {
+                previewAudio.pause();
+            }
         }
 
         function initMasterConfigs() {
@@ -436,6 +486,8 @@
             document.getElementById('settingsModal').style.display = 'flex';
             document.getElementById('cfgSupabaseUrl').value = localStorage.getItem('viziya_supabase_url') || '';
             document.getElementById('cfgSupabaseKey').value = localStorage.getItem('viziya_supabase_key') || '';
+            document.getElementById('cfgAgoraId').value = localStorage.getItem('viziya_agora_id') || '';
+            document.getElementById('cfgGrokKey').value = localStorage.getItem('viziya_grok_key') || '';
         }
 
         function closeSettingsModal() {
@@ -445,6 +497,8 @@
         function saveAllMasterKeys() {
             const url = document.getElementById('cfgSupabaseUrl').value.trim();
             const key = document.getElementById('cfgSupabaseKey').value.trim();
+            const agoraId = document.getElementById('cfgAgoraId').value.trim();
+            const grokKey = document.getElementById('cfgGrokKey').value.trim();
 
             if (!url || !key) {
                 alert("Supabase URL and Key are required!");
@@ -453,6 +507,8 @@
 
             localStorage.setItem('viziya_supabase_url', url);
             localStorage.setItem('viziya_supabase_key', key);
+            localStorage.setItem('viziya_agora_id', agoraId);
+            localStorage.setItem('viziya_grok_key', grokKey);
 
             const msg = document.getElementById('saveMsg');
             msg.style.display = 'block';
@@ -464,32 +520,54 @@
             }, 1500);
         }
 
+        // Camera Initialization with Safe Fallback
         async function initRealCamera() {
             const videoElement = document.getElementById('realCameraStream');
             try {
+                if (activeCameraStream) {
+                    stopCameraStream();
+                }
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                     alert("Your browser does not support camera access!");
                     return;
                 }
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'user' }, 
-                    audio: false 
-                });
-                videoElement.srcObject = stream;
+                
+                // Try front camera first
+                try {
+                    activeCameraStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: 'user' }, 
+                        audio: false 
+                    });
+                } catch (e) {
+                    // Fallback to any available camera
+                    activeCameraStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: true, 
+                        audio: false 
+                    });
+                }
+
+                videoElement.srcObject = activeCameraStream;
                 await videoElement.play();
             } catch (err) {
-                alert("Camera Error: " + err.message);
+                console.error("Camera error details:", err);
+                alert("Camera Error: " + err.message + "\n(Please ensure camera permissions are allowed in your browser settings)");
+            }
+        }
+
+        function stopCameraStream() {
+            if (activeCameraStream) {
+                activeCameraStream.getTracks().forEach(track => track.stop());
+                activeCameraStream = null;
             }
         }
 
         window.onload = () => {
             initMasterConfigs();
-            setTimeout(() => { initRealCamera(); }, 500);
         };
 
         function publishDirectMedia() {
             if (!supabaseClient) {
-                alert("Please configure your Supabase settings in the ⚙️ panel first!");
+                alert("Please configure your Supabase settings in the ⚙️ settings panel first!");
                 openSettingsModal();
                 return;
             }
@@ -514,8 +592,9 @@
                     handle: '@viziya_global',
                     media_url: base64Data,
                     media_type: isVideo ? 'video' : 'image',
-                    caption: caption || 'Media drop with music 🚀',
-                    song_name: selectedSong || ''
+                    caption: caption || 'Live media drop 🚀',
+                    song_name: activeSongName || '',
+                    song_url: activeSongUrl || ''
                 };
 
                 try {
@@ -528,10 +607,13 @@
                     } else {
                         document.getElementById('postCaption').value = '';
                         document.getElementById('songSearchInput').value = '';
-                        document.getElementById('selectedSongBadge').style.display = 'none';
-                        selectedSong = "";
+                        document.getElementById('selectedSongBox').style.display = 'none';
+                        activeSongName = "";
+                        activeSongUrl = "";
+                        if (previewAudio) { previewAudio.pause(); }
                         fileInput.value = '';
                         fetchCloudPosts();
+                        alert("Post published successfully to cloud feed!");
                     }
                 } catch (err) {
                     alert("Upload failed: " + err.message);
@@ -566,8 +648,15 @@
                         ? `<video src="${p.media_url}" class="post-media" controls autoplay loop muted playsinline></video>`
                         : `<img src="${p.media_url}" class="post-media">`;
 
-                    let songHtml = p.song_name 
-                        ? `<div class="song-tag">🎵 Original Audio: <b>${p.song_name}</b></div>` 
+                    let songPlayerHtml = p.song_name && p.song_url 
+                        ? `
+                            <div class="song-player-bar">
+                                <div style="font-size: 12px; color: #e879f9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">
+                                    🎵 <b>${p.song_name}</b>
+                                </div>
+                                <audio controls src="${p.song_url}" style="height: 32px; width: 130px;"></audio>
+                            </div>
+                          ` 
                         : '';
 
                     container.innerHTML += `
@@ -580,7 +669,7 @@
                                 </div>
                             </div>
                             ${mediaHtml}
-                            ${songHtml}
+                            ${songPlayerHtml}
                             <div class="post-footer">
                                 <strong style="color: #fff; margin-right: 6px;">${p.user_name || 'User'}</strong>${p.caption || ''}
                             </div>
