@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viziya - Social Feed, P2P Mirror & Profile</title>
+    <title>Viziya - Single File Web App with Uploads, Chat & Calls</title>
     <!-- Supabase JS Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -45,51 +45,56 @@
         .card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
         .card-title { font-size: 13px; color: var(--neon-glow); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 700; }
 
-        .camera-grid { display: flex; flex-direction: column; gap: 12px; }
-        .camera-box {
-            width: 100%; height: 220px; background: #000; border-radius: 12px; overflow: hidden; position: relative;
-            border: 2px solid var(--neon-glow); display: flex; align-items: center; justify-content: center;
-        }
-        video { width: 100%; height: 100%; object-fit: cover; background: #000; }
-        #localVideo { transform: scaleX(-1); }
-
         .input-field {
             width: 100%; padding: 12px; background: #000; border: 1px solid var(--border-color);
             border-radius: 10px; color: #fff; font-size: 14px; outline: none; margin-bottom: 10px;
         }
         .input-field:focus { border-color: var(--neon-glow); box-shadow: 0 0 8px rgba(0,240,255,0.3); }
 
+        .file-label {
+            display: block; border: 2px dashed var(--border-color); padding: 15px; border-radius: 10px; text-align: center;
+            cursor: pointer; color: var(--text-muted); font-size: 13px; margin-bottom: 10px; background: rgba(0,0,0,0.2);
+        }
+        .file-label:hover { border-color: var(--neon-glow); color: var(--neon-glow); }
+
         .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
         .btn-primary { background: linear-gradient(135deg, var(--neon-glow), #0077ff); color: #000; box-shadow: 0 0 15px rgba(0,240,255,0.3); }
-        .btn-danger { background: linear-gradient(135deg, #ff4d4d, #b91c1c); color: #fff; }
         .btn-secondary { background: rgba(176,0,255,0.2); border: 1px solid var(--accent-purple); color: #e879f9; }
 
-        .post-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; margin-bottom: 15px; }
-        .post-header { padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .user-info-group { display: flex; align-items: center; gap: 10px; }
-        .avatar-circle { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-glow), var(--accent-purple)); color: #000; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .post-media { width: 100%; max-height: 400px; object-fit: contain; display: block; background: #000; }
-        .song-player-bar { background: rgba(176,0,255,0.15); border-top: 1px solid rgba(176,0,255,0.3); border-bottom: 1px solid rgba(176,0,255,0.3); padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .post-footer { padding: 12px; font-size: 13px; color: #e2e8f0; }
+        /* Creator List Styles */
+        .creator-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 12px; margin-bottom: 8px; }
+        .follow-badge { font-size: 11px; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; border: 1px solid var(--neon-glow); background: rgba(0,240,255,0.1); color: var(--neon-glow); }
+        .follow-badge.accepted { background: #10b981; border-color: #10b981; color: #000; }
 
-        /* Profile Styles */
-        .profile-header-card { text-align: center; padding: 25px 15px; }
-        .profile-avatar-large { width: 75px; height: 75px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-glow), var(--accent-purple)); color: #000; font-size: 28px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; box-shadow: 0 0 20px rgba(0,240,255,0.4); }
-        .profile-stats { display: flex; justify-content: space-around; margin: 15px 0; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .stat-box { text-align: center; }
-        .stat-num { font-size: 16px; font-weight: bold; color: var(--neon-glow); }
-        .stat-label { font-size: 11px; color: var(--text-muted); }
+        /* Media Feed Cards */
+        .media-feed-item { background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+        .media-feed-title { font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 6px; }
 
-        .follow-btn { padding: 5px 12px; font-size: 11px; border-radius: 20px; cursor: pointer; font-weight: bold; border: 1px solid var(--neon-glow); background: rgba(0,240,255,0.1); color: var(--neon-glow); }
-        .follow-btn.following { background: var(--neon-glow); color: #000; }
+        /* DM Chat Modal with Video & Audio Calling Header Buttons */
+        #dmModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,7,11,0.96); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
+        .dm-container { width: 100%; max-width: 480px; background: var(--surface-color); border: 1px solid var(--neon-glow); border-radius: 20px; display: flex; flex-direction: column; height: 85vh; overflow: hidden; box-shadow: 0 0 30px rgba(0,240,255,0.3); }
+        
+        .dm-header { padding: 12px 15px; background: rgba(0,240,255,0.08); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .call-buttons-group { display: flex; gap: 8px; }
+        .call-action-btn { background: var(--neon-glow); border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; box-shadow: 0 0 10px rgba(0,240,255,0.4); }
+        .call-action-btn.audio { background: #10b981; }
+        
+        .dm-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.4; }
+        .chat-bubble.sent { background: rgba(0,240,255,0.2); border: 1px solid var(--border-color); align-self: flex-end; color: #fff; }
+        .chat-bubble.received { background: #1f2937; align-self: flex-start; color: #e2e8f0; }
+        .restriction-box { background: rgba(255,77,77,0.1); border: 1px solid #ff4d4d; border-radius: 12px; padding: 20px; text-align: center; margin: auto; }
 
+        /* Master Settings Modal Panel */
         #settingsModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,7,11,0.95); z-index: 1000; justify-content: center; align-items: center; padding: 20px; overflow-y: auto; }
-        .modal-content { width: 100%; max-width: 420px; background: var(--surface-color); border: 1px solid var(--neon-glow); border-radius: 20px; padding: 20px; box-shadow: 0 0 35px rgba(0,240,255,0.3); margin: auto; }
+        .modal-content { width: 100%; max-width: 440px; background: var(--surface-color); border: 1px solid var(--neon-glow); border-radius: 20px; padding: 20px; box-shadow: 0 0 35px rgba(0,240,255,0.3); margin: auto; max-height: 90vh; overflow-y: auto; }
         .field-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; display: block; }
+        .section-divider { font-size: 12px; color: var(--neon-glow); border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin: 15px 0 10px 0; font-weight: bold; text-transform: uppercase; }
         .save-msg { font-size: 11px; color: #10b981; text-align: center; margin-top: 8px; display: none; }
 
+        /* Bottom Navigation Bar */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(11,15,25,0.95); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 100; backdrop-filter: blur(10px); }
-        .nav-item { background: none; border: none; color: var(--text-muted); font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+        .nav-item { background: none; border: none; color: var(--text-muted); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 33%; }
         .nav-item.active { color: var(--neon-glow); }
         .nav-item span { font-size: 18px; }
     </style>
@@ -100,167 +105,140 @@
         <header class="app-header">
             <h1 class="logo-title">VIZIYA</h1>
             <div class="header-icons">
-                <div class="icon-btn" onclick="openSettingsModal()" title="Master Settings">⚙️</div>
+                <div class="icon-btn" onclick="openSettingsModal()" title="Master API Settings">⚙️</div>
             </div>
         </header>
 
-        <!-- VIEW 1: HOME (Global Cloud Feed & Media Upload) -->
+        <!-- VIEW 1: CREATORS & CHAT LIST -->
         <div id="homeView" class="view-section active">
             <div class="card">
-                <div class="card-title">✨ Direct Media & Real Song Upload</div>
-                <input type="file" id="realMediaFile" class="input-field" accept="image/*,video/*" style="padding: 10px; background: #000; border-style: dashed;">
-                <input type="text" id="postCaption" class="input-field" placeholder="Write caption for your post...">
-                
-                <div style="position: relative; margin-bottom: 10px;">
-                    <input type="text" id="songSearchInput" class="input-field" placeholder="🔍 Search real song..." oninput="filterRealSongs(this.value)" style="margin-bottom: 2px;">
-                    <div id="songDropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; max-height:160px; overflow-y:auto; background:#111827; border:1px solid var(--neon-glow); border-radius:8px; z-index:50;"></div>
+                <div class="card-title">👥 Viziya Creators & Direct Chat</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                    नोट: फॉलो रिक्वेस्ट स्वीकार होने के बाद ही चैट या कॉल संभव है!
                 </div>
-
-                <div id="selectedSongBox" style="display: none; background: rgba(176,0,255,0.2); border: 1px solid #b000ff; border-radius: 10px; padding: 10px; margin-bottom: 10px; align-items: center; justify-content: space-between;">
-                    <div>
-                        <div style="font-size: 11px; color: #e879f9;">🎵 Attached Song:</div>
-                        <div id="selectedSongTitle" style="font-size: 13px; font-weight: bold; color: #fff;"></div>
-                    </div>
-                    <button type="button" onclick="previewSelectedSong()" class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 11px;">▶ Play / Pause</button>
-                </div>
-
-                <button class="btn btn-primary" onclick="publishDirectMedia()">Post to Cloud Feed</button>
+                <div id="creatorsListContainer"></div>
             </div>
-
-            <div id="realFeedContainer"></div>
         </div>
 
-        <!-- VIEW 2: LIVE WEBRTC P2P MIRROR -->
-        <div id="mirrorView" class="view-section">
+        <!-- VIEW 2: UPLOAD SECTION (Songs & Videos) -->
+        <div id="uploadView" class="view-section">
             <div class="card">
-                <div class="card-title">🪞 Live P2P Mirror Stream (Dual Phone)</div>
-                
-                <div style="margin-bottom: 12px;">
-                    <input type="text" id="roomCodeInput" class="input-field" placeholder="Enter Shared Room Code (e.g. room123)">
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-primary" onclick="startWebRTCCall()">Connect Mirror</button>
-                        <button class="btn btn-danger" onclick="disconnectWebRTCCall()">Disconnect</button>
-                    </div>
-                    <div id="callStatus" style="font-size: 11px; color: var(--text-muted); margin-top: 6px; text-align: center;">Status: Disconnected</div>
-                </div>
+                <div class="card-title">📤 Upload Song / Audio Track</div>
+                <input type="text" id="songTitle" class="input-field" placeholder="गाना/ऑडियो का शीर्षक (Song Title)">
+                <label class="file-label">
+                    🎵 गाना फाइल चुनें (MP3/WAV)
+                    <input type="file" id="songFile" accept="audio/*" style="display: none;" onchange="updateFileName(this, 'songFileName')">
+                </label>
+                <div id="songFileName" style="font-size: 11px; color: var(--neon-glow); margin-bottom: 10px;"></div>
+                <button class="btn btn-primary" onclick="uploadSongContent()">Upload Song Now</button>
+            </div>
 
-                <div class="camera-grid">
-                    <div>
-                        <span style="font-size: 11px; color: var(--neon-glow); display:block; margin-bottom:4px;">💻 My Camera Feed (Idhar):</span>
-                        <div class="camera-box">
-                            <video id="localVideo" autoplay playsinline muted></video>
-                        </div>
-                    </div>
-                    <div>
-                        <span style="font-size: 11px; color: var(--accent-purple); display:block; margin-bottom:4px;">📱 Remote Peer Feed (Udhar):</span>
-                        <div class="camera-box" style="border-color: var(--accent-purple);">
-                            <video id="remoteVideo" autoplay playsinline></video>
-                        </div>
-                    </div>
+            <div class="card" style="margin-top: 10px;">
+                <div class="card-title">🎬 Upload Video Reel / Movie</div>
+                <input type="text" id="videoTitle" class="input-field" placeholder="वीडियो का शीर्षक (Video Title)">
+                <label class="file-label">
+                    📹 वीडियो फाइल चुनें (MP4/MOV)
+                    <input type="file" id="videoFile" accept="video/*" style="display: none;" onchange="updateFileName(this, 'videoFileName')">
+                </label>
+                <div id="videoFileName" style="font-size: 11px; color: var(--neon-glow); margin-bottom: 10px;"></div>
+                <button class="btn btn-primary" onclick="uploadVideoContent()">Upload Video Now</button>
+            </div>
+
+            <div class="card" style="margin-top: 10px;">
+                <div class="card-title">📂 Uploaded Media Feed</div>
+                <div id="mediaFeedContainer">
+                    <div style="font-size: 12px; color: var(--text-muted); text-align: center;">अभी कोई मीडिया अपलोड नहीं किया गया है।</div>
                 </div>
             </div>
         </div>
 
-        <!-- VIEW 3: USER PROFILE & FOLLOW SYSTEM -->
+        <!-- VIEW 3: PROFILE -->
         <div id="profileView" class="view-section">
-            <div class="card profile-header-card">
-                <div id="profileAvatarLetter" class="profile-avatar-large">T</div>
-                <h2 id="displayProfileName" style="font-size: 18px; color: #fff; margin-bottom: 2px;">Tarun Viziya</h2>
-                <span id="displayProfileHandle" style="font-size: 12px; color: var(--neon-glow); display: block; margin-bottom: 15px;">@viziya_creator</span>
-                
-                <div class="profile-stats">
-                    <div class="stat-box">
-                        <div id="statPostCount" class="stat-num">0</div>
-                        <div class="stat-label">Posts</div>
+            <div class="card" style="text-align: center; padding: 25px 15px;">
+                <div style="width: 75px; height: 75px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-glow), var(--accent-purple)); color: #000; font-size: 28px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; box-shadow: 0 0 20px rgba(0,240,255,0.4);">V</div>
+                <h2 style="font-size: 18px; color: #fff; margin-bottom: 2px;">Vidya Creator</h2>
+                <span style="font-size: 12px; color: var(--neon-glow); display: block; margin-bottom: 15px;">@vidya_user</span>
+                <button class="btn btn-primary" onclick="openSettingsModal()">⚙️ Update API Configurations</button>
+            </div>
+        </div>
+
+        <!-- DM Chat & Call Modal Panel -->
+        <div id="dmModal">
+            <div class="dm-container">
+                <div class="dm-header">
+                    <div>
+                        <strong id="dmChatUserTitle" style="font-size: 14px; color: #fff; display: block;">User</strong>
+                        <span id="dmStatusSubtitle" style="font-size: 10px; color: #10b981;">Connected</span>
                     </div>
-                    <div class="stat-box">
-                        <div id="statFollowers" class="stat-num">142</div>
-                        <div class="stat-label">Followers</div>
-                    </div>
-                    <div class="stat-box">
-                        <div id="statFollowing" class="stat-num">85</div>
-                        <div class="stat-label">Following</div>
+                    
+                    <div class="call-buttons-group">
+                        <button onclick="startVideoCall()" class="call-action-btn" title="Video Call">🎥</button>
+                        <button onclick="startAudioCall()" class="call-action-btn audio" title="Audio Call">📞</button>
+                        <button onclick="closeDmModal()" style="background:none; border:none; color:#ff4d4d; font-size:20px; cursor:pointer; margin-left:8px;">✕</button>
                     </div>
                 </div>
 
-                <button class="btn btn-secondary" onclick="openSettingsModal()" style="margin-top: 5px;">Edit Profile Details</button>
-            </div>
+                <div class="dm-body" id="dmChatBody"></div>
 
-            <div class="card-title" style="margin-top: 5px;">My Published Posts</div>
-            <div id="myProfilePostsContainer"></div>
+                <div id="dmInputArea" style="padding: 10px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--border-color); display: flex; gap: 8px;">
+                    <input type="text" id="dmInputText" class="input-field" placeholder="Type a secure message..." style="margin-bottom: 0;">
+                    <button class="btn btn-primary" onclick="sendDmMessage()" style="width: 80px; padding: 10px;">Send</button>
+                </div>
+            </div>
         </div>
 
-        <!-- Master Settings Modal Panel -->
+        <!-- Master Settings Modal (Supabase, Agora, Groq) -->
         <div id="settingsModal">
             <div class="modal-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="color: var(--neon-glow); font-size: 15px;">⚙️ Master Profile & API Gateway</h3>
+                    <h3 style="color: var(--neon-glow); font-size: 15px;">⚙️ Master API Settings</h3>
                     <button onclick="closeSettingsModal()" style="background:none; border:none; color:#ff4d4d; font-size:20px; cursor:pointer;">✕</button>
                 </div>
                 
-                <div style="margin-bottom: 10px;">
-                    <span class="field-label">Your Display Name</span>
-                    <input type="text" id="cfgUserName" class="input-field" placeholder="e.g. Tarun Kumar">
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <span class="field-label">Your Unique Handle</span>
-                    <input type="text" id="cfgUserHandle" class="input-field" placeholder="e.g. @tarun_viziya">
-                </div>
+                <div class="section-divider">☁️ Supabase Cloud Database</div>
                 <div style="margin-bottom: 10px;">
                     <span class="field-label">Supabase Project URL</span>
                     <input type="text" id="cfgSupabaseUrl" class="input-field" placeholder="https://xyz.supabase.co">
                 </div>
-                <div style="margin-bottom: 15px;">
+                <div style="margin-bottom: 10px;">
                     <span class="field-label">Supabase Anon / Public Key</span>
                     <input type="text" id="cfgSupabaseKey" class="input-field" placeholder="eyJhbGciOiJIUzI1NiIsIn...">
                 </div>
 
-                <button class="btn btn-primary" onclick="saveAllMasterConfigs()">Save Profile & Keys</button>
-                <div id="saveMsg" class="save-msg">✓ Saved Successfully!</div>
+                <div class="section-divider">🎙️ Agora Video/Audio Call API</div>
+                <div style="margin-bottom: 15px;">
+                    <span class="field-label">Agora App ID (अरोरा की)</span>
+                    <input type="text" id="cfgAgoraAppId" class="input-field" placeholder="Enter Agora App ID">
+                </div>
+
+                <div class="section-divider">⚡ Groq / Groww API Key</div>
+                <div style="margin-bottom: 15px;">
+                    <span class="field-label">API Key / Secret Token</span>
+                    <input type="text" id="cfgGroqKey" class="input-field" placeholder="Enter Groq or Groww API Key">
+                </div>
+
+                <button class="btn btn-primary" onclick="saveAllConfigs()">Save All API Configs</button>
+                <div id="saveMsg" class="save-msg">✓ Configurations Saved Successfully!</div>
             </div>
         </div>
 
-        <!-- Bottom Navigation Bar -->
+        <!-- Bottom Navigation Bar with Upload Tab Added -->
         <nav class="bottom-nav">
-            <button class="nav-item active" id="navHome" onclick="switchTab('home', this)"><span>🏠</span>Home</button>
-            <button class="nav-item" id="navMirror" onclick="switchTab('mirror', this)"><span>🪞</span>Mirror</button>
+            <button class="nav-item active" id="navHome" onclick="switchTab('home', this)"><span>💬</span>Chats</button>
+            <button class="nav-item" id="navUpload" onclick="switchTab('upload', this)"><span>📤</span>Uploads</button>
             <button class="nav-item" id="navProfile" onclick="switchTab('profile', this)"><span>👤</span>Profile</button>
-            <button class="nav-item" id="navSettings" onclick="openSettingsModal()"><span>⚙️</span>Settings</button>
         </nav>
     </div>
 
     <script>
         let supabaseClient = null;
-        let activeSongName = "";
-        let activeSongUrl = "";
-        let previewAudio = null;
-
-        // User Identity defaults
-        let currentUserName = localStorage.getItem('viziya_user_name') || 'Tarun Viziya';
-        let currentUserHandle = localStorage.getItem('viziya_user_handle') || '@viziya_creator';
-        let followingList = JSON.parse(localStorage.getItem('viziya_following') || '[]');
-
-        // WebRTC P2P Variables
-        let localStream = null;
-        let peerConnection = null;
-        let signalingChannel = null;
-        const myClientId = Math.random().toString(36).substring(7);
-
-        const rtcConfig = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
-            ]
-        };
-
-        const realMusicLibrary = [
-            { name: "Arjan Vailly - Animal", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-            { name: "Pehle Bhi Main - Animal", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-            { name: "Kesariya - Brahmastra", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-            { name: "Heeriye - Jasleen Royal & Arijit Singh", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-            { name: "Tauba Tauba - Bad News", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
-            { name: "Ayi Nai - Stree 2", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3" }
+        let mockCreators = [
+            { id: 1, name: "Rahul Sharma", handle: "@rahul_viziya", isFollowing: true, isAccepted: true },
+            { id: 2, name: "Priya Singh", handle: "@priya_creator", isFollowing: true, isAccepted: false },
+            { id: 3, name: "Amit Verma", handle: "@amit_tech", isFollowing: false, isAccepted: false }
         ];
+        let uploadedMediaList = [];
+        let activeDmCreator = null;
 
         function switchTab(tabName, btnElement) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -269,281 +247,195 @@
             if (tabName === 'home') {
                 document.getElementById('homeView').classList.add('active');
                 if(btnElement) btnElement.classList.add('active');
-                fetchCloudPosts();
-            } else if (tabName === 'mirror') {
-                document.getElementById('mirrorView').classList.add('active');
+                renderCreatorsList();
+            } else if (tabName === 'upload') {
+                document.getElementById('uploadView').classList.add('active');
                 if(btnElement) btnElement.classList.add('active');
-                initCameraSafely();
+                renderMediaFeed();
             } else if (tabName === 'profile') {
                 document.getElementById('profileView').classList.add('active');
                 if(btnElement) btnElement.classList.add('active');
-                updateProfileUI();
             }
         }
 
-        function updateProfileUI() {
-            document.getElementById('displayProfileName').innerText = currentUserName;
-            document.getElementById('displayProfileHandle').innerText = currentUserHandle;
-            document.getElementById('profileAvatarLetter').innerText = currentUserName.charAt(0).toUpperCase();
-            document.getElementById('statFollowing').innerText = followingList.length;
-            fetchMyProfilePosts();
-        }
-
-        async function initCameraSafely() {
-            try {
-                if (!localStream) {
-                    localStream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }, 
-                        audio: true 
-                    });
-                    document.getElementById('localVideo').srcObject = localStream;
-                }
-            } catch (err) {
-                console.error("Camera access failed:", err);
-                alert("Camera Error: " + err.message + "\n(Ensure permissions are enabled and running via localhost/HTTPS)");
+        function updateFileName(input, targetId) {
+            if (input.files && input.files[0]) {
+                document.getElementById(targetId).innerText = "Selected: " + input.files[0].name;
             }
         }
 
-        async function startWebRTCCall() {
-            if (!supabaseClient) { alert("Please configure Supabase settings in ⚙️ settings first!"); openSettingsModal(); return; }
-            const roomCode = document.getElementById('roomCodeInput').value.trim();
-            if (!roomCode) { alert("Please enter a room code (e.g. room123)!"); return; }
+        function uploadSongContent() {
+            const title = document.getElementById('songTitle').value.trim();
+            const fileInput = document.getElementById('songFile');
+            if(!title) { alert("कृपया गाने का शीर्षक दर्ज करें!"); return; }
+            if(fileInput.files.length === 0) { alert("कृपया गाने की फाइल चुनें!"); return; }
 
-            document.getElementById('callStatus').innerText = "Status: Initializing camera & connecting...";
-            await initCameraSafely();
-            if (!localStream) return;
-
-            setupPeerConnection();
-
-            signalingChannel = supabaseClient.channel('viziya_room_' + roomCode, {
-                config: { broadcast: { ack: true } }
-            });
-
-            signalingChannel.on('broadcast', { event: 'signal-msg' }, async ({ payload }) => {
-                if (payload.sender === myClientId) return;
-                const signal = payload.signal;
-                try {
-                    if (signal.type === 'offer') {
-                        document.getElementById('callStatus').innerText = "Status: Incoming call offer... Connecting...";
-                        await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
-                        const answer = await peerConnection.createAnswer();
-                        await peerConnection.setLocalDescription(answer);
-                        signalingChannel.send({ type: 'broadcast', event: 'signal-msg', payload: { sender: myClientId, signal: answer } });
-                    } else if (signal.type === 'answer') {
-                        document.getElementById('callStatus').innerText = "Status: Call answered! Streaming live...";
-                        await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
-                    } else if (signal.candidate) {
-                        await peerConnection.addIceCandidate(new RTCIceCandidate(signal.candidate));
-                    }
-                } catch (e) { console.error("Signaling error:", e); }
-            });
-
-            signalingChannel.subscribe(async (status) => {
-                if (status === 'SUBSCRIBED') {
-                    document.getElementById('callStatus').innerText = "Status: Room joined. Creating offer...";
-                    try {
-                        const offer = await peerConnection.createOffer();
-                        await peerConnection.setLocalDescription(offer);
-                        signalingChannel.send({ type: 'broadcast', event: 'signal-msg', payload: { sender: myClientId, signal: offer } });
-                    } catch (err) { console.error("Offer error:", err); }
-                }
-            });
+            uploadedMediaList.unshift({ type: 'audio', title: title, fileName: fileInput.files[0].name });
+            document.getElementById('songTitle').value = '';
+            fileInput.value = '';
+            document.getElementById('songFileName').innerText = '';
+            alert("🎵 गाना सफलताપूर्वक अपलोड हो गया है!");
+            renderMediaFeed();
         }
 
-        function setupPeerConnection() {
-            if (peerConnection) return;
-            peerConnection = new RTCPeerConnection(rtcConfig);
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+        function uploadVideoContent() {
+            const title = document.getElementById('videoTitle').value.trim();
+            const fileInput = document.getElementById('videoFile');
+            if(!title) { alert("कृपया वीडियो का शीर्षक दर्ज करें!"); return; }
+            if(fileInput.files.length === 0) { alert("कृपया वीडियो फाइल चुनें!"); return; }
 
-            peerConnection.ontrack = (event) => {
-                document.getElementById('remoteVideo').srcObject = event.streams[0];
-                document.getElementById('callStatus').innerText = "Status: Live Mirror Connected Successfully! 🎉";
-            };
-
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate && signalingChannel) {
-                    signalingChannel.send({ type: 'broadcast', event: 'signal-msg', payload: { sender: myClientId, signal: { candidate: event.candidate } } });
-                }
-            };
+            uploadedMediaList.unshift({ type: 'video', title: title, fileName: fileInput.files[0].name });
+            document.getElementById('videoTitle').value = '';
+            fileInput.value = '';
+            document.getElementById('videoFileName').innerText = '';
+            alert("📹 वीडियो सफलताપूर्वक अपलोड हो गया है!");
+            renderMediaFeed();
         }
 
-        function disconnectWebRTCCall() {
-            if (peerConnection) { peerConnection.close(); peerConnection = null; }
-            if (signalingChannel) { supabaseClient.removeChannel(signalingChannel); signalingChannel = null; }
-            document.getElementById('remoteVideo').srcObject = null;
-            document.getElementById('callStatus').innerText = "Status: Disconnected.";
-            alert("Call disconnected.");
-        }
-
-        function filterRealSongs(query) {
-            const dropdown = document.getElementById('songDropdown');
-            if (!query.trim()) { dropdown.style.display = 'none'; return; }
-            const filtered = realMusicLibrary.filter(s => s.name.toLowerCase().includes(query.toLowerCase()));
-            if (filtered.length === 0) { dropdown.style.display = 'none'; return; }
-            dropdown.style.display = 'block';
-            dropdown.innerHTML = filtered.map(song => `
-                <div onclick="selectRealSong('${song.name}', '${song.url}')" style="padding: 10px; font-size: 13px; color: #fff; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#1f2937'" onmouseout="this.style.background='transparent'">
-                    🎵 ${song.name}
-                </div>
-            `).join('');
-        }
-
-        function selectRealSong(name, url) {
-            activeSongName = name;
-            activeSongUrl = url;
-            document.getElementById('songSearchInput').value = name;
-            document.getElementById('songDropdown').style.display = 'none';
-            document.getElementById('selectedSongTitle').innerText = name;
-            document.getElementById('selectedSongBox').style.display = 'flex';
-            if (previewAudio) { previewAudio.pause(); }
-            previewAudio = new Audio(activeSongUrl);
-        }
-
-        function previewSelectedSong() {
-            if (!previewAudio) return;
-            if (previewAudio.paused) { previewAudio.play(); } else { previewAudio.pause(); }
-        }
-
-        function initMasterConfigs() {
-            const url = localStorage.getItem('viziya_supabase_url');
-            const key = localStorage.getItem('viziya_supabase_key');
-            if (url && key) {
-                try {
-                    supabaseClient = window.supabase.createClient(url, key);
-                    fetchCloudPosts();
-                } catch (e) { console.error("Supabase init error:", e); }
+        function renderMediaFeed() {
+            const container = document.getElementById('mediaFeedContainer');
+            if(uploadedMediaList.length === 0) {
+                container.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); text-align: center;">अभी कोई मीडिया अपलोड नहीं किया गया है।</div>`;
+                return;
             }
+            container.innerHTML = '';
+            uploadedMediaList.forEach(item => {
+                let icon = item.type === 'audio' ? '🎵' : '📹';
+                container.innerHTML += `
+                    <div class="media-feed-item">
+                        <div class="media-feed-title">${icon} ${item.title}</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">File: ${item.fileName}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderCreatorsList() {
+            const container = document.getElementById('creatorsListContainer');
+            container.innerHTML = '';
+            mockCreators.forEach(creator => {
+                let badgeText = creator.isAccepted ? "Accepted ✓" : (creator.isFollowing ? "Pending ⏳" : "+ Follow");
+                let badgeClass = creator.isAccepted ? "follow-badge accepted" : "follow-badge";
+
+                container.innerHTML += `
+                    <div class="creator-item">
+                        <div>
+                            <strong style="font-size: 13px; color: #fff; display: block;">${creator.name}</strong>
+                            <span style="font-size: 11px; color: var(--neon-glow);">${creator.handle}</span>
+                        </div>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <button class="${badgeClass}" onclick="handleFollowClick(${creator.id})">${badgeText}</button>
+                            <button class="btn btn-secondary" onclick="openDmModal(${creator.id})" style="padding: 6px 12px; font-size: 11px; width: auto;">Chat 💬</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function handleFollowClick(id) {
+            let creator = mockCreators.find(c => c.id === id);
+            if (!creator.isFollowing) {
+                creator.isFollowing = true;
+                creator.isAccepted = false;
+                alert("Follow request sent to " + creator.name);
+            } else if (creator.isFollowing && !creator.isAccepted) {
+                creator.isAccepted = true;
+                alert(creator.name + " accepted your follow request!");
+            } else {
+                creator.isFollowing = false;
+                creator.isAccepted = false;
+                alert("Unfollowed " + creator.name);
+            }
+            renderCreatorsList();
+        }
+
+        function openDmModal(id) {
+            activeDmCreator = mockCreators.find(c => c.id === id);
+            document.getElementById('dmChatUserTitle').innerText = activeDmCreator.name + " (" + activeDmCreator.handle + ")";
+            document.getElementById('dmModal').style.display = 'flex';
+            
+            const chatBody = document.getElementById('dmChatBody');
+            const inputArea = document.getElementById('dmInputArea');
+
+            if (!activeDmCreator.isAccepted) {
+                document.getElementById('dmStatusSubtitle').innerText = "Restricted (Follow pending)";
+                chatBody.innerHTML = `
+                    <div class="restriction-box">
+                        <div style="font-size: 30px; margin-bottom: 8px;">🔒</div>
+                        <h4 style="color: #ff4d4d; font-size: 14px; margin-bottom: 6px;">मैसेज भेजना प्रतिबंधित है</h4>
+                        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+                            जब तक ${activeDmCreator.name} आपकी फॉलो रिक्वेस्ट स्वीकार नहीं करते, आप चैट या कॉल नहीं कर सकते।
+                        </p>
+                    </div>
+                `;
+                inputArea.style.display = 'none';
+            } else {
+                document.getElementById('dmStatusSubtitle').innerText = "Connected & Active";
+                chatBody.innerHTML = `
+                    <div class="chat-bubble received">Hello! Follow request is accepted. You can now chat or call. 🎉</div>
+                `;
+                inputArea.style.display = 'flex';
+            }
+        }
+
+        function closeDmModal() {
+            document.getElementById('dmModal').style.display = 'none';
+        }
+
+        function sendDmMessage() {
+            const input = document.getElementById('dmInputText');
+            const text = input.value.trim();
+            if(!text) return;
+            if(!activeDmCreator || !activeDmCreator.isAccepted) return;
+
+            const chatBody = document.getElementById('dmChatBody');
+            chatBody.innerHTML += `<div class="chat-bubble sent">${text}</div>`;
+            input.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function startVideoCall() {
+            if (!activeDmCreator || !activeDmCreator.isAccepted) {
+                alert("फॉलो रिक्वेस्ट स्वीकार होने के बाद ही वीडियो कॉल की जा सकती है!");
+                return;
+            }
+            alert(`🎥 वीडियो कॉल शुरू हो रही है... Target: ${activeDmCreator.name}`);
+        }
+
+        function startAudioCall() {
+            if (!activeDmCreator || !activeDmCreator.isAccepted) {
+                alert("फॉलो रिक्वेस्ट स्वीकार होने के बाद ही ऑडियो कॉल की जा सकती है!");
+                return;
+            }
+            alert(`📞 ऑडियो कॉल कनेक्ट हो रही है... Target: ${activeDmCreator.name}`);
         }
 
         function openSettingsModal() {
             document.getElementById('settingsModal').style.display = 'flex';
-            document.getElementById('cfgUserName').value = currentUserName;
-            document.getElementById('cfgUserHandle').value = currentUserHandle;
             document.getElementById('cfgSupabaseUrl').value = localStorage.getItem('viziya_supabase_url') || '';
             document.getElementById('cfgSupabaseKey').value = localStorage.getItem('viziya_supabase_key') || '';
+            document.getElementById('cfgAgoraAppId').value = localStorage.getItem('viziya_agora_appid') || '';
+            document.getElementById('cfgGroqKey').value = localStorage.getItem('viziya_groq_key') || '';
         }
 
-        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
 
-        function saveAllMasterConfigs() {
-            const name = document.getElementById('cfgUserName').value.trim();
-            const handle = document.getElementById('cfgUserHandle').value.trim();
-            const url = document.getElementById('cfgSupabaseUrl').value.trim();
-            const key = document.getElementById('cfgSupabaseKey').value.trim();
-
-            if (!url || !key) { alert("Supabase URL and Key are required!"); return; }
-            if (name) { currentUserName = name; localStorage.setItem('viziya_user_name', name); }
-            if (handle) { currentUserHandle = handle; localStorage.setItem('viziya_user_handle', handle); }
-
-            localStorage.setItem('viziya_supabase_url', url);
-            localStorage.setItem('viziya_supabase_key', key);
+        function saveAllConfigs() {
+            localStorage.setItem('viziya_supabase_url', document.getElementById('cfgSupabaseUrl').value.trim());
+            localStorage.setItem('viziya_supabase_key', document.getElementById('cfgSupabaseKey').value.trim());
+            localStorage.setItem('viziya_agora_appid', document.getElementById('cfgAgoraAppId').value.trim());
+            localStorage.setItem('viziya_groq_key', document.getElementById('cfgGroqKey').value.trim());
 
             const msg = document.getElementById('saveMsg');
             msg.style.display = 'block';
-            setTimeout(() => { msg.style.display = 'none'; closeSettingsModal(); initMasterConfigs(); updateProfileUI(); }, 1200);
+            setTimeout(() => { msg.style.display = 'none'; closeSettingsModal(); }, 1200);
         }
 
-        window.onload = () => { initMasterConfigs(); updateProfileUI(); };
-
-        function publishDirectMedia() {
-            if (!supabaseClient) { alert("Please configure your Supabase settings first!"); openSettingsModal(); return; }
-            const fileInput = document.getElementById('realMediaFile');
-            const caption = document.getElementById('postCaption').value.trim();
-            if (fileInput.files.length === 0) { alert("Please select a photo or video!"); return; }
-
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const base64Data = e.target.result;
-                const isVideo = file.type.startsWith('video');
-                const newPost = {
-                    user_name: currentUserName, handle: currentUserHandle,
-                    media_url: base64Data, media_type: isVideo ? 'video' : 'image',
-                    caption: caption || 'Live media drop 🚀',
-                    song_name: activeSongName || '', song_url: activeSongUrl || ''
-                };
-                try {
-                    const { error } = await supabaseClient.from('posts').insert([newPost]);
-                    if (error) { alert("Supabase Error: " + error.message); } 
-                    else {
-                        document.getElementById('postCaption').value = '';
-                        document.getElementById('songSearchInput').value = '';
-                        document.getElementById('selectedSongBox').style.display = 'none';
-                        activeSongName = ""; activeSongUrl = "";
-                        if (previewAudio) { previewAudio.pause(); }
-                        fileInput.value = '';
-                        fetchCloudPosts();
-                        alert("Post published successfully to cloud feed!");
-                    }
-                } catch (err) { alert("Upload failed: " + err.message); }
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function toggleFollowUser(handle) {
-            if (followingList.includes(handle)) {
-                followingList = followingList.filter(h => h !== handle);
-                alert("Unfollowed " + handle);
-            } else {
-                followingList.push(handle);
-                alert("Successfully Followed " + handle + " 🎉");
-            }
-            localStorage.setItem('viziya_following', JSON.stringify(followingList));
-            fetchCloudPosts();
-        }
-
-        async function fetchCloudPosts() {
-            const container = document.getElementById('realFeedContainer');
-            if (!supabaseClient) { container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">Configure Supabase in settings to view cloud feed.</div>`; return; }
-            try {
-                const { data: posts, error } = await supabaseClient.from('posts').select('*').order('id', { ascending: false });
-                if (error || !posts || posts.length === 0) { container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">No cloud posts found yet. Post something above!</div>`; return; }
-                container.innerHTML = '';
-                posts.forEach(p => {
-                    let isSelf = p.handle === currentUserHandle;
-                    let isFollowing = followingList.includes(p.handle);
-                    let followBtnHtml = isSelf ? '' : `<button class="follow-btn ${isFollowing ? 'following' : ''}" onclick="toggleFollowUser('${p.handle}')">${isFollowing ? 'Following ✓' : '+ Follow'}</button>`;
-                    
-                    let mediaHtml = p.media_type === 'video' ? `<video src="${p.media_url}" class="post-media" controls autoplay loop muted playsinline></video>` : `<img src="${p.media_url}" class="post-media">`;
-                    let songPlayerHtml = p.song_name && p.song_url ? `<div class="song-player-bar"><div style="font-size: 12px; color: #e879f9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">🎵 <b>${p.song_name}</b></div><audio controls src="${p.song_url}" style="height: 32px; width: 130px;"></audio></div>` : '';
-                    
-                    container.innerHTML += `
-                        <div class="post-card">
-                            <div class="post-header">
-                                <div class="user-info-group">
-                                    <div class="avatar-circle">${p.user_name ? p.user_name.charAt(0).toUpperCase() : 'U'}</div>
-                                    <div><strong style="font-size: 13px; display: block; color: #fff;">${p.user_name || 'User'}</strong><span style="font-size: 10px; color: var(--neon-glow);">${p.handle || '@viziya'}</span></div>
-                                </div>
-                                ${followBtnHtml}
-                            </div>
-                            ${mediaHtml} ${songPlayerHtml}
-                            <div class="post-footer"><strong style="color: #fff; margin-right: 6px;">${p.user_name || 'User'}</strong>${p.caption || ''}</div>
-                        </div>
-                    `;
-                });
-            } catch (err) { console.error("Fetch error:", err); }
-        }
-
-        async function fetchMyProfilePosts() {
-            const container = document.getElementById('myProfilePostsContainer');
-            if (!supabaseClient) { container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:12px;">Configure Supabase first.</div>`; return; }
-            try {
-                const { data: posts, error } = await supabaseClient.from('posts').select('*').eq('handle', currentUserHandle).order('id', { ascending: false });
-                if (error || !posts) { container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:12px;">No posts yet.</div>`; return; }
-                document.getElementById('statPostCount').innerText = posts.length;
-                if (posts.length === 0) { container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:12px; padding:15px;">You haven't posted anything yet.</div>`; return; }
-                container.innerHTML = '';
-                posts.forEach(p => {
-                    let mediaHtml = p.media_type === 'video' ? `<video src="${p.media_url}" class="post-media" controls muted playsinline></video>` : `<img src="${p.media_url}" class="post-media">`;
-                    container.innerHTML += `
-                        <div class="post-card">
-                            ${mediaHtml}
-                            <div class="post-footer"><strong style="color: #fff; margin-right: 6px;">${p.user_name}</strong>${p.caption || ''}</div>
-                        </div>
-                    `;
-                });
-            } catch (e) { console.error("Profile posts error:", e); }
-        }
+        window.onload = () => {
+            renderCreatorsList();
+        };
     </script>
 </body>
 </html>
