@@ -86,7 +86,7 @@
             </div>
         </div>
         <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-slate-800">
-            तरुण एआई Pro v3.0 • Scam Shield Active
+            तरुण एआई Pro v3.1 • Direct Shield Active
         </div>
     </div>
 
@@ -107,6 +107,17 @@
             </button>
         </div>
     </header>
+
+    <!-- QUICK ACTION BANNER (Direct Front Screen Scam/UPI Check Button) -->
+    <div class="bg-gradient-to-r from-red-900/40 to-indigo-900/40 border-b border-red-500/30 px-4 py-2 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-shield-virus text-red-400 text-base animate-pulse"></i>
+            <span class="text-xs text-slate-200 font-medium">फर्जी पेमेंट या स्कैम लिंक चेक करना है?</span>
+        </div>
+        <button onclick="enableScamModeDirectly()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-md flex items-center gap-1.5">
+            <i class="fa-solid fa-camera"></i> तुरंत स्कैन करें
+        </button>
+    </div>
 
     <!-- MAIN CHAT AREA -->
     <main id="chat-container" class="flex-1 overflow-y-auto px-4 py-3 space-y-4">
@@ -274,6 +285,15 @@
             updateUIState();
             loadHistoryData();
             toggleSidebar();
+        }
+
+        function enableScamModeDirectly() {
+            currentMode = 'scam_guard';
+            document.getElementById('app-mode-select').value = 'scam_guard';
+            localStorage.setItem('app_mode', 'scam_guard');
+            updateUIState();
+            loadHistoryData();
+            document.getElementById('image-file-input').click();
         }
 
         function saveLanguage() {
