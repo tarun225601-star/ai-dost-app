@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>मदर चैट - 100% फिक्स्ड कैटलॉग</title>
+    <title>मदर चैट - लाइव कैटलॉग</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -60,14 +60,14 @@
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-xs font-semibold text-emerald-400">🏪 दुकान का नाम:</label>
-                    <input type="text" id="shop-name-input" autocomplete="off" placeholder="जैसे: लोकल एआई स्टोर" 
+                    <label class="text-xs font-semibold text-emerald-400">🏪 दुकान का नाम (जैसे: तरुण स्टोर):</label>
+                    <input type="text" id="shop-name-input" autocomplete="off" placeholder="जैसे: तरुण" 
                         class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-xs font-semibold text-emerald-400">💬 व्हाट्सएप नंबर (आर्डर के लिए):</label>
-                    <input type="text" id="shop-whatsapp-input" autocomplete="off" placeholder="जैसे: 919876543210" 
+                    <label class="text-xs font-semibold text-emerald-400">💬 व्हाट्सएप नंबर (कंट्री कोड 91 के साथ):</label>
+                    <input type="text" id="shop-whatsapp-input" autocomplete="off" placeholder="जैसे: 919971968060" 
                         class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
                 </div>
 
@@ -88,9 +88,9 @@
                     <label class="text-xs font-bold text-indigo-400 flex items-center justify-between">
                         <span><i class="fa-solid fa-boxes-stacked"></i> आइटम/कैटलॉग जोड़ें:</span>
                     </label>
-                    <input type="text" id="new-item-name" placeholder="आइटम नाम (जैसे: अनार, सेब)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
+                    <input type="text" id="new-item-name" placeholder="आइटम नाम (जैसे: सेब, अनार)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="new-item-unit" placeholder="यूनिट (किलो/दर्जन)" class="bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
+                        <input type="text" id="new-item-unit" placeholder="यूनिट (किलो/ पीस)" class="bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                         <input type="text" id="new-item-price" placeholder="रेट (₹)" class="bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     </div>
                     
@@ -99,7 +99,7 @@
                         <input type="file" id="new-item-img-file" accept="image/*" class="w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
                     </div>
 
-                    <input type="text" id="new-item-discount" placeholder="ऑफर/डिस्काउंट (जैसे: ₹10 छूट)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
+                    <input type="text" id="new-item-discount" placeholder="ऑफर/डिस्काउंट (जैसे: ताजा स्टॉक)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     
                     <button onclick="addNewCatalogItem()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-plus-circle"></i> कैटलॉग में जोड़ें (+)
@@ -126,19 +126,36 @@
                 </button>
             </div>
 
-            <!-- API Key -->
-            <div class="space-y-1.5 pt-3 border-t border-slate-800">
-                <label class="text-xs font-semibold text-slate-400">🔑 Groq API Key:</label>
-                <input type="password" id="groq-key-input" autocomplete="off" placeholder="gsk_..." 
-                    class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
-                <button onclick="saveApiKey()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-xl transition">
-                    API Key सेव करें
+            <!-- API Keys & Supabase Settings -->
+            <div class="space-y-2.5 pt-3 border-t border-slate-800">
+                <h4 class="text-xs font-bold text-amber-400"><i class="fa-solid fa-database"></i> API & Database Config:</h4>
+                
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-slate-400">🔑 Groq API Key:</label>
+                    <input type="password" id="groq-key-input" autocomplete="off" placeholder="gsk_..." 
+                        class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2 border border-slate-700 focus:outline-none">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-slate-400">🌐 Supabase URL:</label>
+                    <input type="text" id="supabase-url-input" autocomplete="off" placeholder="https://xyz.supabase.co" 
+                        class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2 border border-slate-700 focus:outline-none">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-slate-400">🔑 Supabase Anon Key:</label>
+                    <input type="password" id="supabase-key-input" autocomplete="off" placeholder="eyJhbGciOi..." 
+                        class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2 border border-slate-700 focus:outline-none">
+                </div>
+
+                <button onclick="saveApiAndSupabaseKeys()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow">
+                    कनेक्शन सेटिंग्स सेव करें
                 </button>
             </div>
         </div>
 
         <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-slate-800 mt-4">
-            Mother Chat Admin • v16.0 (Force Catalog Sync)
+            Mother Chat Admin • v19.0 (Live Default Catalog)
         </div>
     </div>
 
@@ -154,7 +171,7 @@
                     <img id="header-owner-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-4 h-4 rounded-full object-cover absolute -bottom-1 -right-1 border border-slate-900">
                 </div>
                 <div>
-                    <span class="text-sm font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent" id="header-shop-name">लोकल एआई स्टोर</span>
+                    <span class="text-sm font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent" id="header-shop-name">तरुण</span>
                     <p class="text-[10px] text-slate-400" id="header-open-status-text">🟢 खुली हुई है</p>
                 </div>
             </div>
@@ -163,7 +180,7 @@
             <button onclick="openCartModal()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow flex items-center gap-1.5">
                 <i class="fa-solid fa-cart-shopping"></i> कार्ट (<span id="cart-count">0</span>)
             </button>
-            <button onclick="clearCurrentHistory()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800" title="रिफ्रेश करें">
+            <button onclick="clearCurrentHistory()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800" title="चैट रीसेट करें">
                 <i class="fa-solid fa-rotate-right text-base"></i>
             </button>
         </div>
@@ -208,7 +225,7 @@
     <!-- BOTTOM INPUT FOR CHAT -->
     <div class="px-4 pt-2 pb-5 bg-[#0B0F19] flex-shrink-0">
         <div class="bg-[#161F30] border border-slate-700/80 rounded-3xl p-2.5 flex items-center shadow-xl">
-            <input type="text" id="user-input" autocomplete="off" placeholder="जैसे: अनार क्या भाव है? या 2 किलो सेब पैक कर दो..." 
+            <input type="text" id="user-input" autocomplete="off" placeholder="जैसे: कोई सवाल पूछें या आर्डर दें..." 
                 class="flex-1 bg-transparent text-slate-100 placeholder-slate-400 text-sm px-3 py-2 focus:outline-none">
             <button onclick="sendMessage()" class="bg-emerald-600 hover:bg-emerald-700 text-white w-10 h-10 rounded-full flex items-center justify-center transition shadow-md ml-1 flex-shrink-0">
                 <i class="fa-solid fa-arrow-up text-sm"></i>
@@ -218,18 +235,13 @@
 
     <script>
         let messages = [];
-        let shopName = "लोकल एआई स्टोर";
+        let shopName = "तरुण";
         let shopWhatsApp = "";
         let shopPhoto = "";
         let ownerPhoto = "";
         let shopStatus = "OPEN";
         
-        // डिफ़ॉल्ट प्रोडक्ट्स लिस्ट (अब यह सीधे चैट में दिखेगी)
-        let productsList = [
-            { name: "ताजा सेब (Fresh Apple)", unit: "किलो", price: "120", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=200", discount: "₹10 छूट" },
-            { name: "मीठे अनार (Pomegranate)", unit: "किलो", price: "160", img: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200", discount: "ताजा स्टॉक" }
-        ];
-        
+        let productsList = [];
         let cart = [];
         let tempItemImageBase64 = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200";
 
@@ -237,7 +249,13 @@
             const savedKey = localStorage.getItem('groq_api_key');
             if (savedKey) document.getElementById('groq-key-input').value = savedKey;
 
-            shopName = localStorage.getItem('ai_shop_name') || "लोकल एआई स्टोर";
+            const savedSupabaseUrl = localStorage.getItem('supabase_url');
+            if (savedSupabaseUrl) document.getElementById('supabase-url-input').value = savedSupabaseUrl;
+
+            const savedSupabaseKey = localStorage.getItem('supabase_key');
+            if (savedSupabaseKey) document.getElementById('supabase-key-input').value = savedSupabaseKey;
+
+            shopName = localStorage.getItem('ai_shop_name') || "तरुण";
             shopWhatsApp = localStorage.getItem('ai_shop_whatsapp') || "";
             shopPhoto = localStorage.getItem('ai_shop_photo') || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=100";
             ownerPhoto = localStorage.getItem('ai_owner_photo') || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100";
@@ -255,6 +273,13 @@
                 }
             }
 
+            if (productsList.length === 0) {
+                productsList = [
+                    { name: "ताजा सेब (Fresh Apple)", unit: "किलो", price: "120", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=200", discount: "₹10 छूट" },
+                    { name: "मीठे अनार (Pomegranate)", unit: "किलो", price: "160", img: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200", discount: "ताजा स्टॉक" }
+                ];
+            }
+
             if (shopName) {
                 document.getElementById('shop-name-input').value = shopName;
                 document.getElementById('header-shop-name').innerText = shopName;
@@ -268,9 +293,16 @@
             if (savedPin) document.getElementById('new-admin-pin').value = savedPin;
 
             setupImageUploadListeners();
-            generateWelcomeMessageWithCatalog();
             renderAdminProductsList();
             updateShopStatusUI();
+
+            // 🚀 AUTOMATIC INITIAL MESSAGE WITH CATALOG CARDS DIRECTLY SHOWN ON LOAD
+            let initialWelcomeHtml = `नमस्ते! **${shopName}** की दुकान में आपका स्वागत है। 🍎<br><br>यह रहा हमारा लाइव कैटलॉग और रेट्स:${getCatalogCardsHTML()}`;
+            messages.push({
+                'sender': 'ai', 
+                'html': initialWelcomeHtml
+            });
+            renderChat();
         };
 
         function setupImageUploadListeners() {
@@ -322,7 +354,6 @@
             }
 
             productsList.push({ name, unit, price, img: tempItemImageBase64, discount });
-
             localStorage.setItem('ai_shop_products_json', JSON.stringify(productsList));
 
             document.getElementById('new-item-name').value = '';
@@ -333,7 +364,6 @@
             tempItemImageBase64 = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200";
 
             renderAdminProductsList();
-            generateWelcomeMessageWithCatalog();
             alert('✅ आइटम सफलतापूर्वक जुड़ गया!');
         }
 
@@ -368,7 +398,6 @@
             productsList.splice(index, 1);
             localStorage.setItem('ai_shop_products_json', JSON.stringify(productsList));
             renderAdminProductsList();
-            generateWelcomeMessageWithCatalog();
             alert('🗑️ आइटम हटा दिया गया है।');
         }
 
@@ -407,8 +436,15 @@
                     document.getElementById('header-owner-img').src = ownerPhoto;
 
                     updateShopStatusUI();
-                    generateWelcomeMessageWithCatalog();
-                    alert('✅ सब कुछ सफलतापूर्वक सेव हो गया और कैटलॉग लाइव हो गया!');
+                    
+                    // Reset and update welcome message with new shop name and catalog
+                    messages = [{
+                        'sender': 'ai',
+                        'html': `नमस्ते! **${shopName}** की दुकान में आपका स्वागत है। 🍎<br><br>यह रहा हमारा लाइव कैटलॉग और रेट्स:${getCatalogCardsHTML()}`
+                    }];
+                    renderChat();
+
+                    alert('✅ सब कुछ सफलतापूर्वक सेव हो गया!');
                     lockAdminPanel();
                     toggleSidebar();
                 }
@@ -440,53 +476,38 @@
             }
         }
 
-        function generateWelcomeMessageWithCatalog() {
-            let catalogHTML = "";
-            
+        function getCatalogCardsHTML() {
             if (shopStatus === "CLOSED") {
-                catalogHTML = `<div class="text-red-400 font-bold text-xs py-2 text-center"><i class="fa-solid fa-store-slash"></i> दुकान अभी बंद (Closed) है।</div>`;
-            } else if (productsList.length === 0) {
-                catalogHTML = `<div class="text-slate-400 text-xs py-2 text-center">फिलहाल कोई आइटम लिस्टेड नहीं है।</div>`;
-            } else {
-                catalogHTML = `<div class="space-y-2 mt-2 pt-2 border-t border-slate-700">`;
-                productsList.forEach((prod, index) => {
-                    catalogHTML += `
-                        <div class="bg-[#0B0F19] border border-slate-700 rounded-2xl p-2.5 flex items-center justify-between shadow-sm">
-                            <div class="flex items-center space-x-2.5">
-                                <img src="${prod.img}" class="w-10 h-10 object-cover rounded-xl border border-slate-700 flex-shrink-0">
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-100">${prod.name}</h4>
-                                    <p class="text-[11px] text-emerald-400 font-semibold">₹${prod.price} <span class="text-slate-400 text-[10px]">/ ${prod.unit}</span></p>
-                                    ${prod.discount ? `<span class="text-[9px] bg-amber-950 text-amber-300 px-1 py-0.5 rounded border border-amber-800">${prod.discount}</span>` : ''}
-                                </div>
-                            </div>
-                            <button onclick="addProdToCart(${index})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-1.5 px-3 rounded-xl transition shadow flex items-center gap-1 flex-shrink-0">
-                                <i class="fa-solid fa-plus text-[10px]"></i> Add
-                            </button>
-                        </div>
-                    `;
-                });
-                catalogHTML += `</div>`;
+                return `<div class="text-red-400 font-bold text-xs py-2 text-center"><i class="fa-solid fa-store-slash"></i> दुकान अभी बंद (Closed) है।</div>`;
+            }
+            if (productsList.length === 0) {
+                return `<div class="text-slate-400 text-xs py-2 text-center">फिलहाल कोई आइटम लिस्टेड नहीं है।</div>`;
             }
 
-            let welcomeText = `नमस्ते! **${shopName}** में आपका स्वागत है। हमारी लाइव कैटलॉग और रेट्स सूची नीचे दी गई है:`;
-            
-            let fullAiHtml = `
-                <div class="space-y-2">
-                    <div>${welcomeText}</div>
-                    ${catalogHTML}
-                </div>
-            `;
-
-            messages = [{ 'sender': 'ai', 'html': fullAiHtml }];
-            renderChat();
+            let html = `<div class="space-y-2 mt-2 pt-2 border-t border-slate-700">`;
+            productsList.forEach((prod, index) => {
+                html += `
+                    <div class="bg-[#0B0F19] border border-slate-700 rounded-2xl p-2.5 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center space-x-2.5">
+                            <img src="${prod.img}" class="w-10 h-10 object-cover rounded-xl border border-slate-700 flex-shrink-0">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-100">${prod.name}</h4>
+                                <p class="text-[11px] text-emerald-400 font-semibold">₹${prod.price} <span class="text-slate-400 text-[10px]">/ ${prod.unit}</span></p>
+                                ${prod.discount ? `<span class="text-[9px] bg-amber-950 text-amber-300 px-1 py-0.5 rounded border border-amber-800">${prod.discount}</span>` : ''}
+                            </div>
+                        </div>
+                        <button onclick="addProdToCart(${index})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-1.5 px-3 rounded-xl transition shadow flex items-center gap-1 flex-shrink-0">
+                            <i class="fa-solid fa-plus text-[10px]"></i> Add
+                        </button>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            return html;
         }
 
         function addProdToCart(index) {
-            if (shopStatus === "CLOSED") {
-                alert('❌ दुकान बंद है!');
-                return;
-            }
+            if (shopStatus === "CLOSED") { alert('❌ दुकान बंद है!'); return; }
             const p = productsList[index];
             const itemString = `${p.name} - ₹${p.price} / ${p.unit}`;
             cart.push(itemString);
@@ -536,15 +557,24 @@
             window.open(`https://wa.me/${shopWhatsApp}?text=${encodeURIComponent(orderText)}`, '_blank');
         }
 
-        function saveApiKey() {
-            const key = document.getElementById('groq-key-input').value.trim();
-            if (!key) { alert('वैध की दर्ज करें!'); return; }
-            localStorage.setItem('groq_api_key', key);
-            alert('✅ API Key सेव हो गई!');
+        function saveApiAndSupabaseKeys() {
+            const groqKey = document.getElementById('groq-key-input').value.trim();
+            const supabaseUrl = document.getElementById('supabase-url-input').value.trim();
+            const supabaseKey = document.getElementById('supabase-key-input').value.trim();
+
+            if (groqKey) localStorage.setItem('groq_api_key', groqKey);
+            if (supabaseUrl) localStorage.setItem('supabase_url', supabaseUrl);
+            if (supabaseKey) localStorage.setItem('supabase_key', supabaseKey);
+
+            alert('✅ API और Supabase सेटिंग्स सफलतापूर्वक सेव हो गईं!');
         }
 
         function clearCurrentHistory() {
-            generateWelcomeMessageWithCatalog();
+            messages = [{
+                'sender': 'ai', 
+                'html': `नमस्ते! **${shopName}** की दुकान में आपका स्वागत है। 🍎<br><br>यह रहा हमारा लाइव कैटलॉग और रेट्स:${getCatalogCardsHTML()}`
+            }];
+            renderChat();
         }
 
         function renderChat() {
@@ -614,7 +644,8 @@ Answer customer questions about prices, availability and items accurately and po
 
                 if (response.ok) {
                     const data = await response.json();
-                    messages.push({'sender': 'ai', 'text': data.choices[0].message.content});
+                    let aiReply = data.choices[0].message.content;
+                    messages.push({'sender': 'ai', 'text': aiReply});
                 } else {
                     messages.push({'sender': 'ai', 'text': `❌ एरर: ${await response.text()}`});
                 }
