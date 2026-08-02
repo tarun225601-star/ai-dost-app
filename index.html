@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>मदर चैट - इन-चैट ब्लैक लिस्ट कैटलॉग</title>
+    <title>मदर चैट - 100% फिक्स्ड कैटलॉग</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -61,7 +61,7 @@
 
                 <div class="space-y-1">
                     <label class="text-xs font-semibold text-emerald-400">🏪 दुकान का नाम:</label>
-                    <input type="text" id="shop-name-input" autocomplete="off" placeholder="जैसे: तरुण फ्रेश फ्रूट्स" 
+                    <input type="text" id="shop-name-input" autocomplete="off" placeholder="जैसे: लोकल एआई स्टोर" 
                         class="w-full bg-[#1F2937] text-slate-100 text-xs rounded-xl p-2.5 border border-slate-700 focus:outline-none">
                 </div>
 
@@ -86,8 +86,7 @@
                 <!-- UNLIMITED PRODUCTS ADDER SECTION -->
                 <div class="bg-[#1F2937] p-3 rounded-2xl border border-slate-700 space-y-2.5">
                     <label class="text-xs font-bold text-indigo-400 flex items-center justify-between">
-                        <span><i class="fa-solid fa-boxes-stacked"></i> अनलिमिटेड आइटम/कैटलॉग जोड़ें:</span>
-                        <span class="text-[10px] bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-700">कितने भी जोड़ें</span>
+                        <span><i class="fa-solid fa-boxes-stacked"></i> आइटम/कैटलॉग जोड़ें:</span>
                     </label>
                     <input type="text" id="new-item-name" placeholder="आइटम नाम (जैसे: अनार, सेब)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     <div class="grid grid-cols-2 gap-2">
@@ -96,21 +95,21 @@
                     </div>
                     
                     <div class="space-y-1">
-                        <label class="text-[10px] font-semibold text-slate-300">📸 आइटम की फोटो (कैमरा/गैलरी):</label>
+                        <label class="text-[10px] font-semibold text-slate-300">📸 आइटम की फोटो:</label>
                         <input type="file" id="new-item-img-file" accept="image/*" class="w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
                     </div>
 
                     <input type="text" id="new-item-discount" placeholder="ऑफर/डिस्काउंट (जैसे: ₹10 छूट)" class="w-full bg-[#0B0F19] text-slate-100 text-xs rounded-xl p-2 border border-slate-600 focus:outline-none">
                     
                     <button onclick="addNewCatalogItem()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-plus-circle"></i> कैटलॉग में नया आइटम जोड़ें (+)
+                        <i class="fa-solid fa-plus-circle"></i> कैटलॉग में जोड़ें (+)
                     </button>
                 </div>
 
                 <!-- ADMIN PRODUCTS MANAGEMENT LIST -->
                 <div class="space-y-2 pt-2 border-t border-slate-800">
                     <h4 class="text-xs font-bold text-slate-300 flex justify-between items-center">
-                        <span>📦 जुड़े हुए सभी कैटलॉग आइटम:</span>
+                        <span>📦 जुड़े हुए सभी आइटम:</span>
                         <span id="total-items-badge" class="text-[10px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">0 आइटम</span>
                     </h4>
                     <div id="admin-products-list-container" class="max-h-36 overflow-y-auto space-y-1.5 pr-1"></div>
@@ -139,7 +138,7 @@
         </div>
 
         <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-slate-800 mt-4">
-            Mother Chat Admin • v13.0 (In-Chat Catalog)
+            Mother Chat Admin • v16.0 (Force Catalog Sync)
         </div>
     </div>
 
@@ -164,13 +163,13 @@
             <button onclick="openCartModal()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow flex items-center gap-1.5">
                 <i class="fa-solid fa-cart-shopping"></i> कार्ट (<span id="cart-count">0</span>)
             </button>
-            <button onclick="clearCurrentHistory()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800" title="चैट क्लियर करें">
+            <button onclick="clearCurrentHistory()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800" title="रिफ्रेश करें">
                 <i class="fa-solid fa-rotate-right text-base"></i>
             </button>
         </div>
     </header>
 
-    <!-- MAIN CHAT AREA (कैटलॉग अब सीधे चैट के अंदर नमस्ते वाले मैसेज में दिखेगा) -->
+    <!-- MAIN CHAT AREA -->
     <main id="chat-container" class="flex-1 overflow-y-auto px-4 py-3 space-y-4">
         <div id="chat-messages-list" class="space-y-4"></div>
     </main>
@@ -224,10 +223,13 @@
         let shopPhoto = "";
         let ownerPhoto = "";
         let shopStatus = "OPEN";
+        
+        // डिफ़ॉल्ट प्रोडक्ट्स लिस्ट (अब यह सीधे चैट में दिखेगी)
         let productsList = [
             { name: "ताजा सेब (Fresh Apple)", unit: "किलो", price: "120", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=200", discount: "₹10 छूट" },
             { name: "मीठे अनार (Pomegranate)", unit: "किलो", price: "160", img: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=200", discount: "ताजा स्टॉक" }
         ];
+        
         let cart = [];
         let tempItemImageBase64 = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200";
 
@@ -243,7 +245,14 @@
             
             const savedProducts = localStorage.getItem('ai_shop_products_json');
             if (savedProducts) {
-                productsList = JSON.parse(savedProducts);
+                try {
+                    let parsed = JSON.parse(savedProducts);
+                    if (parsed && parsed.length > 0) {
+                        productsList = parsed;
+                    }
+                } catch(e) {
+                    console.error("Error parsing saved products", e);
+                }
             }
 
             if (shopName) {
@@ -259,14 +268,7 @@
             if (savedPin) document.getElementById('new-admin-pin').value = savedPin;
 
             setupImageUploadListeners();
-            loadHistory();
-            
-            // अगर चैट बिल्कुल खाली है तो शुरुआत में नमस्ते और इन-चैट कैटलॉग दिखाएं
-            if (messages.length === 0) {
-                generateWelcomeMessageWithCatalog();
-            } else {
-                renderChat();
-            }
+            generateWelcomeMessageWithCatalog();
             renderAdminProductsList();
             updateShopStatusUI();
         };
@@ -321,6 +323,8 @@
 
             productsList.push({ name, unit, price, img: tempItemImageBase64, discount });
 
+            localStorage.setItem('ai_shop_products_json', JSON.stringify(productsList));
+
             document.getElementById('new-item-name').value = '';
             document.getElementById('new-item-unit').value = '';
             document.getElementById('new-item-price').value = '';
@@ -329,7 +333,8 @@
             tempItemImageBase64 = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200";
 
             renderAdminProductsList();
-            alert('✅ आइटम जुड़ गया! नीचे "सब कुछ सेव करें" पर क्लिक करें।');
+            generateWelcomeMessageWithCatalog();
+            alert('✅ आइटम सफलतापूर्वक जुड़ गया!');
         }
 
         function renderAdminProductsList() {
@@ -361,8 +366,10 @@
 
         function removeCatalogItem(index) {
             productsList.splice(index, 1);
+            localStorage.setItem('ai_shop_products_json', JSON.stringify(productsList));
             renderAdminProductsList();
-            alert('🗑️ आइटम हटा दिया गया है। सेव करने के लिए नीचे बटन दबाएं।');
+            generateWelcomeMessageWithCatalog();
+            alert('🗑️ आइटम हटा दिया गया है।');
         }
 
         function saveShopSettings() {
@@ -401,7 +408,7 @@
 
                     updateShopStatusUI();
                     generateWelcomeMessageWithCatalog();
-                    alert('✅ दुकान और कैटलॉग सीधे चैट में अपडेट हो गए!');
+                    alert('✅ सब कुछ सफलतापूर्वक सेव हो गया और कैटलॉग लाइव हो गया!');
                     lockAdminPanel();
                     toggleSidebar();
                 }
@@ -433,14 +440,13 @@
             }
         }
 
-        // नमस्ते और कैटलॉग को सीधे चैट बबल के अंदर जनरेट करने का फंक्शन
         function generateWelcomeMessageWithCatalog() {
             let catalogHTML = "";
             
             if (shopStatus === "CLOSED") {
                 catalogHTML = `<div class="text-red-400 font-bold text-xs py-2 text-center"><i class="fa-solid fa-store-slash"></i> दुकान अभी बंद (Closed) है।</div>`;
             } else if (productsList.length === 0) {
-                catalogHTML = `<div class="text-slate-400 text-xs py-2 text-center">फिलहाल कोई आइटम लिस्टेड नहीं है। एडमिन पैनल से जोड़ें।</div>`;
+                catalogHTML = `<div class="text-slate-400 text-xs py-2 text-center">फिलहाल कोई आइटम लिस्टेड नहीं है।</div>`;
             } else {
                 catalogHTML = `<div class="space-y-2 mt-2 pt-2 border-t border-slate-700">`;
                 productsList.forEach((prod, index) => {
@@ -473,7 +479,6 @@
             `;
 
             messages = [{ 'sender': 'ai', 'html': fullAiHtml }];
-            localStorage.setItem('ai_store_chat_history', JSON.stringify(messages));
             renderChat();
         }
 
@@ -538,11 +543,6 @@
             alert('✅ API Key सेव हो गई!');
         }
 
-        function loadHistory() {
-            const saved = localStorage.getItem('ai_store_chat_history');
-            messages = saved ? JSON.parse(saved) : [];
-        }
-
         function clearCurrentHistory() {
             generateWelcomeMessageWithCatalog();
         }
@@ -575,7 +575,6 @@
 
             messages.push({'sender': 'user', 'text': userText});
             inputField.value = '';
-            localStorage.setItem('ai_store_chat_history', JSON.stringify(messages));
             renderChat();
 
             document.getElementById('loading-bar').classList.remove('hidden');
@@ -592,7 +591,6 @@
                 if (shopStatus === "CLOSED") {
                     document.getElementById('loading-bar').classList.add('hidden');
                     messages.push({'sender': 'ai', 'text': '❌ माफ कीजिए, यह दुकान अभी बंद (Closed) है।'});
-                    localStorage.setItem('ai_store_chat_history', JSON.stringify(messages));
                     renderChat();
                     return;
                 }
@@ -600,8 +598,8 @@
                 let itemsString = productsList.map(p => `${p.name} - ₹${p.price} / ${p.unit} (${p.discount || 'कोई ऑफर नहीं'})`).join(', ');
 
                 let sysPrompt = `You are an intelligent AI shop assistant for "${shopName}". 
-Inventory Catalog: "${itemsString || 'No items listed'}".
-Answer customer questions about prices and items politely in Hindi/Hinglish.`;
+Current Inventory Catalog: [${itemsString || 'No items listed'}].
+Answer customer questions about prices, availability and items accurately and politely in Hindi/Hinglish based strictly on this catalog.`;
                 
                 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
@@ -621,7 +619,6 @@ Answer customer questions about prices and items politely in Hindi/Hinglish.`;
                     messages.push({'sender': 'ai', 'text': `❌ एरर: ${await response.text()}`});
                 }
 
-                localStorage.setItem('ai_store_chat_history', JSON.stringify(messages));
                 renderChat();
 
             } catch (e) {
