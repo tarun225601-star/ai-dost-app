@@ -86,7 +86,7 @@
             </div>
         </div>
         <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-slate-800">
-            तरुण एआई Pro v3.1 • Direct Shield Active
+            तरुण एआई Pro v3.2 • Vision Fixed
         </div>
     </div>
 
@@ -483,7 +483,8 @@
                 if (userText) userContent.push({"type": "text", "text": userText});
                 if (currentImage) userContent.push({"type": "image_url", "image_url": {"url": currentImage}});
 
-                let activeModel = currentImage ? "llama-3.2-90b-vision-preview" : "llama-3.3-70b-versatile";
+                // Updated to latest active Groq Vision Model (llama-3.2-11b-vision-preview)
+                let activeModel = currentImage ? "llama-3.2-11b-vision-preview" : "llama-3.3-70b-versatile";
 
                 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
