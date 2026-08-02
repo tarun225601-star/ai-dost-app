@@ -1,298 +1,1582 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  View, Text, TextInput, TouchableOpacity, Image, FlatList, 
-  StyleSheet, Modal, Dimensions, ScrollView, Alert 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  StyleSheet,
+  Modal,
+  Dimensions,
+  ScrollView,
+  Alert,
+  StatusBar,
+  SafeAreaView,
+  ActivityIndicator
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Video from 'react-native-video';
 
-const { width } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
+// ==========================================
+// MOCK DATA: 100% WORKING REAL MUSIC & MEDIA
+// ==========================================
+const INITIAL_SONGS = [
+  {
+    id: 's1',
+    title: 'Upbeat Energetic Pop',
+    artist: 'SoundHelix Artist 1',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    duration: '06:12'
+  },
+  {
+    id: 's2',
+    title: 'Chill Lo-Fi Beat Atmospheric',
+    artist: 'SoundHelix Artist 2',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    duration: '07:05'
+  },
+  {
+    id: 's3',
+    title: 'Aesthetic Deep House Track',
+    artist: 'SoundHelix Artist 3',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    duration: '05:44'
+  },
+  {
+    id: 's4',
+    title: 'Romantic Acoustic Guitar Melody',
+    artist: 'SoundHelix Artist 4',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    duration: '05:02'
+  },
+  {
+    id: 's5',
+    title: 'Electronic Synthwave Drive',
+    artist: 'SoundHelix Artist 5',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+    duration: '06:33'
+  }
+];
+
+const INITIAL_STORIES = [
+  { id: 'st0', user: 'Your Story', avatar: 'https://picsum.photos/id/64/150/150', isUser: true },
+  { id: 'st1', user: 'viziag_global', avatar: 'https://picsum.photos/id/1011/150/150', isUser: false },
+  { id: 'st2', user: 'elight_cleaning', avatar: 'https://picsum.photos/id/1025/150/150', isUser: false },
+  { id: 'st3', user: 'jet_black_india', avatar: 'https://picsum.photos/id/1062/150/150', isUser: false },
+  { id: 'st4', user: 'cyber_guard', avatar: 'https://picsum.photos/id/1074/150/150', isUser: false },
+];
+
+const INITIAL_POSTS = [
+  {
+    id: 'p1',
+    username: 'viziag_global',
+    userAvatar: 'https://picsum.photos/id/1011/100/100',
+    location: 'Faridabad, India',
+    type: 'video',
+    mediaUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    likesCount: 1240,
+    caption: 'High resolution 8K Video Upscaling demo! Check out the details ✨ #AI #VideoEditing #ViziagGlobal',
+    attachedSong: INITIAL_SONGS[0],
+    comments: [
+      { id: 'c1', user: 'rahul_dev', text: 'Quality is top notch brother 🔥' },
+      { id: 'c2', user: 'priya_art', text: 'Which AI tool did you use for this?' }
+    ],
+    timestamp: '2 HOURS AGO'
+  },
+  {
+    id: 'p2',
+    username: 'elight_cleaning',
+    userAvatar: 'https://picsum.photos/id/1025/100/100',
+    location: 'Sector 15, Faridabad',
+    type: 'image',
+    mediaUrl: 'https://picsum.photos/id/201/800/800',
+    likesCount: 856,
+    caption: 'Deep cleaning service done for luxury residential suite. Book your slot now! 🧼✨ #DeepCleaning #Faridabad',
+    attachedSong: INITIAL_SONGS[1],
+    comments: [
+      { id: 'c3', user: 'sector15_resident', text: 'Great service team, very professional!' }
+    ],
+    timestamp: '5 HOURS AGO'
+  },
+  {
+    id: 'p3',
+    username: 'jet_black_india',
+    userAvatar: 'https://picsum.photos/id/1062/100/100',
+    location: 'Automotive Lab',
+    type: 'image',
+    mediaUrl: 'https://picsum.photos/id/111/800/800',
+    likesCount: 2310,
+    caption: 'Jet Black Tire & Dashboard Polish - High shine chemical formulation tested on premium vehicles 🚗💨',
+    attachedSong: INITIAL_SONGS[2],
+    comments: [
+      { id: 'c4', user: 'auto_detailer', text: 'Is this silicon emulsion based?' },
+      { id: 'c5', user: 'tarun_shop', text: 'Yes, 100% hydrophobic coating effect!' }
+    ],
+    timestamp: '1 DAY AGO'
+  }
+];
+
+const INITIAL_REELS = [
+  {
+    id: 'r1',
+    username: 'viziag_global',
+    userAvatar: 'https://picsum.photos/id/1011/100/100',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    caption: 'Mastering AI Video Workflows in 2026 🚀 #Editing #FlutterFlow',
+    songTitle: 'SoundHelix Song 1 - Upbeat Pop',
+    likes: '45.2K',
+    commentsCount: '1,204'
+  },
+  {
+    id: 'r2',
+    username: 'master_bot_ai',
+    userAvatar: 'https://picsum.photos/id/1074/100/100',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    caption: 'Autonomous Bot Prototype Testing Tracked Wheel Chassis 🤖⚙️',
+    songTitle: 'SoundHelix Song 3 - Deep House',
+    likes: '89.1K',
+    commentsCount: '3,410'
+  }
+];
+
+// ==========================================
+// MAIN APP COMPONENT
+// ==========================================
 export default function App() {
-  // 1. Settings Popup State (पहली बार आने वाला पॉप-अप)
+  // Navigation State
+  const [currentTab, setCurrentTab] = useState('Home'); // 'Home', 'Search', 'Reels', 'Activity', 'Profile'
+
+  // Settings & Keys Modal State
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [appIdKey, setAppIdKey] = useState('');
   const [tokenKey, setTokenKey] = useState('');
   const [channelKey, setChannelKey] = useState('');
   const [apiKey, setApiKey] = useState('');
 
-  // 2. Navigation & Media State (आप यहाँ अपनी मर्जी की फोटो या वीडियो की लिंक डाल सकते हैं)
-  const [currentTab, setCurrentTab] = useState('Home');
-  const [mediaUri, setMediaUri] = useState('https://www.w3schools.com/html/mov_bbb.mp4');
-  const [mediaType, setMediaType] = useState('video'); // 'video' या 'image'
+  // Feed & Interactive State
+  const [posts, setPosts] = useState(INITIAL_POSTS);
+  const [likedPosts, setLikedPosts] = useState({});
+  const [savedPosts, setSavedPosts] = useState({});
 
-  // 3. Real Music & Search State (असली गाने सर्च और प्ले करने के लिए)
-  const [songQuery, setSongQuery] = useState('');
-  const [songList, setSongList] = useState([
-    { id: '1', title: 'SoundHelix Song 1 (Upbeat Electronic)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-    { id: '2', title: 'SoundHelix Song 2 (Aesthetic Chill)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-    { id: '3', title: 'SoundHelix Song 3 (Pop Dance Mix)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-    { id: '4', title: 'SoundHelix Song 4 (Instrumental Acoustic)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' }
-  ]);
-  const [filteredSongs, setFilteredSongs] = useState(songList);
-  const [selectedSong, setSelectedSong] = useState(null);
+  // Audio Playback & Music Selection State
+  const [selectedSong, setSelectedSong] = useState(INITIAL_SONGS[0]);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const [audioOffset, setAudioOffset] = useState(0); // गाने को आगे-पीछे सेट करने का टाइम (सेकंड में)
-  const audioRef = useRef(null);
+  const [audioOffset, setAudioOffset] = useState(0); // Seek offset in seconds
+  const [isMusicModalVisible, setIsMusicModalVisible] = useState(false);
+  const [searchSongQuery, setSearchSongQuery] = useState('');
+  const [filteredSongsList, setFilteredSongsList] = useState(INITIAL_SONGS);
+  const audioPlayerRef = useRef(null);
 
-  // 4. Calling State (वीडियो और ऑडियो कॉल)
+  // Calling Feature State
   const [inCall, setInCall] = useState(false);
-  const [callType, setCallType] = useState('video');
+  const [callType, setCallType] = useState('video'); // 'video' | 'audio'
+  const [callDuration, setCallDuration] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isCameraOff, setIsCameraOff] = useState(false);
 
-  // चेक करें कि क्या पहली बार की सेव हैं या नहीं
+  // Comments Bottom Sheet State
+  const [isCommentsVisible, setIsCommentsVisible] = useState(false);
+  const [activePostComments, setActivePostComments] = useState([]);
+  const [activePostId, setActivePostId] = useState(null);
+  const [newCommentText, setNewCommentText] = useState('');
+
+  // ------------------------------------------
+  // LIFECYCLE & STORAGE LOGIC
+  // ------------------------------------------
   useEffect(() => {
-    checkInitialSettings();
+    loadSavedSettings();
   }, []);
 
-  const checkInitialSettings = async () => {
+  // Call timer interval logic
+  useEffect(() => {
+    let timer;
+    if (inCall) {
+      timer = setInterval(() => {
+        setCallDuration((prev) => prev + 1);
+      }, 1000);
+    } else {
+      setCallDuration(0);
+    }
+    return () => clearInterval(timer);
+  }, [inCall]);
+
+  const loadSavedSettings = async () => {
     try {
-      const savedAppId = await AsyncStorage.getItem('@trial_app_id');
+      const savedAppId = await AsyncStorage.getItem('@app_id_key');
+      const savedToken = await AsyncStorage.getItem('@app_token_key');
+      const savedChannel = await AsyncStorage.getItem('@app_channel_key');
+      const savedApi = await AsyncStorage.getItem('@app_api_key');
+
+      if (savedAppId) setAppIdKey(savedAppId);
+      if (savedToken) setTokenKey(savedToken);
+      if (savedChannel) setChannelKey(savedChannel);
+      if (savedApi) setApiKey(savedApi);
+
       if (!savedAppId) {
-        setIsSettingsVisible(true);
+        setIsSettingsVisible(true); // Popup on first launch if not configured
       }
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.log('Error reading AsyncStorage:', error);
     }
   };
 
   const handleSaveSettings = async () => {
-    if (!appIdKey || !tokenKey || !channelKey || !apiKey) {
-      Alert.alert("एरर", "कृपया चारों की (Keys) सही से भरें!");
+    if (!appIdKey.trim() || !tokenKey.trim() || !channelKey.trim() || !apiKey.trim()) {
+      Alert.alert('फील्ड्स अधूरी हैं', 'कृपया चारों (App ID, Token, Channel, API Key) भरें!');
       return;
     }
     try {
-      await AsyncStorage.setItem('@trial_app_id', appIdKey);
-      await AsyncStorage.setItem('@trial_token', tokenKey);
-      await AsyncStorage.setItem('@trial_channel', channelKey);
-      await AsyncStorage.setItem('@trial_api', apiKey);
-      
+      await AsyncStorage.setItem('@app_id_key', appIdKey);
+      await AsyncStorage.setItem('@app_token_key', tokenKey);
+      await AsyncStorage.setItem('@app_channel_key', channelKey);
+      await AsyncStorage.setItem('@app_api_key', apiKey);
       setIsSettingsVisible(false);
-      Alert.alert("सफलता", "सेटिंग्स सेव हो गई हैं! अब ऐप पूरी तरह तैयार है।");
-    } catch (e) {
-      Alert.alert("एरर", "सेव करने में समस्या आई।");
+      Alert.alert('सेटिंग्स सेव हो गईं', 'आपकी API और Agora कीज़ सफलता से सेव हो गई हैं!');
+    } catch (error) {
+      Alert.alert('एरर', 'कीज़ सेव करने में दिक्कत आई।');
     }
   };
 
-  // रियल गाना सर्च करने का फंक्शन (सर्च करते ही लिस्ट फिल्टर होगी)
-  const handleSearchSongs = (text) => {
-    setSongQuery(text);
-    if (!text.trim()) {
-      setFilteredSongs(songList);
+  // ------------------------------------------
+  // MUSIC & AUDIO SEARCH / SEEK HANDLERS
+  // ------------------------------------------
+  const handleSearchSong = (query) => {
+    setSearchSongQuery(query);
+    if (!query.trim()) {
+      setFilteredSongsList(INITIAL_SONGS);
     } else {
-      const results = songList.filter(s => s.title.toLowerCase().includes(text.toLowerCase()));
-      setFilteredSongs(results);
+      const filtered = INITIAL_SONGS.filter(
+        (song) =>
+          song.title.toLowerCase().includes(query.toLowerCase()) ||
+          song.artist.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredSongsList(filtered);
     }
   };
 
-  // गाने को आगे या पीछे करने का फंक्शन (Seek Offset)
-  const handleSeekAudio = (seconds) => {
-    let newTime = audioOffset + seconds;
-    if (newTime < 0) newTime = 0;
-    setAudioOffset(newTime);
-    if (audioRef.current) {
-      audioRef.current.seek(newTime);
+  const handleSelectSong = (song) => {
+    setSelectedSong(song);
+    setIsPlayingAudio(true);
+    setAudioOffset(0);
+    setIsMusicModalVisible(false);
+    Alert.alert('म्यूजिक सिलेक्ट हुआ', `गाना '${song.title}' अब आपकी मीडिया पर बज रहा है!`);
+  };
+
+  const handleSeekAudio = (secondsDelta) => {
+    let nextTime = audioOffset + secondsDelta;
+    if (nextTime < 0) nextTime = 0;
+    setAudioOffset(nextTime);
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.seek(nextTime);
     }
   };
 
-  return (
-    <View style={styles.container}>
-      
-      {/* ⚙️ SETTINGS POPUP MODAL (पहली बार आने वाला पॉप-अप) */}
-      <Modal visible={isSettingsVisible} animationType="fade" transparent={true}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>⚙️ Trial Setup Keys</Text>
-            <Text style={styles.modalSubtitle}>यह पॉप-अप केवल पहली बार दिखेगा।</Text>
+  // ------------------------------------------
+  // FEED INTERACTION HANDLERS
+  // ------------------------------------------
+  const toggleLikePost = (postId) => {
+    setLikedPosts((prev) => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
 
-            <TextInput 
-              style={styles.input} placeholder="Agora App ID" placeholderTextColor="#aaa"
-              value={appIdKey} onChangeText={setAppIdKey} 
-            />
-            <TextInput 
-              style={styles.input} placeholder="Agora Token Key" placeholderTextColor="#aaa"
-              value={tokenKey} onChangeText={setTokenKey} 
-            />
-            <TextInput 
-              style={styles.input} placeholder="Channel Name" placeholderTextColor="#aaa"
-              value={channelKey} onChangeText={setChannelKey} 
-            />
-            <TextInput 
-              style={styles.input} placeholder="Main API Key" placeholderTextColor="#aaa"
-              value={apiKey} onChangeText={setApiKey} secureTextEntry={true}
-            />
+  const toggleSavePost = (postId) => {
+    setSavedPosts((prev) => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSaveSettings}>
-              <Text style={styles.saveButtonText}>Save & Launch App</Text>
+  const openCommentsModal = (post) => {
+    setActivePostId(post.id);
+    setActivePostComments(post.comments);
+    setIsCommentsVisible(true);
+  };
+
+  const handleAddComment = () => {
+    if (!newCommentText.trim()) return;
+    const newCommentObj = {
+      id: `c_${Date.now()}`,
+      user: 'tarun_official',
+      text: newCommentText.trim()
+    };
+    const updatedComments = [...activePostComments, newCommentObj];
+    setActivePostComments(updatedComments);
+
+    // Update main posts list state
+    setPosts((prevPosts) =>
+      prevPosts.map((p) => (p.id === activePostId ? { ...p, comments: updatedComments } : p))
+    );
+
+    setNewCommentText('');
+  };
+
+  const formatTime = (secs) => {
+    const mins = Math.floor(secs / 60);
+    const remSecs = secs % 60;
+    return `${mins < 10 ? '0' : ''}${mins}:${remSecs < 10 ? '0' : ''}${remSecs}`;
+  };
+
+  // ==========================================
+  // RENDER UI COMPONENTS
+  // ==========================================
+
+  // 1. TOP HEADER BAR
+  const renderHeader = () => (
+    <View style={styles.headerContainer}>
+      <Text style={styles.headerLogoText}>Instagram</Text>
+      <View style={styles.headerIconsRow}>
+        <TouchableOpacity style={styles.iconButton} onPress={() => setIsMusicModalVisible(true)}>
+          <Text style={styles.emojiIcon}>🎵</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => {
+            setCallType('audio');
+            setInCall(true);
+          }}
+        >
+          <Text style={styles.emojiIcon}>📞</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => {
+            setCallType('video');
+            setInCall(true);
+          }}
+        >
+          <Text style={styles.emojiIcon}>📹</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton} onPress={() => setIsSettingsVisible(true)}>
+          <Text style={styles.emojiIcon}>⚙️</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  // 2. STORIES TRAY
+  const renderStoriesBar = () => (
+    <View style={styles.storiesContainer}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {INITIAL_STORIES.map((story) => (
+          <View key={story.id} style={styles.storyWrapper}>
+            <View style={[styles.storyRing, story.isUser && styles.userStoryRing]}>
+              <Image source={{ uri: story.avatar }} style={styles.storyAvatar} />
+              {story.isUser && (
+                <View style={styles.addStoryPlus}>
+                  <Text style={styles.plusText}>+</Text>
+                </View>
+              )}
+            </View>
+            <Text style={styles.storyUsername} numberOfLines={1}>
+              {story.user}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
+
+  // 3. POST CARD COMPONENT
+  const renderPostCard = ({ item }) => {
+    const isLiked = !!likedPosts[item.id];
+    const isSaved = !!savedPosts[item.id];
+
+    return (
+      <View style={styles.postCardContainer}>
+        {/* Post Header */}
+        <View style={styles.postHeader}>
+          <View style={styles.userInfoRow}>
+            <Image source={{ uri: item.userAvatar }} style={styles.postUserAvatar} />
+            <View>
+              <Text style={styles.postUsernameText}>{item.username}</Text>
+              <Text style={styles.postLocationText}>{item.location}</Text>
+            </View>
+          </View>
+          <TouchableOpacity>
+            <Text style={styles.threeDotsText}>•••</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Media Player View (Video or Image) */}
+        <View style={styles.postMediaBox}>
+          {item.type === 'video' ? (
+            <Video
+              source={{ uri: item.mediaUrl }}
+              style={styles.postMedia}
+              resizeMode="cover"
+              repeat={true}
+              muted={false}
+            />
+          ) : (
+            <Image source={{ uri: item.mediaUrl }} style={styles.postMedia} resizeMode="cover" />
+          )}
+
+          {/* Music Badge Overlay on Top Left of Media */}
+          {selectedSong && (
+            <View style={styles.mediaMusicOverlay}>
+              <Text style={styles.musicOverlayText}>
+                🎶 {selectedSong.title} • {selectedSong.artist}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Post Action Buttons */}
+        <View style={styles.postActionsRow}>
+          <View style={styles.leftActionsRow}>
+            <TouchableOpacity onPress={() => toggleLikePost(item.id)} style={styles.actionBtn}>
+              <Text style={styles.actionIcon}>{isLiked ? '❤️' : '🤍'}</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => openCommentsModal(item)} style={styles.actionBtn}>
+              <Text style={styles.actionIcon}>💬</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionBtn}>
+              <Text style={styles.actionIcon}>✈️</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity onPress={() => toggleSavePost(item.id)}>
+            <Text style={styles.actionIcon}>{isSaved ? '🏷️' : '🔖'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Post Caption & Details */}
+        <View style={styles.postDetailsContainer}>
+          <Text style={styles.likesText}>
+            {isLiked ? item.likesCount + 1 : item.likesCount} likes
+          </Text>
+          <Text style={styles.captionText}>
+            <Text style={styles.captionUsername}>{item.username} </Text>
+            {item.caption}
+          </Text>
+
+          {item.comments.length > 0 && (
+            <TouchableOpacity onPress={() => openCommentsModal(item)}>
+              <Text style={styles.viewCommentsText}>
+                View all {item.comments.length} comments
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          <Text style={styles.timestampText}>{item.timestamp}</Text>
+        </View>
+      </View>
+    );
+  };
+
+  // 4. REELS VIEW (FULL SCREEN REELS ENGINE)
+  const renderReelsTab = () => (
+    <FlatList
+      data={INITIAL_REELS}
+      keyExtractor={(item) => item.id}
+      pagingEnabled
+      showsVerticalScrollIndicator={false}
+      renderItem={({ item }) => (
+        <View style={styles.reelContainer}>
+          <Video
+            source={{ uri: item.videoUrl }}
+            style={styles.reelVideo}
+            resizeMode="cover"
+            repeat={true}
+          />
+          {/* Reel Overlay Info */}
+          <View style={styles.reelOverlayBottom}>
+            <View style={styles.reelUserRow}>
+              <Image source={{ uri: item.userAvatar }} style={styles.reelAvatar} />
+              <Text style={styles.reelUsername}>{item.username}</Text>
+              <TouchableOpacity style={styles.reelFollowBtn}>
+                <Text style={styles.reelFollowTxt}>Follow</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.reelCaption}>{item.caption}</Text>
+            <View style={styles.reelMusicRow}>
+              <Text style={styles.reelMusicText}>🎶 {item.songTitle}</Text>
+            </View>
+          </View>
+
+          {/* Reel Right Action Sidebar */}
+          <View style={styles.reelRightSidebar}>
+            <TouchableOpacity style={styles.reelActionItem}>
+              <Text style={styles.reelActionIcon}>❤️</Text>
+              <Text style={styles.reelActionCount}>{item.likes}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.reelActionItem}>
+              <Text style={styles.reelActionIcon}>💬</Text>
+              <Text style={styles.reelActionCount}>{item.commentsCount}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.reelActionItem}>
+              <Text style={styles.reelActionIcon}>✈️</Text>
+              <Text style={styles.reelActionCount}>Share</Text>
+            </TouchableOpacity>
+            <View style={styles.reelsDiskDisc}>
+              <Text style={styles.diskEmoji}>💿</Text>
+            </View>
+          </View>
+        </View>
+      )}
+    />
+  );
+
+  // 5. SEARCH & EXPLORE GRID VIEW
+  const renderSearchTab = () => {
+    const gridItems = Array.from({ length: 15 }).map((_, index) => ({
+      id: `grid_${index}`,
+      uri: `https://picsum.photos/id/${100 + index}/300/300`
+    }));
+
+    return (
+      <View style={styles.searchTabContainer}>
+        <View style={styles.searchBarBox}>
+          <Text style={styles.searchBarIcon}>🔍</Text>
+          <TextInput
+            style={styles.searchBarInput}
+            placeholder="Search accounts, tags, audio..."
+            placeholderTextColor="#888"
+          />
+        </View>
+
+        <FlatList
+          data={gridItems}
+          keyExtractor={(item) => item.id}
+          numColumns={3}
+          renderItem={({ item }) => (
+            <Image source={{ uri: item.uri }} style={styles.gridImageTile} />
+          )}
+        />
+      </View>
+    );
+  };
+
+  // 6. PROFILE TAB VIEW
+  const renderProfileTab = () => (
+    <ScrollView style={styles.profileContainer}>
+      <View style={styles.profileHeader}>
+        <Image source={{ uri: 'https://picsum.photos/id/64/150/150' }} style={styles.profileBigAvatar} />
+        <View style={styles.profileStatsRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>18</Text>
+            <Text style={styles.statLabel}>Posts</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>4.2K</Text>
+            <Text style={styles.statLabel}>Followers</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>350</Text>
+            <Text style={styles.statLabel}>Following</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.bioSection}>
+        <Text style={styles.profileNameText}>Tarun | Full-Stack AI Apps</Text>
+        <Text style={styles.bioText}>🚀 Founder at Viziag Global & Elight Cleaning</Text>
+        <Text style={styles.bioText}>💻 Mobile App Automation | Jet Black India</Text>
+        <Text style={styles.bioLink}>📍 Faridabad, Haryana</Text>
+      </View>
+
+      <View style={styles.profileButtonsRow}>
+        <TouchableOpacity style={styles.editProfileBtn}>
+          <Text style={styles.editProfileTxt}>Edit Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.editProfileBtn} onPress={() => setIsSettingsVisible(true)}>
+          <Text style={styles.editProfileTxt}>API Keys & Setup</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* User Post Grid */}
+      <View style={styles.profileGridHeader}>
+        <Text style={styles.gridTabTitleActive}>▦ Posts</Text>
+        <Text style={styles.gridTabTitle}>🎬 Reels</Text>
+        <Text style={styles.gridTabTitle}>🏷️ Tagged</Text>
+      </View>
+
+      <View style={styles.profileGridWrap}>
+        {Array.from({ length: 9 }).map((_, i) => (
+          <Image
+            key={i}
+            source={{ uri: `https://picsum.photos/id/${210 + i}/300/300` }}
+            style={styles.profileGridTile}
+          />
+        ))}
+      </View>
+    </ScrollView>
+  );
+
+  // ------------------------------------------
+  // RENDER MAIN SCREEN LAYOUT
+  // ------------------------------------------
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" backgroundColor="#000" />
+
+      {/* BACKGROUND REAL AUDIO PLAYER ENGINE */}
+      {selectedSong && (
+        <Video
+          ref={audioPlayerRef}
+          source={{ uri: selectedSong.url }}
+          audioOnly={true}
+          paused={!isPlayingAudio}
+          playInBackground={true}
+          ignoreSilentSwitch="ignore"
+        />
+      )}
+
+      {/* ACTIVE CALL OVERLAY SCREEN */}
+      {inCall ? (
+        <View style={styles.fullCallOverlay}>
+          <Text style={styles.callTypeTitle}>
+            {callType === 'video' ? '📹 Instagram Video Call' : '📞 Instagram Voice Call'}
+          </Text>
+          <Text style={styles.callTimerText}>{formatTime(callDuration)}</Text>
+
+          <View style={styles.callAvatarFrame}>
+            {callType === 'video' && !isCameraOff ? (
+              <Video
+                source={{ uri: 'https://www.w3schools.com/html/mov_bbb.mp4' }}
+                style={styles.fullCallVideo}
+                resizeMode="cover"
+                repeat={true}
+              />
+            ) : (
+              <Image
+                source={{ uri: 'https://picsum.photos/id/1011/300/300' }}
+                style={styles.callBigAvatar}
+              />
+            )}
+          </View>
+
+          <View style={styles.callControlsRow}>
+            <TouchableOpacity
+              style={[styles.callControlCircle, isMuted && styles.controlActiveRed]}
+              onPress={() => setIsMuted(!isMuted)}
+            >
+              <Text style={styles.callControlIcon}>{isMuted ? '🔇' : '🎙️'}</Text>
+            </TouchableOpacity>
+
+            {callType === 'video' && (
+              <TouchableOpacity
+                style={[styles.callControlCircle, isCameraOff && styles.controlActiveRed]}
+                onPress={() => setIsCameraOff(!isCameraOff)}
+              >
+                <Text style={styles.callControlIcon}>{isCameraOff ? '📷❌' : '📹'}</Text>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity style={styles.endCallCircle} onPress={() => setInCall(false)}>
+              <Text style={styles.endCallIcon}>📵</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
+        /* MAIN NAVIGATION CONTROLLER */
+        <View style={styles.mainWrapper}>
+          {currentTab === 'Home' && (
+            <View style={{ flex: 1 }}>
+              {renderHeader()}
+
+              {/* MUSIC CONTROLLER BAR (If Song Selected) */}
+              {selectedSong && (
+                <View style={styles.musicStickyPlayerBar}>
+                  <Text style={styles.stickyMusicTitle} numberOfLines={1}>
+                    🎶 {selectedSong.title} (Offset: {audioOffset}s)
+                  </Text>
+                  <View style={styles.stickyControlsRow}>
+                    <TouchableOpacity style={styles.miniBtn} onPress={() => handleSeekAudio(-5)}>
+                      <Text style={styles.miniBtnTxt}>-5s</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.miniBtn}
+                      onPress={() => setIsPlayingAudio(!isPlayingAudio)}
+                    >
+                      <Text style={styles.miniBtnTxt}>{isPlayingAudio ? '⏸️' : '▶️'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.miniBtn} onPress={() => handleSeekAudio(5)}>
+                      <Text style={styles.miniBtnTxt}>+5s</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+
+              <FlatList
+                data={posts}
+                keyExtractor={(item) => item.id}
+                ListHeaderComponent={renderStoriesBar}
+                renderItem={renderPostCard}
+                showsVerticalScrollIndicator={false}
+              />
+            </View>
+          )}
+
+          {currentTab === 'Search' && renderSearchTab()}
+          {currentTab === 'Reels' && renderReelsTab()}
+          {currentTab === 'Profile' && renderProfileTab()}
+
+          {/* BOTTOM TAB BAR */}
+          <View style={styles.bottomTabBar}>
+            <TouchableOpacity onPress={() => setCurrentTab('Home')}>
+              <Text style={styles.tabIcon}>{currentTab === 'Home' ? '🏠' : '🏚️'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setCurrentTab('Search')}>
+              <Text style={styles.tabIcon}>{currentTab === 'Search' ? '🔍' : '🔎'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setCurrentTab('Reels')}>
+              <Text style={styles.tabIcon}>{currentTab === 'Reels' ? '🎬' : '🎞️'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setCurrentTab('Profile')}>
+              <Text style={styles.tabIcon}>{currentTab === 'Profile' ? '👤' : '👤'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* ========================================== */}
+      {/* MODAL 1: SEARCH & ADD MUSIC MODAL          */}
+      {/* ========================================== */}
+      <Modal visible={isMusicModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalDarkOverlay}>
+          <View style={styles.musicModalSheet}>
+            <View style={styles.modalHeaderRow}>
+              <Text style={styles.modalTitleText}>🎵 Search & Add Music</Text>
+              <TouchableOpacity onPress={() => setIsMusicModalVisible(false)}>
+                <Text style={styles.closeModalTxt}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TextInput
+              style={styles.modalSearchInput}
+              placeholder="Search MP3 tracks, artists..."
+              placeholderTextColor="#777"
+              value={searchSongQuery}
+              onChangeText={handleSearchSong}
+            />
+
+            <FlatList
+              data={filteredSongsList}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.songCardRow,
+                    selectedSong?.id === item.id && styles.selectedSongCardRow
+                  ]}
+                  onPress={() => handleSelectSong(item)}
+                >
+                  <View style={styles.songMetaLeft}>
+                    <Text style={styles.songCardTitle}>🎶 {item.title}</Text>
+                    <Text style={styles.songCardArtist}>
+                      {item.artist} • {item.duration}
+                    </Text>
+                  </View>
+                  <Text style={styles.selectSongBadge}>
+                    {selectedSong?.id === item.id ? 'Playing 🎧' : 'Apply'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
           </View>
         </View>
       </Modal>
 
-      {/* 📞 CALL SCREEN */}
-      {inCall ? (
-        <View style={styles.callScreen}>
-          <Text style={styles.callHeaderTitle}>
-            {callType === 'video' ? '📹 Video Call Connected' : '📞 Audio Call Connected'}
-          </Text>
-          <View style={styles.videoBox}>
-            <Text style={styles.callingText}>Connecting stream securely...</Text>
-          </View>
-          <TouchableOpacity style={styles.endCallButton} onPress={() => setInCall(false)}>
-            <Text style={styles.endCallText}>End Call</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        /* 📱 MAIN INSTAGRAM INTERFACE */
-        <View style={{ flex: 1 }}>
-          
-          {/* Top Header */}
-          <View style={styles.header}>
-            <Text style={styles.logoText}>Instagram Trial</Text>
-            <View style={styles.callIconsRow}>
-              <TouchableOpacity onPress={() => { setCallType('audio'); setInCall(true); }} style={styles.iconBtn}>
-                <Text style={styles.iconText}>📞</Text>
+      {/* ========================================== */}
+      {/* MODAL 2: COMMENTS BOTTOM SHEET MODAL       */}
+      {/* ========================================== */}
+      <Modal visible={isCommentsVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalDarkOverlay}>
+          <View style={styles.commentsModalSheet}>
+            <View style={styles.modalHeaderRow}>
+              <Text style={styles.modalTitleText}>💬 Comments</Text>
+              <TouchableOpacity onPress={() => setIsCommentsVisible(false)}>
+                <Text style={styles.closeModalTxt}>✕</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => { setCallType('video'); setInCall(true); }} style={styles.iconBtn}>
-                <Text style={styles.iconText}>📹</Text>
+            </View>
+
+            <FlatList
+              data={activePostComments}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.commentRowItem}>
+                  <Text style={styles.commentUserText}>{item.user}</Text>
+                  <Text style={styles.commentBodyText}>{item.text}</Text>
+                </View>
+              )}
+            />
+
+            <View style={styles.addCommentBar}>
+              <TextInput
+                style={styles.commentInput}
+                placeholder="Add a comment as tarun_official..."
+                placeholderTextColor="#666"
+                value={newCommentText}
+                onChangeText={setNewCommentText}
+              />
+              <TouchableOpacity onPress={handleAddComment} style={styles.postCommentBtn}>
+                <Text style={styles.postCommentBtnTxt}>Post</Text>
               </TouchableOpacity>
             </View>
           </View>
-
-          {/* Body Feed Content */}
-          {currentTab === 'Home' && (
-            <ScrollView style={styles.bodyScroll}>
-              
-              {/* Media Preview (चाहे आप फोटो डालें या वीडियो, गाना इसके साथ रियल प्ले होगा) */}
-              <View style={styles.mediaContainer}>
-                {mediaType === 'video' ? (
-                  <Video source={{ uri: mediaUri }} style={styles.mediaView} resizeMode="cover" repeat={true} />
-                ) : (
-                  <Image source={{ uri: mediaUri }} style={styles.mediaView} />
-                )}
-              </View>
-
-              {/* 🎵 REAL AUDIO PLAYBACK ENGINE (असली गाना बजाने वाला कंपोनेंट) */}
-              {selectedSong && (
-                <Video 
-                  ref={audioRef}
-                  source={{ uri: selectedSong.url }}
-                  audioOnly={true}
-                  paused={!isPlayingAudio}
-                  playInBackground={true}
-                  onError={(e) => console.log("Audio Error:", e)}
-                />
-              )}
-
-              {/* 🔍 Song Search & Selection Section */}
-              <View style={styles.musicSection}>
-                <Text style={styles.sectionTitle}>🎵 सर्च करें और गाने को मीडिया पर लगाएं</Text>
-                
-                {/* सर्च बार */}
-                <TextInput 
-                  style={styles.searchInput}
-                  placeholder="गाना सर्च करें (जैसे: Upbeat, Chill, Pop)..."
-                  placeholderTextColor="#888"
-                  value={songQuery}
-                  onChangeText={handleSearchSongs}
-                />
-
-                {/* गानों की लिस्ट */}
-                <FlatList 
-                  data={filteredSongs}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity 
-                      style={[styles.songCard, selectedSong?.id === item.id && styles.selectedSongCard]}
-                      onPress={() => {
-                        setSelectedSong(item);
-                        setIsPlayingAudio(true);
-                        Alert.alert("म्यूजिक लग गया", `गाना '${item.title}' अब बज रहा है!`);
-                      }}
-                    >
-                      <Text style={styles.songTitleText}>🎶 {item.title}</Text>
-                      <Text style={styles.selectText}>{selectedSong?.id === item.id ? 'Playing...' : 'Select'}</Text>
-                    </TouchableOpacity>
-                  )}
-                  scrollEnabled={false}
-                />
-
-                {/* 🎛️ Audio Offset & Trim Controls (गाना आगे-पीछे सेट करने के लिए) */}
-                {selectedSong && (
-                  <View style={styles.audioControlsBox}>
-                    <Text style={styles.audioControlLabel}>गाना टाइमिंग (Offset): {audioOffset} सेकण्ड</Text>
-                    <View style={styles.offsetRow}>
-                      <TouchableOpacity style={styles.smallBtn} onPress={() => handleSeekAudio(-5)}>
-                        <Text style={styles.btnTxt}>-5s पीछे</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.smallBtn} onPress={() => setIsPlayingAudio(!isPlayingAudio)}>
-                        <Text style={styles.btnTxt}>{isPlayingAudio ? '⏸️ पॉज़ करें' : '▶️ प्ले करें'}</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.smallBtn} onPress={() => handleSeekAudio(5)}>
-                        <Text style={styles.btnTxt}>+5s आगे</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                )}
-              </View>
-
-            </ScrollView>
-          )}
-
-          {/* Bottom Navigation Bar */}
-          <View style={styles.bottomNav}>
-            <TouchableOpacity onPress={() => setCurrentTab('Home')}><Text style={styles.navIcon}>🏠</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => setCurrentTab('Search')}><Text style={styles.navIcon}>🔍</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => setCurrentTab('Reels')}><Text style={styles.navIcon}>🎬</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => setCurrentTab('Profile')}><Text style={styles.navIcon}>👤</Text></TouchableOpacity>
-          </View>
-
         </View>
-      )}
-    </View>
+      </Modal>
+
+      {/* ========================================== */}
+      {/* MODAL 3: AGORA & API KEYS SETUP MODAL      */}
+      {/* ========================================== */}
+      <Modal visible={isSettingsVisible} animationType="fade" transparent={true}>
+        <View style={styles.modalDarkOverlay}>
+          <View style={styles.settingsModalCard}>
+            <Text style={styles.settingsTitle}>⚙️ Config & API Keys</Text>
+            <Text style={styles.settingsSubtitle}>
+              पहली बार सेटिंग्स भरें। यह आपके लोकल स्टोरेज (AsyncStorage) में सुरक्षित सेव रहेगा।
+            </Text>
+
+            <TextInput
+              style={styles.keyInput}
+              placeholder="Agora App ID"
+              placeholderTextColor="#888"
+              value={appIdKey}
+              onChangeText={setAppIdKey}
+            />
+            <TextInput
+              style={styles.keyInput}
+              placeholder="Agora Token Key"
+              placeholderTextColor="#888"
+              value={tokenKey}
+              onChangeText={setTokenKey}
+            />
+            <TextInput
+              style={styles.keyInput}
+              placeholder="Channel Name"
+              placeholderTextColor="#888"
+              value={channelKey}
+              onChangeText={setChannelKey}
+            />
+            <TextInput
+              style={styles.keyInput}
+              placeholder="Main AI / Backend API Key"
+              placeholderTextColor="#888"
+              value={apiKey}
+              onChangeText={setApiKey}
+              secureTextEntry={true}
+            />
+
+            <TouchableOpacity style={styles.saveKeysButton} onPress={handleSaveSettings}>
+              <Text style={styles.saveKeysBtnText}>Save Configuration</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.cancelKeysButton}
+              onPress={() => setIsSettingsVisible(false)}
+            >
+              <Text style={styles.cancelKeysBtnText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
   );
 }
 
+// ==========================================
+// COMPREHENSIVE INSTAGRAM DARK THEME STYLES
+// ==========================================
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { width: '85%', backgroundColor: '#1c1c1c', padding: 20, borderRadius: 12, borderWidth: 1, borderColor: '#333' },
-  modalTitle: { color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 5, textAlign: 'center' },
-  modalSubtitle: { color: '#aaa', fontSize: 13, marginBottom: 20, textAlign: 'center' },
-  input: { backgroundColor: '#2a2a2a', color: '#fff', padding: 12, borderRadius: 8, marginBottom: 12, fontSize: 14 },
-  saveButton: { backgroundColor: '#0095f6', padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 5 },
-  saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  
-  header: { height: 55, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 15, borderBottomWidth: 0.5, borderBottomColor: '#222' },
-  logoText: { color: '#fff', fontSize: 20, fontWeight: 'bold', fontStyle: 'italic' },
-  callIconsRow: { flexDirection: 'row' },
-  iconBtn: { marginLeft: 15 },
-  iconText: { fontSize: 20 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#000000'
+  },
+  mainWrapper: {
+    flex: 1,
+    backgroundColor: '#000000'
+  },
 
-  bodyScroll: { flex: 1 },
-  mediaContainer: { width: width, height: 320, backgroundColor: '#111', justifyContent: 'center', alignItems: 'center' },
-  mediaView: { width: '100%', height: '100%' },
+  // 1. Header Styles
+  headerContainer: {
+    height: 52,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    borderBottomWidth: 0.3,
+    borderBottomColor: '#262626',
+    backgroundColor: '#000000'
+  },
+  headerLogoText: {
+    color: '#ffffff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    letterSpacing: -0.5
+  },
+  headerIconsRow: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  iconButton: {
+    marginLeft: 14
+  },
+  emojiIcon: {
+    fontSize: 20
+  },
 
-  musicSection: { padding: 15, backgroundColor: '#121212' },
-  sectionTitle: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginBottom: 10 },
-  searchInput: { backgroundColor: '#222', color: '#fff', padding: 10, borderRadius: 6, marginBottom: 10, fontSize: 13 },
-  songCard: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#1a1a1a', padding: 12, borderRadius: 6, marginBottom: 6, alignItems: 'center' },
-  selectedSongCard: { backgroundColor: '#003366', borderColor: '#0095f6', borderWidth: 1 },
-  songTitleText: { color: '#fff', fontSize: 13, flex: 1 },
-  selectText: { color: '#0095f6', fontWeight: 'bold', fontSize: 12, marginLeft: 10 },
+  // 2. Stories Bar Styles
+  storiesContainer: {
+    paddingVertical: 10,
+    borderBottomWidth: 0.3,
+    borderBottomColor: '#262626',
+    backgroundColor: '#000000'
+  },
+  storyWrapper: {
+    alignItems: 'center',
+    marginHorizontal: 8,
+    width: 72
+  },
+  storyRing: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    borderWidth: 2.5,
+    borderColor: '#c13584',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  userStoryRing: {
+    borderColor: '#333333'
+  },
+  storyAvatar: {
+    width: 58,
+    height: 58,
+    borderRadius: 29
+  },
+  addStoryPlus: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#0095f6',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#000000'
+  },
+  plusText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: 'bold'
+  },
+  storyUsername: {
+    color: '#cccccc',
+    fontSize: 11,
+    marginTop: 4,
+    textAlign: 'center'
+  },
 
-  audioControlsBox: { marginTop: 15, padding: 10, backgroundColor: '#1f1f1f', borderRadius: 8 },
-  audioControlLabel: { color: '#aaa', textAlign: 'center', marginBottom: 8, fontSize: 12 },
-  offsetRow: { flexDirection: 'row', justifyContent: 'space-around' },
-  smallBtn: { backgroundColor: '#333', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 6 },
-  btnTxt: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
+  // 3. Post Card Styles
+  postCardContainer: {
+    marginBottom: 15,
+    backgroundColor: '#000000'
+  },
+  postHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8
+  },
+  userInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  postUserAvatar: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    marginRight: 10
+  },
+  postUsernameText: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: 'bold'
+  },
+  postLocationText: {
+    color: '#999999',
+    fontSize: 11
+  },
+  threeDotsText: {
+    color: '#ffffff',
+    fontSize: 16,
+    letterSpacing: 2
+  },
+  postMediaBox: {
+    width: SCREEN_WIDTH,
+    height: 380,
+    backgroundColor: '#111111',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  postMedia: {
+    width: '100%',
+    height: '100%'
+  },
+  mediaMusicOverlay: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15
+  },
+  musicOverlayText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '600'
+  },
+  postActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 10
+  },
+  leftActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  actionBtn: {
+    marginRight: 16
+  },
+  actionIcon: {
+    fontSize: 22
+  },
+  postDetailsContainer: {
+    paddingHorizontal: 12
+  },
+  likesText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 13,
+    marginBottom: 4
+  },
+  captionText: {
+    color: '#ffffff',
+    fontSize: 13,
+    lineHeight: 18
+  },
+  captionUsername: {
+    fontWeight: 'bold'
+  },
+  viewCommentsText: {
+    color: '#888888',
+    fontSize: 12,
+    marginTop: 5
+  },
+  timestampText: {
+    color: '#555555',
+    fontSize: 10,
+    marginTop: 4
+  },
 
-  callScreen: { flex: 1, backgroundColor: '#111', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  callHeaderTitle: { color: '#fff', fontSize: 22, fontWeight: 'bold', marginBottom: 30 },
-  videoBox: { width: '100%', height: 400, backgroundColor: '#222', justifyContent: 'center', alignItems: 'center', borderRadius: 12, marginBottom: 30 },
-  callingText: { color: '#aaa', fontSize: 16 },
-  endCallButton: { backgroundColor: '#ff3b30', paddingVertical: 12, paddingHorizontal: 30, borderRadius: 25 },
-  endCallText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  // 4. Reels View Styles
+  reelContainer: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT - 110,
+    backgroundColor: '#000000',
+    justifyContent: 'flex-end'
+  },
+  reelVideo: {
+    ...StyleSheet.absoluteFillObject
+  },
+  reelOverlayBottom: {
+    padding: 15,
+    marginBottom: 20,
+    width: '80%'
+  },
+  reelUserRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8
+  },
+  reelAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8
+  },
+  reelUsername: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginRight: 10
+  },
+  reelFollowBtn: {
+    borderWidth: 1,
+    borderColor: '#ffffff',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2
+  },
+  reelFollowTxt: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: 'bold'
+  },
+  reelCaption: {
+    color: '#ffffff',
+    fontSize: 13,
+    marginBottom: 6
+  },
+  reelMusicRow: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  reelMusicText: {
+    color: '#dddddd',
+    fontSize: 12
+  },
+  reelRightSidebar: {
+    position: 'absolute',
+    right: 15,
+    bottom: 40,
+    alignItems: 'center'
+  },
+  reelActionItem: {
+    alignItems: 'center',
+    marginBottom: 20
+  },
+  reelActionIcon: {
+    fontSize: 26
+  },
+  reelActionCount: {
+    color: '#ffffff',
+    fontSize: 12,
+    marginTop: 3
+  },
+  reelsDiskDisc: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#222',
+    justify: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff'
+  },
+  diskEmoji: {
+    fontSize: 14
+  },
 
-  bottomNav: { height: 50, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', borderTopWidth: 0.5, borderTopColor: '#222', backgroundColor: '#000' },
-  navIcon: { fontSize: 22 }
+  // 5. Search & Grid Styles
+  searchTabContainer: {
+    flex: 1,
+    backgroundColor: '#000000'
+  },
+  searchBarBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#262626',
+    margin: 10,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 38
+  },
+  searchBarIcon: {
+    fontSize: 14,
+    marginRight: 8
+  },
+  searchBarInput: {
+    color: '#ffffff',
+    fontSize: 13,
+    flex: 1
+  },
+  gridImageTile: {
+    width: SCREEN_WIDTH / 3 - 2,
+    height: SCREEN_WIDTH / 3 - 2,
+    margin: 1
+  },
+
+  // 6. Profile Styles
+  profileContainer: {
+    flex: 1,
+    backgroundColor: '#000000'
+  },
+  profileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingTop: 15
+  },
+  profileBigAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40
+  },
+  profileStatsRow: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginLeft: 15
+  },
+  statBox: {
+    alignItems: 'center'
+  },
+  statNumber: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  statLabel: {
+    color: '#aaaaaa',
+    fontSize: 12
+  },
+  bioSection: {
+    paddingHorizontal: 15,
+    paddingVertical: 10
+  },
+  profileNameText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 14
+  },
+  bioText: {
+    color: '#dddddd',
+    fontSize: 13,
+    marginTop: 2
+  },
+  bioLink: {
+    color: '#e0e0e0',
+    fontSize: 12,
+    marginTop: 2
+  },
+  profileButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    marginVertical: 10
+  },
+  editProfileBtn: {
+    flex: 0.48,
+    backgroundColor: '#262626',
+    paddingVertical: 8,
+    borderRadius: 6,
+    alignItems: 'center'
+  },
+  editProfileTxt: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 13
+  },
+  profileGridHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    borderTopWidth: 0.3,
+    borderTopColor: '#262626',
+    borderBottomWidth: 0.3,
+    borderBottomColor: '#262626',
+    paddingVertical: 10,
+    marginTop: 10
+  },
+  gridTabTitleActive: {
+    color: '#0095f6',
+    fontWeight: 'bold'
+  },
+  gridTabTitle: {
+    color: '#777777'
+  },
+  profileGridWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
+  profileGridTile: {
+    width: SCREEN_WIDTH / 3 - 2,
+    height: SCREEN_WIDTH / 3 - 2,
+    margin: 1
+  },
+
+  // 7. Sticky Music Player & Controls
+  musicStickyPlayerBar: {
+    backgroundColor: '#1a1a1a',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#333333'
+  },
+  stickyMusicTitle: {
+    color: '#0095f6',
+    fontSize: 12,
+    fontWeight: 'bold',
+    flex: 0.6
+  },
+  stickyControlsRow: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  miniBtn: {
+    backgroundColor: '#333333',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginLeft: 6
+  },
+  miniBtnTxt: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: 'bold'
+  },
+
+  // 8. Calling Overlay Styles
+  fullCallOverlay: {
+    flex: 1,
+    backgroundColor: '#111111',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 50
+  },
+  callTypeTitle: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  callTimerText: {
+    color: '#0095f6',
+    fontSize: 16,
+    marginTop: 5
+  },
+  callAvatarFrame: {
+    width: 250,
+    height: 350,
+    borderRadius: 20,
+    backgroundColor: '#222222',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  fullCallVideo: {
+    width: '100%',
+    height: '100%'
+  },
+  callBigAvatar: {
+    width: 140,
+    height: 140,
+    borderRadius: 70
+  },
+  callControlsRow: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  callControlCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#333333',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 12
+  },
+  controlActiveRed: {
+    backgroundColor: '#ff3b30'
+  },
+  callControlIcon: {
+    fontSize: 22
+  },
+  endCallCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#ff3b30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 12
+  },
+  endCallIcon: {
+    fontSize: 26
+  },
+
+  // 9. Bottom Navigation Bar Styles
+  bottomTabBar: {
+    height: 48,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: '#000000',
+    borderTopWidth: 0.3,
+    borderTopColor: '#262626'
+  },
+  tabIcon: {
+    fontSize: 22
+  },
+
+  // 10. Modals Base Styles
+  modalDarkOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'flex-end'
+  },
+  musicModalSheet: {
+    height: '75%',
+    backgroundColor: '#1c1c1c',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 15
+  },
+  commentsModalSheet: {
+    height: '65%',
+    backgroundColor: '#1c1c1c',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 15
+  },
+  modalHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12
+  },
+  modalTitleText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  closeModalTxt: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  modalSearchInput: {
+    backgroundColor: '#2a2a2a',
+    color: '#ffffff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 40,
+    marginBottom: 12
+  },
+  songCardRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#262626',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8
+  },
+  selectedSongCardRow: {
+    borderColor: '#0095f6',
+    borderWidth: 1,
+    backgroundColor: '#002244'
+  },
+  songMetaLeft: {
+    flex: 0.8
+  },
+  songCardTitle: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 13
+  },
+  songCardArtist: {
+    color: '#888888',
+    fontSize: 11,
+    marginTop: 2
+  },
+  selectSongBadge: {
+    color: '#0095f6',
+    fontWeight: 'bold',
+    fontSize: 12
+  },
+  commentRowItem: {
+    paddingVertical: 8,
+    borderBottomWidth: 0.3,
+    borderBottomColor: '#333'
+  },
+  commentUserText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 12
+  },
+  commentBodyText: {
+    color: '#dddddd',
+    fontSize: 13,
+    marginTop: 2
+  },
+  addCommentBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10
+  },
+  commentInput: {
+    flex: 1,
+    backgroundColor: '#2a2a2a',
+    color: '#ffffff',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    height: 40,
+    fontSize: 13
+  },
+  postCommentBtn: {
+    marginLeft: 10
+  },
+  postCommentBtnTxt: {
+    color: '#0095f6',
+    fontWeight: 'bold',
+    fontSize: 14
+  },
+
+  // 11. Key Settings Modal Styles
+  settingsModalCard: {
+    backgroundColor: '#1c1c1c',
+    margin: 20,
+    borderRadius: 12,
+    padding: 20,
+    alignSelf: 'center',
+    width: '90%'
+  },
+  settingsTitle: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 6,
+    textAlign: 'center'
+  },
+  settingsSubtitle: {
+    color: '#aaaaaa',
+    fontSize: 12,
+    marginBottom: 16,
+    textAlign: 'center'
+  },
+  keyInput: {
+    backgroundColor: '#2a2a2a',
+    color: '#ffffff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 42,
+    marginBottom: 10,
+    fontSize: 13
+  },
+  saveKeysButton: {
+    backgroundColor: '#0095f6',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10
+  },
+  saveKeysBtnText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 14
+  },
+  cancelKeysButton: {
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginTop: 5
+  },
+  cancelKeysBtnText: {
+    color: '#888888',
+    fontSize: 13
+  }
 });
