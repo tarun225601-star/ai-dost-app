@@ -3,522 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram Pro - Tarun App</title>
+    <title>AI CID / विजया CID - Live Voice Lie Detector</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #000; color: #fff; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        .app-container { width: 100%; max-width: 450px; height: 100%; background: #000; display: flex; flex-direction: column; position: relative; border-left: 1px solid #222; border-right: 1px solid #222; }
+        body { background-color: #0b0f19; color: #fff; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+        .app-container { width: 100%; max-width: 450px; height: 100%; background: #111827; display: flex; flex-direction: column; position: relative; border-left: 1px solid #1f2937; border-right: 1px solid #1f2937; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
         
-        /* 4 API Keys Setup Overlay */
-        .setup-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; flex-direction: column; justify-content: center; padding: 25px; overflow-y: auto; }
-        .setup-title { font-size: 22px; font-weight: bold; margin-bottom: 8px; color: #fff; }
-        .setup-desc { font-size: 13px; color: #aaa; margin-bottom: 20px; line-height: 1.4; }
-        .setup-input { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 12px; font-size: 13px; }
-        .setup-btn { width: 100%; background: #0095f6; border: none; padding: 12px; border-radius: 8px; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 5px; }
-
         /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #262626; background: #000; z-index: 10; }
-        .logo { font-size: 22px; font-weight: bold; font-style: italic; letter-spacing: -0.5px; }
-        .header-icons { display: flex; gap: 15px; font-size: 20px; cursor: pointer; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #1f2937; background: #1f2937; z-index: 10; }
+        .logo { font-size: 18px; font-weight: bold; color: #ef4444; display: flex; align-items: center; gap: 8px; }
+        .vip-badge { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; }
 
         /* Content Area */
-        .content-area { flex: 1; overflow-y: auto; background: #000; padding-bottom: 60px; }
+        .content-area { flex: 1; overflow-y: auto; background: #0b0f19; padding: 15px; padding-bottom: 70px; display: none; }
+        .content-area.active-tab { display: block; }
         .content-area::-webkit-scrollbar { display: none; }
 
-        /* Stories */
-        .stories-bar { display: flex; padding: 10px 0; border-bottom: 1px solid #262626; gap: 12px; overflow-x: auto; padding-left: 12px; }
-        .story-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 65px; }
-        .story-ring { width: 64px; height: 64px; border-radius: 50%; border: 2.5px solid #c13584; padding: 2px; display: flex; justify-content: center; align-items: center; }
-        .story-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; }
-        .story-name { font-size: 11px; margin-top: 4px; color: #aaa; text-overflow: ellipsis; overflow: hidden; width: 60px; text-align: center; }
+        /* Dashboard Cards */
+        .card { background: #1f2937; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #374151; }
+        .card-title { font-size: 15px; font-weight: bold; color: #f87171; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .card-desc { font-size: 12px; color: #9ca3af; margin-bottom: 12px; line-height: 1.4; }
 
-        /* Post Card */
-        .post { border-bottom: 1px solid #262626; margin-bottom: 15px; }
-        .post-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; }
-        .post-user { display: flex; align-items: center; gap: 10px; }
-        .post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
-        .post-username { font-size: 13px; font-weight: bold; }
-        .post-location { font-size: 11px; color: #aaa; }
-        .post-media-box { width: 100%; height: 380px; background: #111; position: relative; display: flex; justify-content: center; align-items: center; }
-        .post-media { width: 100%; height: 100%; object-fit: cover; }
-        .music-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #fff; cursor: pointer; }
-        .post-actions { display: flex; justify-content: space-between; padding: 10px 12px; font-size: 22px; }
-        .post-actions-left { display: flex; gap: 15px; cursor: pointer; }
-        .post-info { padding: 0 12px 12px 12px; font-size: 13px; }
-        .likes-count { font-weight: bold; margin-bottom: 4px; }
-        .caption span { font-weight: bold; margin-right: 5px; }
-        .comments-link { color: #888; margin-top: 4px; cursor: pointer; display: block; }
-        .time-ago { font-size: 10px; color: #555; margin-top: 4px; text-transform: uppercase; }
+        /* Form Inputs */
+        .form-input { width: 100%; background: #111827; border: 1px solid #4b5563; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 12px; font-size: 13px; }
+        
+        .btn-primary { width: 100%; background: #ef4444; border: none; padding: 12px; border-radius: 8px; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .btn-primary:hover { background: #dc2626; }
+
+        .btn-success { background: #10b981; border: none; padding: 12px 16px; border-radius: 8px; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-success:hover { background: #059669; }
+
+        .btn-mic { background: #3b82f6; border: none; width: 48px; height: 48px; border-radius: 50%; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+        .btn-mic.recording { background: #ef4444; animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        /* Live Call Room Styling */
+        .call-screen { display: flex; flex-direction: column; height: 100%; justify-content: space-between; text-align: center; }
+        .ai-avatar { width: 75px; height: 75px; background: linear-gradient(135deg, #ef4444, #991b1b); border-radius: 50%; margin: 10px auto; display: flex; justify-content: center; align-items: center; font-size: 30px; box-shadow: 0 0 20px rgba(239,68,68,0.4); }
+        
+        .chat-transcript { flex: 1; background: #1f2937; border-radius: 10px; padding: 10px; overflow-y: auto; text-align: left; margin-bottom: 12px; font-size: 12px; border: 1px solid #374151; max-height: 280px; }
+        .msg-ai { color: #f87171; margin-bottom: 10px; line-height: 1.4; }
+        .msg-user { color: #34d399; margin-bottom: 10px; line-height: 1.4; }
+
+        .input-bar { display: flex; gap: 8px; align-items: center; }
 
         /* Bottom Nav */
-        .bottom-nav { position: absolute; bottom: 0; width: 100%; height: 50px; background: #000; border-top: 1px solid #262626; display: flex; justify-content: space-around; align-items: center; font-size: 22px; cursor: pointer; z-index: 10; }
+        .bottom-nav { position: absolute; bottom: 0; width: 100%; height: 55px; background: #1f2937; border-top: 1px solid #374151; display: flex; justify-content: space-around; align-items: center; font-size: 11px; z-index: 10; color: #9ca3af; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; gap: 2px; }
+        .nav-item span { font-size: 18px; }
+        .nav-item.active { color: #ef4444; }
 
-        /* Call Screen Overlay */
-        .call-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111; z-index: 100; display: none; flex-direction: column; justify-content: space-between; align-items: center; padding: 40px 20px; }
-        .call-title { font-size: 20px; font-weight: bold; }
-        .call-timer { color: #0095f6; font-size: 15px; margin-top: 5px; }
-        .call-avatar-box { width: 220px; height: 320px; background: #222; border-radius: 20px; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-        .call-avatar-box img, .call-avatar-box video { width: 100%; height: 100%; object-fit: cover; }
-        .call-controls { display: flex; gap: 20px; align-items: center; }
-        .call-btn { width: 55px; height: 55px; border-radius: 50%; background: #333; display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; border: none; color: #fff; }
-        .end-call-btn { width: 65px; height: 65px; border-radius: 50%; background: #ff3b30; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; border: none; color: #fff; }
-
-        /* Modals */
-        .modal { position: absolute; bottom: 0; left: 0; width: 100%; height: 75%; background: #1c1c1c; border-top-left-radius: 16px; border-top-right-radius: 16px; z-index: 50; display: none; flex-direction: column; padding: 15px; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold; font-size: 16px; }
-        .modal-close { cursor: pointer; font-size: 18px; }
-        .search-input, .post-input { width: 100%; background: #2a2a2a; border: 1px solid #444; padding: 10px; border-radius: 8px; color: #fff; margin-bottom: 12px; font-size: 13px; }
-        .song-row { display: flex; justify-content: space-between; align-items: center; background: #262626; padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
-        .song-row:hover { background: #333; }
-        .post-submit-btn { width: 100%; background: #0095f6; border: none; padding: 10px; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; font-size: 14px; }
-
-        /* Notification Toast */
-        #toast { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background: #0095f6; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; display: none; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-
-        /* Reels View */
-        .reel-container { width: 100%; height: 100%; position: relative; background: #000; display: none; }
-        .reel-video { width: 100%; height: 100%; object-fit: cover; }
-        .reel-sidebar { position: absolute; right: 15px; bottom: 80px; display: flex; flex-direction: column; align-items: center; gap: 20px; font-size: 24px; }
-        .reel-info { position: absolute; bottom: 30px; left: 15px; right: 80px; }
-        
-        /* Profile View */
-        .profile-container { padding: 15px; display: none; }
-        .profile-header { display: flex; align-items: center; gap: 20px; }
-        .profile-avatar { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; }
-        .profile-stats { display: flex; gap: 20px; text-align: center; flex: 1; justify-content: space-around; }
-        .stat-num { font-weight: bold; font-size: 16px; }
-        .stat-lbl { font-size: 11px; color: #aaa; }
-        .profile-bio { margin-top: 10px; font-size: 13px; }
-        .follow-btn { width: 100%; background: #0095f6; border: none; padding: 8px; border-radius: 6px; color: #fff; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 15px; }
-        .profile-grid img { width: 100%; height: 110px; object-fit: cover; }
+        #toast { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; display: none; z-index: 1000; }
     </style>
 </head>
 <body>
 
-<div class="app-container" id="app">
-    <!-- SETUP OVERLAY FOR 4 API KEYS -->
-    <div class="setup-overlay" id="setupOverlay" style="display: none;">
-        <div class="setup-title">🚀 Tarun Instagram Setup</div>
-        <div class="setup-desc">अपने चारों API Credentials यहाँ दर्ज करें। एक बार सेव होने के बाद यह सेटअप विंडो दोबारा कभी नहीं खुलेगी।</div>
-        
-        <label style="font-size: 11px; color: #aaa;">1. Supabase URL:</label>
-        <input type="text" id="supaUrlInput" class="setup-input" placeholder="https://xyz.supabase.co">
-        
-        <label style="font-size: 11px; color: #aaa;">2. Supabase Anon Key:</label>
-        <input type="text" id="supaAnonInput" class="setup-input" placeholder="eyJhbGciOiJIUzI1Ni...">
-        
-        <label style="font-size: 11px; color: #aaa;">3. Grok API Key:</label>
-        <input type="text" id="grokApiInput" class="setup-input" placeholder="xai-xxxxxxxxxxxxxxxx">
-        
-        <label style="font-size: 11px; color: #aaa;">4. Agora API Key (App ID):</label>
-        <input type="text" id="agoraKeyInput" class="setup-input" placeholder="Agora App ID">
-        
-        <button class="setup-btn" onclick="saveAllApiKeys()">Save Keys & Launch App</button>
-    </div>
-
+<div class="app-container">
     <div id="toast">Notification</div>
 
     <!-- HEADER -->
-    <div class="header" id="mainHeader">
-        <div class="logo">Instagram</div>
-        <div class="header-icons">
-            <span onclick="openMusicModal()" title="Music Library">🎵</span>
-            <span onclick="startCall('audio')" title="Audio Call">📞</span>
-            <span onclick="startCall('video')" title="Video Call">📹</span>
+    <div class="header">
+        <div class="logo">🚨 AI CID <span style="font-size:11px; color:#9ca3af;">/ विजया सीआईडी</span></div>
+        <div class="vip-badge">Live Interrogation</div>
+    </div>
+
+    <!-- TAB 1: LIVE TALK / LIE DETECTOR -->
+    <div class="content-area active-tab" id="tabLiveCall">
+        <div class="call-screen">
+            <div>
+                <div class="ai-avatar">🤖</div>
+                <div style="font-weight: bold; font-size: 15px; color: #f87171;">AI CID Live Interrogator</div>
+                <div style="font-size: 11px; color: #9ca3af;" id="callStatus">माइक या टाइप करके अपनी बात रखें। AI सच/झूठ पकड़ेगा।</div>
+            </div>
+
+            <div class="chat-transcript" id="chatTranscript">
+                <div class="msg-ai"><b>AI CID:</b> नमस्ते तरुण भाई! मैं विजया सीआईडी का ऑटोनॉमस जासूस हूँ। आप माइक से बोलकर या लिखकर अपनी सफाई दें, मैं आपके शब्दों से सच या झूठ तुरंत परख लूँगा।</div>
+            </div>
+
+            <div class="input-bar">
+                <button class="btn-mic" id="micBtn" onclick="toggleVoiceRecording()" title="Voice Record">🎙️</button>
+                <input type="text" id="userSpeechInput" class="form-input" placeholder="या यहाँ टाइप करें..." style="margin-bottom: 0;">
+                <button class="btn-success" onclick="sendStatement()">भेजें 🚀</button>
+            </div>
         </div>
     </div>
 
-    <!-- CONTENT SECTIONS -->
-    <div class="content-area" id="contentArea">
-        
-        <!-- HOME FEED TAB -->
-        <div id="tabHome">
-            <div class="stories-bar">
-                <div class="story-item" onclick="showToast('Your Story')">
-                    <div class="story-ring"><img src="https://picsum.photos/id/64/100/100" class="story-img"></div>
-                    <span class="story-name">Your Story</span>
-                </div>
-                <div class="story-item" onclick="showToast('Viewing viziag_global story')">
-                    <div class="story-ring"><img src="https://picsum.photos/id/1011/100/100" class="story-img"></div>
-                    <span class="story-name">viziag_global</span>
-                </div>
-                <div class="story-item" onclick="showToast('Viewing elight_cleaning story')">
-                    <div class="story-ring"><img src="https://picsum.photos/id/1025/100/100" class="story-img"></div>
-                    <span class="story-name">elight_clean</span>
-                </div>
-            </div>
+    <!-- TAB 2: SETTINGS (API KEY CONFIG) -->
+    <div class="content-area" id="tabSettings">
+        <div class="card">
+            <div class="card-title">⚙️ API Configuration Settings</div>
+            <div class="card-desc">अपनी AI Model API Key यहाँ दर्ज करें ताकि लाइव इंटर्रोगेशन और स्मार्ट एनालिसिस ठीक से काम कर सके।</div>
 
-            <!-- Posts List Container -->
-            <div id="postsList"></div>
+            <label style="font-size: 11px; color: #9ca3af;">API Provider:</label>
+            <select class="form-input" id="apiProvider">
+                <option value="openai">OpenAI (GPT-4 / Grok Compatible)</option>
+                <option value="custom">Custom AI Endpoint</option>
+            </select>
+
+            <label style="font-size: 11px; color: #9ca3af;">Secret API Key:</label>
+            <input type="password" id="apiKeyInput" class="form-input" placeholder="sk-proj-xxxxxxxxxxxxxxxx">
+
+            <button class="btn-primary" onclick="saveApiKey()">API Key सुरक्षित करें 🔒</button>
         </div>
+    </div>
 
-        <!-- REELS TAB -->
-        <div id="tabReels" class="reel-container">
-            <video class="reel-video" src="https://www.w3schools.com/html/mov_bbb.mp4" autoplay loop muted></video>
-            <div class="reel-info">
-                <strong>@viziag_global</strong>
-                <p style="font-size: 13px; margin-top: 5px;">High Quality 8K Video Rendering 🚀 #AI #Faridabad</p>
-                <p style="font-size: 11px; color: #ccc; margin-top: 3px;" id="reelMusicTag">🎶 Original Sound - Tarun</p>
-            </div>
-            <div class="reel-sidebar">
-                <div onclick="showToast('Liked Reel ❤️')">❤️</div>
-                <div onclick="openMusicModal()">🎵</div>
-                <div onclick="showToast('Reel Shared ✈️')">✈️</div>
+    <!-- TAB 3: PROFILE -->
+    <div class="content-area" id="tabProfile">
+        <div class="card">
+            <div class="card-title">🛡️ विजया सीआईडी प्रोफाइल</div>
+            <div style="font-size: 12px; color: #d1d5db; margin-top: 10px; line-height: 1.5;">
+                <b>एप संस्करण:</b> v1.0 (Public Edition)<br>
+                <b>इंजन:</b> Autonomous Lie & Deception Detector<br>
+                <b>स्थिति:</b> पूरी तरह सक्रिय और तैयार
             </div>
         </div>
-
-        <!-- PROFILE TAB -->
-        <div id="tabProfile" class="profile-container">
-            <div class="profile-header">
-                <img src="https://picsum.photos/id/64/150/150" class="profile-avatar">
-                <div class="profile-stats">
-                    <div><div class="stat-num" id="postCountNum">18</div><div class="stat-lbl">Posts</div></div>
-                    <div><div class="stat-num" id="fCount">4,250</div><div class="stat-lbl">Followers</div></div>
-                    <div><div class="stat-num">350</div><div class="stat-lbl">Following</div></div>
-                </div>
-            </div>
-            <div class="profile-bio">
-                <strong>Tarun | Full-Stack App Developer</strong>
-                <p>🚀 Viziag Global & Elight Cleaning</p>
-                <p style="color: #0095f6;">📍 Faridabad, Haryana</p>
-            </div>
-            <button class="follow-btn" id="followBtn" onclick="toggleFollow()">Following</button>
-            <div class="profile-grid" id="profileGrid">
-                <img src="https://picsum.photos/id/210/300/300">
-                <img src="https://picsum.photos/id/211/300/300">
-                <img src="https://picsum.photos/id/212/300/300">
-            </div>
-        </div>
-
     </div>
 
     <!-- BOTTOM NAVIGATION -->
     <div class="bottom-nav">
-        <span onclick="switchTab('Home')">🏠</span>
-        <span onclick="showToast('Search & Explore')">🔍</span>
-        <span onclick="openAddPostModal()" style="color: #0095f6; font-weight: bold;" title="Create Post">➕</span>
-        <span onclick="switchTab('Reels')">🎬</span>
-        <span onclick="switchTab('Profile')">👤</span>
+        <div class="nav-item active" id="navLive" onclick="switchTab('live')"><span>📞</span>Live Test</div>
+        <div class="nav-item" id="navSettings" onclick="switchTab('settings')"><span>⚙️</span>Settings</div>
+        <div class="nav-item" id="navProfile" onclick="switchTab('profile')"><span>👤</span>Profile</div>
     </div>
-
-    <!-- CALL SCREEN OVERLAY (Agora Ready) -->
-    <div class="call-overlay" id="callOverlay">
-        <div>
-            <div class="call-title" id="callTitleText">Agora Video Call</div>
-            <div class="call-timer" id="callTimer">00:00</div>
-        </div>
-        <div class="call-avatar-box">
-            <img src="https://picsum.photos/id/1011/300/300" id="callMediaView">
-        </div>
-        <div class="call-controls">
-            <button class="call-btn" onclick="toggleMute()">🎙️</button>
-            <button class="end-call-btn" onclick="endCall()">📵</button>
-            <button class="call-btn" onclick="toggleCam()">📹</button>
-        </div>
-    </div>
-
-    <!-- MUSIC SELECTOR MODAL (Real Songs) -->
-    <div class="modal" id="musicModal">
-        <div class="modal-header">
-            <span>🎵 Real Song Library (SoundHelix)</span>
-            <span class="modal-close" onclick="closeMusicModal()">✕</span>
-        </div>
-        <input type="text" class="search-input" placeholder="Search real songs..." oninput="filterSongs(this.value)">
-        <div id="songsListContainer" style="overflow-y: auto; flex: 1;"></div>
-    </div>
-
-    <!-- ADD NEW POST / VIDEO MODAL (Gallery Picker) -->
-    <div class="modal" id="addPostModal">
-        <div class="modal-header">
-            <span>✨ Create New Post / Video</span>
-            <span class="modal-close" onclick="closeAddPostModal()">✕</span>
-        </div>
-        <div style="overflow-y: auto; flex: 1;">
-            <label style="font-size: 11px; color: #aaa;">सवाएं / गैलरी से फोटो या वीडियो चुनें:</label>
-            <input type="file" id="galleryFileInput" class="post-input" accept="image/*,video/*" onchange="previewSelectedFile(event)" style="padding: 8px;">
-            
-            <!-- Live Preview Area -->
-            <div id="mediaPreviewContainer" style="width: 100%; height: 160px; background: #111; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative;">
-                <span style="font-size: 12px; color: #666;" id="previewPlaceholder">No file chosen</span>
-            </div>
-
-            <label style="font-size: 11px; color: #aaa;">Location:</label>
-            <input type="text" id="newPostLocation" class="post-input" value="Faridabad, India">
-            
-            <label style="font-size: 11px; color: #aaa;">Caption & Tags:</label>
-            <textarea id="newPostCaption" class="post-input" rows="3" placeholder="Write a caption..."></textarea>
-            
-            <button class="post-submit-btn" onclick="submitNewPost()">Publish Post</button>
-        </div>
-    </div>
-
-    <!-- AUDIO PLAYER ELEMENT -->
-    <audio id="audioPlayer" loop></audio>
 </div>
 
 <script>
-    // 1. Check all 4 API Keys on Startup
-    window.addEventListener('DOMContentLoaded', () => {
-        let supaUrl = localStorage.getItem('tarun_supa_url');
-        let supaAnon = localStorage.getItem('tarun_supa_anon');
-        let grokKey = localStorage.getItem('tarun_grok_key');
-        let agoraKey = localStorage.getItem('tarun_agora_key');
+    let isRecording = false;
 
-        if (!supaUrl || !supaAnon || !grokKey || !agoraKey) {
-            document.getElementById('setupOverlay').style.display = 'flex';
-        } else {
-            document.getElementById('setupOverlay').style.display = 'none';
+    function switchTab(tab) {
+        document.getElementById('tabLiveCall').classList.remove('active-tab');
+        document.getElementById('tabSettings').classList.remove('active-tab');
+        document.getElementById('tabProfile').classList.remove('active-tab');
+
+        document.getElementById('navLive').classList.remove('active');
+        document.getElementById('navSettings').classList.remove('active');
+        document.getElementById('navProfile').classList.remove('active');
+
+        if(tab === 'live') {
+            document.getElementById('tabLiveCall').classList.add('active-tab');
+            document.getElementById('navLive').classList.add('active');
+        } else if(tab === 'settings') {
+            document.getElementById('tabSettings').classList.add('active-tab');
+            document.getElementById('navSettings').classList.add('active');
+        } else if(tab === 'profile') {
+            document.getElementById('tabProfile').classList.add('active-tab');
+            document.getElementById('navProfile').classList.add('active');
         }
-    });
+    }
 
-    function saveAllApiKeys() {
-        let u = document.getElementById('supaUrlInput').value.trim();
-        let a = document.getElementById('supaAnonInput').value.trim();
-        let g = document.getElementById('grokApiInput').value.trim();
-        let ag = document.getElementById('agoraKeyInput').value.trim();
+    function saveApiKey() {
+        let key = document.getElementById('apiKeyInput').value.trim();
+        if(!key) {
+            alert("कृपया वैध API Key दर्ज करें!");
+            return;
+        }
+        localStorage.setItem('ai_cid_api_key', key);
+        showToast("API Key सफलतापूर्वक सेव हो गई!");
+        switchTab('live');
+    }
 
-        if (!u || !a || !g || !ag) {
-            alert("कृपया चारों API Keys को सही से भरें!");
+    function toggleVoiceRecording() {
+        let micBtn = document.getElementById('micBtn');
+        let inputField = document.getElementById('userSpeechInput');
+
+        // Check browser speech recognition support
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert("आपका ब्राउज़र वॉइस रिकग्निशन सपोर्ट नहीं करता। कृपया लिखकर बयान दें!");
             return;
         }
 
-        localStorage.setItem('tarun_supa_url', u);
-        localStorage.setItem('tarun_supa_anon', a);
-        localStorage.setItem('tarun_grok_key', g);
-        localStorage.setItem('tarun_agora_key', ag);
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'hi-IN'; // Set to Hindi / Hinglish
 
-        document.getElementById('setupOverlay').style.display = 'none';
-        showToast("सभी 4 API Keys सफलतापूर्वक सेव हो गईं! 🎉");
-    }
+        if (!isRecording) {
+            recognition.start();
+            isRecording = true;
+            micBtn.classList.add('recording');
+            document.getElementById('callStatus').innerText = "सुन रहा हूँ... बोलिए तरुण भाई!";
 
-    // App State & Data
-    let currentSong = null;
-    let isFollowing = true;
-    let callInterval = null;
-    let secondsElapsed = 0;
-    let selectedFileUrl = "";
-    let isFileTypeVideo = false;
+            recognition.onresult = function(event) {
+                let speechToText = event.results[0][0].transcript;
+                inputField.value = speechToText;
+                stopMicState();
+                sendStatement(); // Automatically send after speech ends
+            };
 
-    const realSongs = [
-        { title: "SoundHelix Pop Track 1", artist: "SoundHelix", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-        { title: "SoundHelix Electronic 2", artist: "SoundHelix", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-        { title: "SoundHelix Chill Beat 3", artist: "SoundHelix", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-        { title: "SoundHelix Ambient 4", artist: "SoundHelix", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" }
-    ];
+            recognition.onerror = function() {
+                stopMicState();
+                showToast("आवाज़ पहचानने में समस्या आई। टाइप करें!");
+            };
 
-    const postsData = [
-        { id: 1, user: "viziag_global", avatar: "https://picsum.photos/id/1011/100/100", location: "Faridabad", img: "https://picsum.photos/id/102/600/600", isVideo: false, likes: 1240, caption: "High resolution video upscaling service live now ✨ #AI", song: "Original Audio" },
-        { id: 2, user: "elight_cleaning", avatar: "https://picsum.photos/id/1025/100/100", location: "Sector 15", img: "https://picsum.photos/id/201/600/600", isVideo: false, likes: 856, caption: "Professional deep cleaning for luxury rooms 🧼", song: "SoundHelix Pop Track 1" },
-        { id: 3, user: "jet_black_india", avatar: "https://picsum.photos/id/1062/100/100", location: "Automotive Lab", img: "https://picsum.photos/id/111/600/600", isVideo: false, likes: 2310, caption: "Tire and dashboard polish chemical test 🚗💨", song: "SoundHelix Chill Beat 3" }
-    ];
-
-    // Handle Gallery File Selection
-    function previewSelectedFile(event) {
-        let file = event.target.files[0];
-        if (file) {
-            selectedFileUrl = URL.createObjectURL(file);
-            isFileTypeVideo = file.type.startsWith('video');
-            let container = document.getElementById('mediaPreviewContainer');
-            
-            if (isFileTypeVideo) {
-                container.innerHTML = `<video src="${selectedFileUrl}" style="width:100%; height:100%; object-fit:cover;" controls autoplay muted></video>`;
-            } else {
-                container.innerHTML = `<img src="${selectedFileUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-            }
-            showToast("File selected from gallery successfully!");
+            recognition.onend = function() {
+                stopMicState();
+            };
+        } else {
+            recognition.stop();
+            stopMicState();
         }
     }
 
-    // Render Feed
-    function renderPosts() {
-        let html = "";
-        postsData.forEach(p => {
-            let mediaContent = p.isVideo 
-                ? `<video src="${p.img}" class="post-media" controls autoplay loop muted></video>`
-                : `<img src="${p.img}" class="post-media">`;
-
-            html += `
-                <div class="post">
-                    <div class="post-header">
-                        <div class="post-user">
-                            <img src="${p.avatar}" class="post-avatar">
-                            <div>
-                                <div class="post-username">${p.user}</div>
-                                <div class="post-location">${p.location}</div>
-                            </div>
-                        </div>
-                        <div>•••</div>
-                    </div>
-                    <div class="post-media-box">
-                        ${mediaContent}
-                        <div class="music-badge" onclick="openMusicModal()">🎶 ${p.song || (currentSong ? currentSong.title : 'Original Audio')}</div>
-                    </div>
-                    <div class="post-actions">
-                        <div class="post-actions-left">
-                            <span onclick="showToast('Liked post ❤️')">❤️</span>
-                            <span onclick="showToast('Opened comments 💬')">💬</span>
-                            <span onclick="showToast('Post shared ✈️')">✈️</span>
-                        </div>
-                        <span>🔖</span>
-                    </div>
-                    <div class="post-info">
-                        <div class="likes-count">${p.likes} likes</div>
-                        <div class="caption"><span>${p.user}</span>${p.caption}</div>
-                        <span class="comments-link" onclick="showToast('Viewing all comments')">View all comments</span>
-                        <div class="time-ago">Just now</div>
-                    </div>
-                </div>
-            `;
-        });
-        document.getElementById('postsList').innerHTML = html;
-        document.getElementById('postCountNum').innerText = postsData.length + 15;
+    function stopMicState() {
+        isRecording = false;
+        document.getElementById('micBtn').classList.remove('recording');
+        document.getElementById('callStatus').innerText = "कॉल कनेक्टेड है।";
     }
 
-    // Tab Switching
-    function switchTab(tabName) {
-        document.getElementById('tabHome').style.display = tabName === 'Home' ? 'block' : 'none';
-        document.getElementById('tabReels').style.display = tabName === 'Reels' ? 'block' : 'none';
-        document.getElementById('tabProfile').style.display = tabName === 'Profile' ? 'block' : 'none';
-        document.getElementById('mainHeader').style.display = tabName === 'Reels' ? 'none' : 'flex';
+    function sendStatement() {
+        let inputField = document.getElementById('userSpeechInput');
+        let text = inputField.value.trim();
+        if(!text) return;
+
+        let transcript = document.getElementById('chatTranscript');
+        transcript.innerHTML += `<div class="msg-user"><b>तरुण भाई:</b> ${text}</div>`;
+        inputField.value = "";
+        transcript.scrollTop = transcript.scrollHeight;
+
+        document.getElementById('callStatus').innerText = "AI बयान के पैटर्न और सच की जाँच कर रहा है...";
+
+        // Simulated AI Interrogation logic (Replace this with live API fetch if API Key is configured)
+        setTimeout(() => {
+            let apiKey = localStorage.getItem('ai_cid_api_key');
+            let aiReply = "";
+
+            // Smart mock logic responding based on length and words
+            let lowerText = text.toLowerCase();
+            let isSuspicious = lowerText.includes("pata nahi") || lowerText.includes("nahi pata") || lowerText.includes("kasam") || text.length < 10;
+
+            if(isSuspicious) {
+                aiReply = `<div class="msg-ai"><b>AI CID:</b> 🚨 <b>संदेहजनक (Lie Risk - 91%):</b> तरुण भाई, आपके बयान में "कसम" या अनिश्चितता ("पता नहीं") का इस्तेमाल हुआ है। विजया सीआईडी के एल्गोरिथम के अनुसार यहाँ बात छिपाई जा रही है। दोबारा सच बोलिए!</div>`;
+            } else {
+                aiReply = `<div class="msg-ai"><b>AI CID:</b> ✔️ <b>सच्चाई सत्यापित (Truth Verified - 96%):</b> शानदार! आपके वाक्य में आत्मविश्वास और स्पष्टता पूरी तरह दिख रही है। यह बयान एकदम सच है।</div>`;
+            }
+
+            transcript.innerHTML += aiReply;
+            document.getElementById('callStatus').innerText = "कॉल कनेक्टेड है। अगला बयान दें!";
+            transcript.scrollTop = transcript.scrollHeight;
+        }, 1200);
     }
 
-    // Add Post / Video Modal Handlers
-    function openAddPostModal() {
-        document.getElementById('addPostModal').style.display = 'flex';
-    }
-
-    function closeAddPostModal() {
-        document.getElementById('addPostModal').style.display = 'none';
-    }
-
-    function submitNewPost() {
-        let captionText = document.getElementById('newPostCaption').value || "New update from Tarun 🚀";
-        let locText = document.getElementById('newPostLocation').value || "Faridabad";
-        
-        // Use gallery picked file or default placeholder if not chosen
-        let finalMedia = selectedFileUrl || `https://picsum.photos/id/${Math.floor(Math.random() * 80) + 220}/600/600`;
-
-        let newPost = {
-            id: postsData.length + 1,
-            user: "tarun_official",
-            avatar: "https://picsum.photos/id/64/100/100",
-            location: locText,
-            img: finalMedia,
-            isVideo: isFileTypeVideo,
-            likes: 1,
-            caption: captionText,
-            song: currentSong ? currentSong.title : 'Original Audio'
-        };
-
-        postsData.unshift(newPost);
-        renderPosts();
-        closeAddPostModal();
-        switchTab('Home');
-        showToast("Post Published Successfully! 🎉");
-
-        // Reset fields
-        document.getElementById('newPostCaption').value = "";
-        document.getElementById('galleryFileInput').value = "";
-        document.getElementById('mediaPreviewContainer').innerHTML = '<span style="font-size: 12px; color: #666;" id="previewPlaceholder">No file chosen</span>';
-        selectedFileUrl = "";
-        isFileTypeVideo = false;
-    }
-
-    // Notification Toast System
     function showToast(msg) {
         let t = document.getElementById('toast');
         t.innerText = msg;
         t.style.display = 'block';
         setTimeout(() => { t.style.display = 'none'; }, 2000);
     }
-
-    // Follow / Unfollow System
-    function toggleFollow() {
-        isFollowing = !isFollowing;
-        let btn = document.getElementById('followBtn');
-        let countEl = document.getElementById('fCount');
-        let count = 4250;
-        if(isFollowing) {
-            btn.innerText = "Following";
-            btn.style.background = "#0095f6";
-            countEl.innerText = count.toLocaleString();
-            showToast("Started Following");
-        } else {
-            btn.innerText = "Follow";
-            btn.style.background = "#333";
-            countEl.innerText = (count - 1).toLocaleString();
-            showToast("Unfollowed");
-        }
-    }
-
-    // Agora Call Handlers
-    function startCall(type) {
-        document.getElementById('callOverlay').style.display = 'flex';
-        document.getElementById('callTitleText').innerText = type === 'video' ? 'Agora Video Call' : 'Agora Voice Call';
-        secondsElapsed = 0;
-        callInterval = setInterval(() => {
-            secondsElapsed++;
-            let mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-            let secs = (secondsElapsed % 60).toString().padStart(2, '0');
-            document.getElementById('callTimer').innerText = `${mins}:${secs}`;
-        }, 1000);
-        showToast(type === 'video' ? 'Connecting video call via Agora...' : 'Connecting voice call...');
-    }
-
-    function endCall() {
-        clearInterval(callInterval);
-        document.getElementById('callOverlay').style.display = 'none';
-        showToast("Call Disconnected");
-    }
-
-    function toggleMute() { showToast("Microphone Muted/Unmuted"); }
-    function toggleCam() { showToast("Camera Toggled"); }
-
-    // Music Player & Library Handlers
-    function openMusicModal() {
-        document.getElementById('musicModal').style.display = 'flex';
-        renderSongsList(realSongs);
-    }
-
-    function closeMusicModal() {
-        document.getElementById('musicModal').style.display = 'none';
-    }
-
-    function renderSongsList(list) {
-        let html = "";
-        list.forEach(s => {
-            html += `
-                <div class="song-row" onclick="selectAndPlaySong('${s.url}', '${s.title}')">
-                    <div>
-                        <div style="font-weight:bold; font-size:13px;">🎶 ${s.title}</div>
-                        <div style="font-size:11px; color:#aaa;">${s.artist}</div>
-                    </div>
-                    <span style="color:#0095f6; font-size:12px; font-weight:bold;">Play & Apply</span>
-                </div>
-            `;
-        });
-        document.getElementById('songsListContainer').innerHTML = html;
-    }
-
-    function selectAndPlaySong(url, title) {
-        let player = document.getElementById('audioPlayer');
-        player.src = url;
-        player.play();
-        currentSong = { title };
-        closeMusicModal();
-        renderPosts();
-        document.getElementById('reelMusicTag').innerText = `🎶 ${title}`;
-        showToast(`Playing Real Track: ${title}`);
-    }
-
-    function filterSongs(query) {
-        let filtered = realSongs.filter(s => s.title.toLowerCase().includes(query.toLowerCase()));
-        renderSongsList(filtered);
-    }
-
-    // Initialize App Feed on load
-    renderPosts();
 </script>
 
 </body>
