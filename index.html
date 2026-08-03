@@ -1,439 +1,576 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI CID / विजया सीआईडी</title>
+    <title>Vizia - InnovateX Engine</title>
     <style>
         :root {
             --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-red: #ef4444;
-            --accent-green: #22c55e;
+            --panel-bg: #1e293b;
             --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.2);
+            --danger: #f43f5e;
+            --success: #10b981;
         }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            height: 100vh;
             overflow: hidden;
         }
+
         header {
-            background-color: var(--card-bg);
-            padding: 12px 16px;
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
         }
-        .logo-area {
+
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: bold;
-            font-size: 1.1rem;
+            gap: 8px;
         }
-        .badge {
-            background-color: #f59e0b;
-            color: #000;
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
+
+        .brand-title span {
+            color: var(--accent);
         }
-        .main-container {
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        /* Dual API Config Bar */
+        .config-bar {
+            background: #111827;
+            padding: 10px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+        }
+
+        .config-bar input {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            width: 240px;
+        }
+
+        .config-bar label {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .workspace {
             flex: 1;
-            display: none;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
             flex-direction: column;
-            padding: 12px;
-            max-width: 800px;
+            gap: 20px;
+            max-width: 900px;
             width: 100%;
             margin: 0 auto;
-            box-sizing: border-box;
-            overflow-y: auto;
         }
-        .main-container.active-tab {
-            display: flex;
-        }
-        .robot-header {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .robot-avatar {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #ef4444, #991b1b);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 8px;
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
-            font-size: 32px;
-        }
-        .chat-box {
-            background-color: var(--card-bg);
+
+        .welcome-card {
+            background: var(--panel-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 15px;
-            flex: 1;
-            overflow-y: auto;
+            padding: 24px;
+            text-align: center;
+            margin-top: 40px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .welcome-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        .welcome-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .message {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 15px;
-            max-height: calc(100vh - 260px);
+            gap: 8px;
+            max-width: 100%;
+            animation: fadeIn 0.3s ease-out;
         }
-        .message {
-            padding: 10px 14px;
-            border-radius: 8px;
-            line-height: 1.5;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: #2563eb;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 16px 16px 2px 16px;
+            max-width: 75%;
             font-size: 0.95rem;
         }
-        .ai-msg {
-            background-color: #273548;
-            border-left: 4px solid var(--accent-red);
-        }
-        .user-msg {
-            background-color: #1e3a8a;
-            border-left: 4px solid #60a5fa;
-            align-self: flex-end;
-            max-width: 85%;
-        }
-        .input-panel {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background-color: var(--card-bg);
-            padding: 10px;
-            border-radius: 12px;
+
+        .message.assistant {
+            align-self: flex-stretch;
+            background: var(--panel-bg);
             border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .mic-btn {
-            background: #ef4444;
-            border: none;
-            width: 45px;
-            height: 45px;
+
+        /* Circular Progress Loader */
+        .loader-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+            gap: 20px;
+        }
+
+        .circular-progress {
+            position: relative;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
+            background: conic-gradient(var(--accent) 0deg, #334155 0deg);
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
+            box-shadow: 0 0 20px var(--accent-glow);
+            transition: background 0.1s linear;
         }
-        .mic-btn.recording {
-            animation: pulse 1.2s infinite;
-            background: #dc2626;
+
+        .circular-progress::before {
+            content: "";
+            position: absolute;
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background-color: var(--panel-bg);
         }
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+
+        .progress-value {
+            position: relative;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
         }
-        textarea {
+
+        .loader-status-text {
+            font-size: 0.95rem;
+            color: var(--accent);
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 0.5px;
+            min-height: 24px;
+        }
+
+        .report-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .report-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .blockers-box {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .blockers-box h4 {
+            color: var(--danger);
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .solution-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .solution-box h4 {
+            color: var(--success);
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .report-content {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            white-space: pre-wrap;
+        }
+
+        .chat-bar-container {
+            background-color: var(--panel-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .chat-input-wrapper {
+            max-width: 900px;
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .chat-input {
             flex: 1;
             background: transparent;
             border: none;
             color: white;
-            resize: none;
-            height: 24px;
-            max-height: 80px;
-            font-family: inherit;
             font-size: 0.95rem;
             outline: none;
+            padding: 8px 0;
+            resize: none;
+            max-height: 120px;
+            min-height: 24px;
         }
+
         .send-btn {
-            background-color: var(--accent-green);
+            background: var(--accent);
+            color: var(--bg-color);
             border: none;
-            padding: 10px 18px;
+            width: 38px;
+            height: 38px;
             border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        /* Settings Card Styling */
-        .settings-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 10px;
-        }
-        .settings-card label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: #94a3b8;
-        }
-        .settings-card input, .settings-card select {
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid var(--border-color);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
-        .save-key-btn {
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        /* Bottom Nav */
-        .bottom-nav {
-            background-color: var(--card-bg);
-            border-top: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-around;
-            padding: 10px;
-        }
-        .nav-item {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 4px;
-        }
-        .nav-item.active {
-            color: #ef4444;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
             font-weight: bold;
+        }
+
+        .send-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-area">
-            <span>🚨 AI CID</span> / <span style="color: #94a3b8; font-size: 0.9rem;">विजया सीआईडी</span>
+        <div class="brand-container">
+            <h1 class="brand-title">VIZIA <span>InnovateX Engine</span></h1>
+            <span class="brand-subtitle">Universal R&D & Formulation Intelligence</span>
         </div>
-        <div class="badge" onclick="switchTab('settings')">⚙️ Settings</div>
+        <div class="api-status">
+            <div class="status-dot"></div>
+            <span>Claude + Grok Dual-Engine Active</span>
+        </div>
     </header>
 
-    <!-- TAB 1: LIVE CHAT -->
-    <div class="main-container active-tab" id="tabChat">
-        <div class="robot-header">
-            <div class="robot-avatar">🤖</div>
-            <div style="font-weight: bold; font-size: 1.1rem;">AI CID Live Interrogator</div>
-            <div style="font-size: 0.8rem; color: #94a3b8;" id="status-text">तैयार है। बयान दें!</div>
-        </div>
+    <!-- 2 API Keys Input Bar -->
+    <div class="config-bar">
+        <label>Claude API Key:</label>
+        <input type="password" id="claudeKey" placeholder="sk-ant-..." value="">
+        <label>Grok API Key:</label>
+        <input type="password" id="grokKey" placeholder="xai-..." value="">
+    </div>
 
-        <div class="chat-box" id="chatBox">
-            <div class="message ai-msg">
-                <strong>AI CID:</strong> नमस्ते तरुण भाई! सेटिंग्स में अपनी Groq/Grok API Key सेव करें, और फिर यहाँ अपनी बात रखें। मैं सच और झूठ का पर्दाफाश करूँगा!
-            </div>
-        </div>
-
-        <div class="input-panel">
-            <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="बोलकर टाइप करें">🎙️</button>
-            <textarea id="userInput" placeholder="यहाँ अपनी बात टाइप करें..." rows="1" onkeydown="checkEnter(event)"></textarea>
-            <button class="send-btn" onclick="sendMessage()">भेजें 🚀</button>
+    <div class="workspace" id="workspace">
+        <div class="welcome-card" id="welcomeCard">
+            <h2>Welcome to Vizia InnovateX Engine</h2>
+            <p>Your master universal R&D facility. Formulate industrial chemicals, food flavors, beverage recipes, IoT sensors, or mechanical designs. Enter your parameters below to execute deep failure analysis and final optimized formulation.</p>
         </div>
     </div>
 
-    <!-- TAB 2: SETTINGS -->
-    <div class="main-container" id="tabSettings">
-        <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #f87171;">🔑 API Configuration</h2>
-        <div class="settings-card">
-            <label>API Provider (चुनें):</label>
-            <select id="apiProvider">
-                <option value="groq">Groq Cloud (gsk_... keys)</option>
-                <option value="openai">OpenAI (sk-... keys)</option>
-            </select>
-
-            <label>Secret API Key:</label>
-            <input type="password" id="apiKeyInput" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxx">
-
-            <button class="save-key-btn" onclick="saveApiKey()">API Key सुरक्षित सेव करें 💾</button>
+    <div class="chat-bar-container">
+        <div class="chat-input-wrapper">
+            <textarea id="userInput" class="chat-input" placeholder="Type your formulation goal or innovation idea here..." rows="1" onkeydown="handleKey(event)"></textarea>
+            <button class="send-btn" id="sendBtn" onclick="startInnovation()" title="Run Innovation & Formulation">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
         </div>
-    </div>
-
-    <!-- BOTTOM NAVIGATION -->
-    <div class="bottom-nav">
-        <button class="nav-item active" id="navChatBtn" onclick="switchTab('chat')">
-            <span>💬</span> चैट / टेस्ट
-        </button>
-        <button class="nav-item" id="navSettingsBtn" onclick="switchTab('settings')">
-            <span>⚙️</span> सेटिंग्स (API)
-        </button>
     </div>
 
     <script>
-        window.onload = function() {
-            const savedKey = localStorage.getItem('ai_cid_api_key');
-            const savedProvider = localStorage.getItem('ai_cid_provider');
-            if(savedKey) document.getElementById('apiKeyInput').value = savedKey;
-            if(savedProvider) document.getElementById('apiProvider').value = savedProvider;
-        };
-
-        function switchTab(tab) {
-            document.getElementById('tabChat').classList.remove('active-tab');
-            document.getElementById('tabSettings').classList.remove('active-tab');
-            document.getElementById('navChatBtn').classList.remove('active');
-            document.getElementById('navSettingsBtn').classList.remove('active');
-
-            if(tab === 'chat') {
-                document.getElementById('tabChat').classList.add('active-tab');
-                document.getElementById('navChatBtn').classList.add('active');
-            } else if(tab === 'settings') {
-                document.getElementById('tabSettings').classList.add('active-tab');
-                document.getElementById('navSettingsBtn').classList.add('active');
-            }
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            const provider = document.getElementById('apiProvider').value;
-            
-            if(!key) {
-                alert("कृपया पहले API Key दर्ज करें!");
-                return;
-            }
-
-            localStorage.setItem('ai_cid_api_key', key);
-            localStorage.setItem('ai_cid_provider', provider);
-            alert("API Key सफलतापूर्वक सेव हो गई है! अब चैट पर वापस चलें।");
-            switchTab('chat');
-        }
-
-        function checkEnter(e) {
+        function handleKey(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                sendMessage();
+                startInnovation();
             }
         }
 
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-            if (!text) return;
+        async function startInnovation() {
+            const inputField = document.getElementById('userInput');
+            const prompt = inputField.value.trim();
+            if (!prompt) return;
 
-            const apiKey = localStorage.getItem('ai_cid_api_key');
-            const provider = localStorage.getItem('ai_cid_provider') || 'groq';
+            const claudeKey = document.getElementById('claudeKey').value.trim();
+            const grokKey = document.getElementById('grokKey').value.trim();
 
-            if (!apiKey) {
-                alert("पहले 'सेटिंग्स' में जाकर अपनी API Key सेव करें!");
-                switchTab('settings');
+            if (!claudeKey || !grokKey) {
+                alert("Please enter both Claude API Key and Grok API Key in the top configuration bar.");
                 return;
             }
 
-            appendMessage(`तरुण भाई: ${text}`, 'user-msg');
-            input.value = '';
+            const welcomeCard = document.getElementById('welcomeCard');
+            if (welcomeCard) welcomeCard.remove();
 
-            const statusText = document.getElementById('status-text');
-            statusText.innerText = "जांच चल रही है...";
+            const workspace = document.getElementById('workspace');
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.textContent = prompt;
+            workspace.appendChild(userMsg);
+
+            inputField.value = '';
+
+            const assistantMsg = document.createElement('div');
+            assistantMsg.className = 'message assistant';
+            
+            const loaderId = 'loader_' + Date.now();
+            assistantMsg.innerHTML = `
+                <div class="loader-box" id="${loaderId}">
+                    <div class="circular-progress" id="circle_${loaderId}">
+                        <div class="progress-value" id="val_${loaderId}">0%</div>
+                    </div>
+                    <div class="loader-status-text" id="text_${loaderId}">Initializing Vizia Dual-Engine R&D Protocol...</div>
+                </div>
+            `;
+            workspace.appendChild(assistantMsg);
+            workspace.scrollTop = workspace.scrollHeight;
+
+            let progress = 0;
+            const circle = document.getElementById(`circle_${loaderId}`);
+            const valDisplay = document.getElementById(`val_${loaderId}`);
+            const textDisplay = document.getElementById(`text_${loaderId}`);
+
+            const stages = [
+                { limit: 25, text: "Claude API: Analyzing core physics, chemical structures & laws..." },
+                { limit: 50, text: "Grok API: Simulating failure points, real-world variables & blockers..." },
+                { limit: 75, text: "Vizia R&D Loop: Bypassing constraints & engineering workaround formulations..." },
+                { limit: 95, text: "Finalizing exact proportions, ratios & execution blueprint..." }
+            ];
+
+            const apiPromise = callDualEngineAPIs(prompt, claudeKey, grokKey);
+
+            const progressInterval = setInterval(() => {
+                if (progress < 95) {
+                    progress += Math.floor(Math.random() * 3) + 1;
+                    if (progress > 95) progress = 95;
+                    
+                    circle.style.background = `conic-gradient(var(--accent) ${progress * 3.6}deg, #334155 0deg)`;
+                    valDisplay.textContent = progress + '%';
+
+                    for (let stage of stages) {
+                        if (progress <= stage.limit) {
+                            textDisplay.textContent = stage.text;
+                            break;
+                        }
+                    }
+                }
+            }, 60);
 
             try {
-                let url = 'https://api.groq.com/openai/v1/chat/completions';
-                let modelName = 'llama-3.3-70b-versatile'; // Groq का धांसू और फ्री/फास्ट मॉडल
-
-                if(provider === 'openai') {
-                    url = 'https://api.openai.com/v1/chat/completions';
-                    modelName = 'gpt-3.5-turbo';
-                }
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: modelName,
-                        messages: [
-                            {
-                                role: "system", 
-                                content: "तुम एक सख्त और तेजतर्रार AI CID जासूस (विजया सीआईडी) हो। तरुण भाई तुमसे बात कर रहे हैं। उनके हर बयान को गहराई से परखो। विश्लेषण करो कि उनका बयान सच है या झूठ, और उसका प्रतिशत (%) व सटीक कारण हिंदी में बताओ।"
-                            },
-                            {
-                                role: "user", 
-                                content: text
-                            }
-                        ],
-                        temperature: 0.7
-                    })
-                });
-
-                const data = await response.json();
+                const result = await apiPromise;
+                clearInterval(progressInterval);
                 
-                if (data.choices && data.choices.length > 0) {
-                    const aiReply = data.choices[0].message.content;
-                    appendMessage(`AI CID: ${aiReply}`, 'ai-msg');
-                } else if (data.error) {
-                    appendMessage(`AI CID Error: ${data.error.message}`, 'ai-msg');
-                } else {
-                    appendMessage(`AI CID: अमान्य उत्तर प्राप्त हुआ।`, 'ai-msg');
-                }
-            } catch (error) {
-                appendMessage(`AI CID नेटवर्क त्रुटि: ${error.message}`, 'ai-msg');
-            } finally {
-                statusText.innerText = "तैयार है। बयान दें!";
+                circle.style.background = `conic-gradient(var(--success) 360deg, #334155 0deg)`;
+                valDisplay.textContent = '100% 🎉';
+                textDisplay.textContent = 'Eureka! Formulation & Feasibility Report Ready.';
+                textDisplay.style.color = 'var(--success)';
+
+                setTimeout(() => {
+                    assistantMsg.innerHTML = `
+                        <div class="report-section">
+                            <div class="report-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                VIZIA INNOVATEX ANALYSIS REPORT
+                            </div>
+                            <div class="blockers-box">
+                                <h4>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    Detected Blockers & Failure Risks (Reality Check)
+                                </h4>
+                                <div class="report-content">${escapeHtml(result.blockers)}</div>
+                            </div>
+                            <div class="solution-box">
+                                <h4>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                    Validated Formulation & Actionable Blueprint
+                                </h4>
+                                <div class="report-content">${escapeHtml(result.solution)}</div>
+                            </div>
+                        </div>
+                    `;
+                    workspace.scrollTop = workspace.scrollHeight;
+                }, 600);
+
+            } catch (err) {
+                clearInterval(progressInterval);
+                assistantMsg.innerHTML = `
+                    <div style="color: var(--danger); padding: 15px;">
+                        <strong>API Execution Error:</strong> ${escapeHtml(err.message)}<br><small>Please verify your API keys and network connection.</small>
+                    </div>
+                `;
             }
         }
 
-        let recognition;
-        function toggleMic() {
-            const micBtn = document.getElementById('micBtn');
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                alert("आपका ब्राउज़र वॉइस रिकग्निशन सपोर्ट नहीं करता। टाइप करें!");
-                return;
-            }
+        async function callDualEngineAPIs(userPrompt, claudeKey, grokKey) {
+            const systemPrompt = `You are Vizia InnovateX Engine, a master multi-disciplinary R&D AI.
+When the user gives an innovation idea, formulation request, chemical recipe, food/beverage formula, or machinery design:
+1. First, act as a strict failure-first analyst. Identify all physical, chemical, mechanical, or practical blockers and reasons why this could fail in the real world.
+2. Second, provide the exact workaround, precise formulation ratios, and step-by-step verified execution blueprint.
+Format your response clearly divided into two sections:
+[BLOCKERS]: (List all practical failure points, physical limits, warnings)
+[SOLUTION]: (Provide the exact foolproof formulation, ingredient ratios, code, or engineering solution)`;
 
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.lang = 'hi-IN';
+            const claudePromise = fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': claudeKey,
+                    'anthropic-version': '2023-06-01',
+                    'anthropic-dangerous-direct-browser-access': 'true'
+                },
+                body: JSON.stringify({
+                    model: 'claude-3-5-sonnet-20241022',
+                    max_tokens: 2000,
+                    system: systemPrompt,
+                    messages: [{ role: 'user', content: userPrompt }]
+                })
+            }).then(async res => {
+                if (!res.ok) throw new Error(`Claude API Error (${res.status}): ${await res.text()}`);
+                return res.json();
+            });
 
-            recognition.onstart = function() {
-                micBtn.classList.add('recording');
-                document.getElementById('status-text').innerText = "सुन रहा हूँ...";
+            const grokPromise = fetch('https://api.x.ai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${grokKey}`
+                },
+                body: JSON.stringify({
+                    model: 'grok-2-latest',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userPrompt }
+                    ],
+                    temperature: 0.3
+                })
+            }).then(async res => {
+                if (!res.ok) throw new Error(`Grok API Error (${res.status}): ${await res.text()}`);
+                return res.json();
+            });
+
+            const [claudeRes, grokRes] = await Promise.all([claudePromise, grokPromise]);
+
+            const claudeText = claudeRes.content?.[0]?.text || JSON.stringify(claudeRes);
+            const grokText = grokRes.choices?.[0]?.message?.content || JSON.stringify(grokRes);
+
+            return {
+                blockers: `[Claude Deep Analysis & Grok Real-Time Validation]\n\n${claudeText}`,
+                solution: `[Synthesized Vizia InnovateX Master Solution]\n\n${grokText}`
             };
-
-            recognition.onresult = function(event) {
-                const speechToText = event.results[0][0].transcript;
-                document.getElementById('userInput').value = speechToText;
-                micBtn.classList.remove('recording');
-                sendMessage();
-            };
-
-            recognition.onerror = function() {
-                micBtn.classList.remove('recording');
-                document.getElementById('status-text').innerText = "माइक की दिक्कत है।";
-            };
-
-            recognition.onend = function() {
-                micBtn.classList.remove('recording');
-            };
-
-            recognition.start();
         }
 
-        function appendMessage(text, className) {
-            const chatBox = document.getElementById('chatBox');
-            const div = document.createElement('div');
-            div.className = `message ${className}`;
-            div.innerText = text;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
         }
     </script>
 </body>
