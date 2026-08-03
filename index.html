@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vizia - InnovateX Engine (Grok Edition)</title>
+    <title>Vizia - InnovateX Engine (Groq Llama Edition)</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -371,20 +371,20 @@
         </div>
         <div class="api-status">
             <div class="status-dot"></div>
-            <span>Grok-4.5 Active</span>
+            <span>Groq Llama Active</span>
         </div>
     </header>
 
     <div class="config-bar">
-        <label>Grok Key:</label>
-        <input type="password" id="grokKey" placeholder="xai-...">
+        <label>Groq Key (gsk_):</label>
+        <input type="password" id="grokKey" placeholder="gsk_...">
         <button class="save-keys-btn" onclick="saveKey()">Save Key 💾</button>
     </div>
 
     <div class="workspace" id="workspace">
         <div class="welcome-card" id="welcomeCard">
             <h2>Welcome to Vizia InnovateX Engine</h2>
-            <p>Your master universal R&D facility powered by Grok-4.5. Formulate industrial chemicals, safe repellents, food flavors, IoT sensors, or mechanical designs. Enter your parameters below to execute deep failure analysis and final optimized formulation.</p>
+            <p>Your master universal R&D facility powered by Groq Llama 3. Formulate industrial chemicals, safe repellents, food flavors, IoT sensors, or mechanical designs. Enter your parameters below to execute deep failure analysis and final optimized formulation.</p>
         </div>
     </div>
 
@@ -399,19 +399,20 @@
 
     <script>
         window.onload = function() {
-            if(localStorage.getItem('vizia_grok_key')) {
-                document.getElementById('grokKey').value = localStorage.getItem('vizia_grok_key');
+            const savedKey = localStorage.getItem('vizia_groq_key');
+            if(savedKey) {
+                document.getElementById('grokKey').value = savedKey.trim();
             }
         };
 
         function saveKey() {
             const grok = document.getElementById('grokKey').value.trim();
             if(!grok) {
-                alert("Please enter your Grok API key before saving!");
+                alert("Please enter your Groq API key before saving!");
                 return;
             }
-            localStorage.setItem('vizia_grok_key', grok);
-            alert("Grok API Key saved successfully! 🚀");
+            localStorage.setItem('vizia_groq_key', grok);
+            alert("Groq API Key saved successfully! 🚀");
         }
 
         function handleKey(e) {
@@ -429,7 +430,7 @@
             const grokKey = document.getElementById('grokKey').value.trim();
 
             if (!grokKey) {
-                alert("Please enter and save your Grok API key first.");
+                alert("Please enter and save your Groq API key first.");
                 return;
             }
 
@@ -454,7 +455,7 @@
                     <div class="circular-progress" id="circle_${loaderId}">
                         <div class="progress-value" id="val_${loaderId}">0%</div>
                     </div>
-                    <div class="loader-status-text" id="text_${loaderId}">Initializing Grok-4.5 R&D Protocol...</div>
+                    <div class="loader-status-text" id="text_${loaderId}">Initializing Groq Llama R&D Protocol...</div>
                 </div>
             `;
             workspace.appendChild(assistantMsg);
@@ -466,12 +467,12 @@
             const textDisplay = document.getElementById(`text_${loaderId}`);
 
             const stages = [
-                { limit: 30, text: "Grok-4.5: Analyzing core physics, chemical structures & safety rules..." },
+                { limit: 30, text: "Llama: Analyzing core physics, chemical structures & safety rules..." },
                 { limit: 60, text: "Simulating failure points, real-world variables & health limits..." },
                 { limit: 90, text: "Engineering foolproof workaround formulations & exact ratios..." }
             ];
 
-            const apiPromise = callGrokAPI(prompt, grokKey);
+            const apiPromise = callGroqAPI(prompt, grokKey);
 
             const progressInterval = setInterval(() => {
                 if (progress < 95) {
@@ -504,7 +505,7 @@
                         <div class="report-section">
                             <div class="report-title">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                VIZIA INNOVATEX ANALYSIS REPORT (GROK-4.5)
+                                VIZIA INNOVATEX ANALYSIS REPORT (LLAMA 3)
                             </div>
                             <div class="blockers-box">
                                 <h4>
@@ -529,14 +530,14 @@
                 clearInterval(progressInterval);
                 assistantMsg.innerHTML = `
                     <div style="color: var(--danger); padding: 15px;">
-                        <strong>API Execution Error:</strong> ${escapeHtml(err.message)}<br><small>Please verify your Grok API key and network connection.</small>
+                        <strong>API Execution Error:</strong> ${escapeHtml(err.message)}<br><small>Please verify your Groq API key and network connection.</small>
                     </div>
                 `;
             }
         }
 
-        async function callGrokAPI(userPrompt, grokKey) {
-            const systemPrompt = `You are Vizia InnovateX Engine, powered by Grok-4.5, a master multi-disciplinary R&D AI.
+        async function callGroqAPI(userPrompt, grokKey) {
+            const systemPrompt = `You are Vizia InnovateX Engine, powered by Llama 3, a master multi-disciplinary R&D AI.
 When the user gives an innovation idea, formulation request, chemical recipe, safe repellent formula, or machinery design:
 1. First, act as a strict failure-first analyst. Identify all physical, chemical, mechanical, or health blockers and reasons why this could fail in the real world.
 2. Second, provide the exact workaround, precise formulation ratios, and step-by-step verified execution blueprint.
@@ -544,14 +545,14 @@ Format your response clearly divided into two sections:
 [BLOCKERS]: (List all practical failure points, health limits, physical warnings)
 [SOLUTION]: (Provide the exact foolproof formulation, ingredient ratios, safety measures, or code)`;
 
-            const res = await fetch('https://api.x.ai/v1/chat/completions', {
+            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${grokKey}`
                 },
                 body: JSON.stringify({
-                    model: 'grok-4.5',
+                    model: 'llama-3.1-70b-versatile',
                     messages: [
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userPrompt }
@@ -562,13 +563,13 @@ Format your response clearly divided into two sections:
 
             if (!res.ok) {
                 const errText = await res.text();
-                throw new Error(`Grok API Error (${res.status}): ${errText}`);
+                throw new Error(`Groq API Error (${res.status}): ${errText}`);
             }
 
             const data = await res.json();
             const text = data.choices?.[0]?.message?.content || JSON.stringify(data);
 
-            let blockers = "Analysis completed by Grok-4.5.";
+            let blockers = "Analysis completed by Llama.";
             let solution = text;
 
             if (text.includes("[BLOCKERS]") && text.includes("[SOLUTION]")) {
