@@ -88,13 +88,13 @@
             box-shadow: 0 0 8px var(--success);
         }
 
-        /* Dual API Config Bar */
+        /* Config Bar with Save Button */
         .config-bar {
             background: #111827;
             padding: 10px 24px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
-            gap: 15px;
+            gap: 12px;
             align-items: center;
             font-size: 0.85rem;
             flex-wrap: wrap;
@@ -107,12 +107,27 @@
             padding: 6px 10px;
             border-radius: 6px;
             font-size: 0.85rem;
-            width: 240px;
+            width: 200px;
         }
 
         .config-bar label {
             color: var(--text-muted);
             font-weight: 600;
+        }
+
+        .save-keys-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .save-keys-btn:hover {
+            opacity: 0.9;
         }
 
         .workspace {
@@ -181,7 +196,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        /* Circular Progress Loader */
         .loader-box {
             display: flex;
             flex-direction: column;
@@ -362,18 +376,19 @@
         </div>
     </header>
 
-    <!-- 2 API Keys Input Bar -->
+    <!-- Config Bar with Save Keys Button -->
     <div class="config-bar">
-        <label>Claude API Key:</label>
-        <input type="password" id="claudeKey" placeholder="sk-ant-..." value="">
-        <label>Grok API Key:</label>
-        <input type="password" id="grokKey" placeholder="xai-..." value="">
+        <label>Claude Key:</label>
+        <input type="password" id="claudeKey" placeholder="sk-ant-...">
+        <label>Grok Key:</label>
+        <input type="password" id="grokKey" placeholder="xai-...">
+        <button class="save-keys-btn" onclick="saveKeys()">Save Keys 💾</button>
     </div>
 
     <div class="workspace" id="workspace">
         <div class="welcome-card" id="welcomeCard">
             <h2>Welcome to Vizia InnovateX Engine</h2>
-            <p>Your master universal R&D facility. Formulate industrial chemicals, food flavors, beverage recipes, IoT sensors, or mechanical designs. Enter your parameters below to execute deep failure analysis and final optimized formulation.</p>
+            <p>Your master universal R&D facility. Formulate industrial chemicals, safe repellents, food flavors, IoT sensors, or mechanical designs. Enter your parameters below to execute deep failure analysis and final optimized formulation.</p>
         </div>
     </div>
 
@@ -387,6 +402,28 @@
     </div>
 
     <script>
+        // Load saved keys on startup
+        window.onload = function() {
+            if(localStorage.getItem('vizia_claude_key')) {
+                document.getElementById('claudeKey').value = localStorage.getItem('vizia_claude_key');
+            }
+            if(localStorage.getItem('vizia_grok_key')) {
+                document.getElementById('grokKey').value = localStorage.getItem('vizia_grok_key');
+            }
+        };
+
+        function saveKeys() {
+            const claude = document.getElementById('claudeKey').value.trim();
+            const grok = document.getElementById('grokKey').value.trim();
+            if(!claude || !grok) {
+                alert("Please enter both keys before saving!");
+                return;
+            }
+            localStorage.setItem('vizia_claude_key', claude);
+            localStorage.setItem('vizia_grok_key', grok);
+            alert("API Keys saved successfully in browser storage! 🚀");
+        }
+
         function handleKey(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -403,7 +440,7 @@
             const grokKey = document.getElementById('grokKey').value.trim();
 
             if (!claudeKey || !grokKey) {
-                alert("Please enter both Claude API Key and Grok API Key in the top configuration bar.");
+                alert("Please enter and save both Claude and Grok API keys first.");
                 return;
             }
 
@@ -440,10 +477,10 @@
             const textDisplay = document.getElementById(`text_${loaderId}`);
 
             const stages = [
-                { limit: 25, text: "Claude API: Analyzing core physics, chemical structures & laws..." },
-                { limit: 50, text: "Grok API: Simulating failure points, real-world variables & blockers..." },
+                { limit: 25, text: "Claude API: Analyzing core physics, chemical structures & safety rules..." },
+                { limit: 50, text: "Grok API (grok-beta): Simulating failure points & real-world variables..." },
                 { limit: 75, text: "Vizia R&D Loop: Bypassing constraints & engineering workaround formulations..." },
-                { limit: 95, text: "Finalizing exact proportions, ratios & execution blueprint..." }
+                { limit: 95, text: "Finalizing exact proportions, safe ratios & execution blueprint..." }
             ];
 
             const apiPromise = callDualEngineAPIs(prompt, claudeKey, grokKey);
@@ -512,12 +549,12 @@
 
         async function callDualEngineAPIs(userPrompt, claudeKey, grokKey) {
             const systemPrompt = `You are Vizia InnovateX Engine, a master multi-disciplinary R&D AI.
-When the user gives an innovation idea, formulation request, chemical recipe, food/beverage formula, or machinery design:
-1. First, act as a strict failure-first analyst. Identify all physical, chemical, mechanical, or practical blockers and reasons why this could fail in the real world.
+When the user gives an innovation idea, formulation request, chemical recipe, safe repellent formula, or machinery design:
+1. First, act as a strict failure-first analyst. Identify all physical, chemical, mechanical, or health blockers and reasons why this could fail in the real world.
 2. Second, provide the exact workaround, precise formulation ratios, and step-by-step verified execution blueprint.
 Format your response clearly divided into two sections:
-[BLOCKERS]: (List all practical failure points, physical limits, warnings)
-[SOLUTION]: (Provide the exact foolproof formulation, ingredient ratios, code, or engineering solution)`;
+[BLOCKERS]: (List all practical failure points, health limits, physical warnings)
+[SOLUTION]: (Provide the exact foolproof formulation, ingredient ratios, safety measures, or code)`;
 
             const claudePromise = fetch('https://api.anthropic.com/v1/messages', {
                 method: 'POST',
@@ -545,7 +582,7 @@ Format your response clearly divided into two sections:
                     'Authorization': `Bearer ${grokKey}`
                 },
                 body: JSON.stringify({
-                    model: 'grok-2-latest',
+                    model: 'grok-beta',
                     messages: [
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userPrompt }
@@ -563,14 +600,14 @@ Format your response clearly divided into two sections:
             const grokText = grokRes.choices?.[0]?.message?.content || JSON.stringify(grokRes);
 
             return {
-                blockers: `[Claude Deep Analysis & Grok Real-Time Validation]\n\n${claudeText}`,
-                solution: `[Synthesized Vizia InnovateX Master Solution]\n\n${grokText}`
+                blockers: `[Claude Deep Analysis & Safety Check]\n\n${claudeText}`,
+                solution: `[Grok Master Solution & Ratios]\n\n${grokText}`
             };
         }
 
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, m => map[m]);
+            return text.replace(/[\n&<>"']/g, m => m === '\n' ? '<br>' : map[m]);
         }
     </script>
 </body>
