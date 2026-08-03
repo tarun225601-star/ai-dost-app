@@ -1,254 +1,343 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI CID / विजया CID - Live Voice Lie Detector</title>
+    <title>AI CID / विजया सीआईडी</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #0b0f19; color: #fff; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        .app-container { width: 100%; max-width: 450px; height: 100%; background: #111827; display: flex; flex-direction: column; position: relative; border-left: 1px solid #1f2937; border-right: 1px solid #1f2937; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
-        
-        /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #1f2937; background: #1f2937; z-index: 10; }
-        .logo { font-size: 18px; font-weight: bold; color: #ef4444; display: flex; align-items: center; gap: 8px; }
-        .vip-badge { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; }
-
-        /* Content Area */
-        .content-area { flex: 1; overflow-y: auto; background: #0b0f19; padding: 15px; padding-bottom: 70px; display: none; }
-        .content-area.active-tab { display: block; }
-        .content-area::-webkit-scrollbar { display: none; }
-
-        /* Dashboard Cards */
-        .card { background: #1f2937; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #374151; }
-        .card-title { font-size: 15px; font-weight: bold; color: #f87171; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .card-desc { font-size: 12px; color: #9ca3af; margin-bottom: 12px; line-height: 1.4; }
-
-        /* Form Inputs */
-        .form-input { width: 100%; background: #111827; border: 1px solid #4b5563; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 12px; font-size: 13px; }
-        
-        .btn-primary { width: 100%; background: #ef4444; border: none; padding: 12px; border-radius: 8px; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s; }
-        .btn-primary:hover { background: #dc2626; }
-
-        .btn-success { background: #10b981; border: none; padding: 12px 16px; border-radius: 8px; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn-success:hover { background: #059669; }
-
-        .btn-mic { background: #3b82f6; border: none; width: 48px; height: 48px; border-radius: 50%; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
-        .btn-mic.recording { background: #ef4444; animation: pulse 1.2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-
-        /* Live Call Room Styling */
-        .call-screen { display: flex; flex-direction: column; height: 100%; justify-content: space-between; text-align: center; }
-        .ai-avatar { width: 75px; height: 75px; background: linear-gradient(135deg, #ef4444, #991b1b); border-radius: 50%; margin: 10px auto; display: flex; justify-content: center; align-items: center; font-size: 30px; box-shadow: 0 0 20px rgba(239,68,68,0.4); }
-        
-        .chat-transcript { flex: 1; background: #1f2937; border-radius: 10px; padding: 10px; overflow-y: auto; text-align: left; margin-bottom: 12px; font-size: 12px; border: 1px solid #374151; max-height: 280px; }
-        .msg-ai { color: #f87171; margin-bottom: 10px; line-height: 1.4; }
-        .msg-user { color: #34d399; margin-bottom: 10px; line-height: 1.4; }
-
-        .input-bar { display: flex; gap: 8px; align-items: center; }
-
-        /* Bottom Nav */
-        .bottom-nav { position: absolute; bottom: 0; width: 100%; height: 55px; background: #1f2937; border-top: 1px solid #374151; display: flex; justify-content: space-around; align-items: center; font-size: 11px; z-index: 10; color: #9ca3af; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; gap: 2px; }
-        .nav-item span { font-size: 18px; }
-        .nav-item.active { color: #ef4444; }
-
-        #toast { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; display: none; z-index: 1000; }
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-red: #ef4444;
+            --accent-green: #22c55e;
+            --border-color: #334155;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background-color: var(--card-bg);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .badge {
+            background-color: #f59e0b;
+            color: #000;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .robot-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .robot-avatar {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #ef4444, #991b1b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            font-size: 32px;
+        }
+        .chat-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .message {
+            padding: 10px 14px;
+            border-radius: 8px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        .ai-msg {
+            background-color: #273548;
+            border-left: 4px solid var(--accent-red);
+        }
+        .user-msg {
+            background-color: #1e3a8a;
+            border-left: 4px solid #60a5fa;
+            align-self: flex-end;
+            max-width: 85%;
+        }
+        .input-panel {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .mic-btn {
+            background: #ef4444;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+        .mic-btn.recording {
+            animation: pulse 1.2s infinite;
+            background: #dc2626;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            resize: none;
+            height: 24px;
+            max-height: 80px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .send-btn {
+            background-color: var(--accent-green);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .settings-bar {
+            background: #111827;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+        }
+        .settings-bar input {
+            background: #1f2937;
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            width: 140px;
+        }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div id="toast">Notification</div>
+    <header>
+        <div class="logo-area">
+            <span>🚨 AI CID</span> / <span style="color: #94a3b8; font-size: 0.9rem;">विजया सीआईडी</span>
+        </div>
+        <div class="badge">LIVE INTERROGATION</div>
+    </header>
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="logo">🚨 AI CID <span style="font-size:11px; color:#9ca3af;">/ विजया सीआईडी</span></div>
-        <div class="vip-badge">Live Interrogation</div>
-    </div>
+    <div class="main-container">
+        <div class="robot-header">
+            <div class="robot-avatar">🤖</div>
+            <div style="font-weight: bold; font-size: 1.1rem;">AI CID Live Interrogator</div>
+            <div style="font-size: 0.8rem; color: #94a3b8;" id="status-text">असली AI मॉडल कनेक्टेड है। बयान दें!</div>
+        </div>
 
-    <!-- TAB 1: LIVE TALK / LIE DETECTOR -->
-    <div class="content-area active-tab" id="tabLiveCall">
-        <div class="call-screen">
-            <div>
-                <div class="ai-avatar">🤖</div>
-                <div style="font-weight: bold; font-size: 15px; color: #f87171;">AI CID Live Interrogator</div>
-                <div style="font-size: 11px; color: #9ca3af;" id="callStatus">माइक या टाइप करके अपनी बात रखें। AI सच/झूठ पकड़ेगा।</div>
+        <div class="chat-box" id="chatBox">
+            <div class="message ai-msg">
+                <strong>AI CID:</strong> नमस्ते तरुण भाई! मैं विजया सीआईडी का ऑटोनॉमस जासूस हूँ। आप जो भी बोलेंगे, मैं आपकी असली API Key के जरिए इंटरनेट से वेरीफाई करके बताऊँगा कि बात सच है या झूठ!
             </div>
+        </div>
 
-            <div class="chat-transcript" id="chatTranscript">
-                <div class="msg-ai"><b>AI CID:</b> नमस्ते तरुण भाई! मैं विजया सीआईडी का ऑटोनॉमस जासूस हूँ। आप माइक से बोलकर या लिखकर अपनी सफाई दें, मैं आपके शब्दों से सच या झूठ तुरंत परख लूँगा।</div>
-            </div>
-
-            <div class="input-bar">
-                <button class="btn-mic" id="micBtn" onclick="toggleVoiceRecording()" title="Voice Record">🎙️</button>
-                <input type="text" id="userSpeechInput" class="form-input" placeholder="या यहाँ टाइप करें..." style="margin-bottom: 0;">
-                <button class="btn-success" onclick="sendStatement()">भेजें 🚀</button>
-            </div>
+        <div class="input-panel">
+            <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="बोलकर टाइप करें">🎙️</button>
+            <textarea id="userInput" placeholder="यहाँ अपनी बात टाइप करें..." rows="1" onkeydown="checkEnter(event)"></textarea>
+            <button class="send-btn" onclick="sendMessage()">भेजें 🚀</button>
         </div>
     </div>
 
-    <!-- TAB 2: SETTINGS (API KEY CONFIG) -->
-    <div class="content-area" id="tabSettings">
-        <div class="card">
-            <div class="card-title">⚙️ API Configuration Settings</div>
-            <div class="card-desc">अपनी AI Model API Key यहाँ दर्ज करें ताकि लाइव इंटर्रोगेशन और स्मार्ट एनालिसिस ठीक से काम कर सके।</div>
-
-            <label style="font-size: 11px; color: #9ca3af;">API Provider:</label>
-            <select class="form-input" id="apiProvider">
-                <option value="openai">OpenAI (GPT-4 / Grok Compatible)</option>
-                <option value="custom">Custom AI Endpoint</option>
-            </select>
-
-            <label style="font-size: 11px; color: #9ca3af;">Secret API Key:</label>
-            <input type="password" id="apiKeyInput" class="form-input" placeholder="sk-proj-xxxxxxxxxxxxxxxx">
-
-            <button class="btn-primary" onclick="saveApiKey()">API Key सुरक्षित करें 🔒</button>
-        </div>
+    <div class="settings-bar">
+        <span>API Key:</span>
+        <input type="password" id="apiKeyInput" placeholder="अपनी Real API Key यहाँ डालें" onchange="saveApiKey()">
     </div>
 
-    <!-- TAB 3: PROFILE -->
-    <div class="content-area" id="tabProfile">
-        <div class="card">
-            <div class="card-title">🛡️ विजया सीआईडी प्रोफाइल</div>
-            <div style="font-size: 12px; color: #d1d5db; margin-top: 10px; line-height: 1.5;">
-                <b>एप संस्करण:</b> v1.0 (Public Edition)<br>
-                <b>इंजन:</b> Autonomous Lie & Deception Detector<br>
-                <b>स्थिति:</b> पूरी तरह सक्रिय और तैयार
-            </div>
-        </div>
-    </div>
+    <script>
+        // लोड करते ही सेव की गई API Key चेक करना
+        window.onload = function() {
+            const savedKey = localStorage.getItem('ai_cid_api_key');
+            if(savedKey) {
+                document.getElementById('apiKeyInput').value = savedKey;
+            }
+        };
 
-    <!-- BOTTOM NAVIGATION -->
-    <div class="bottom-nav">
-        <div class="nav-item active" id="navLive" onclick="switchTab('live')"><span>📞</span>Live Test</div>
-        <div class="nav-item" id="navSettings" onclick="switchTab('settings')"><span>⚙️</span>Settings</div>
-        <div class="nav-item" id="navProfile" onclick="switchTab('profile')"><span>👤</span>Profile</div>
-    </div>
-</div>
-
-<script>
-    let isRecording = false;
-
-    function switchTab(tab) {
-        document.getElementById('tabLiveCall').classList.remove('active-tab');
-        document.getElementById('tabSettings').classList.remove('active-tab');
-        document.getElementById('tabProfile').classList.remove('active-tab');
-
-        document.getElementById('navLive').classList.remove('active');
-        document.getElementById('navSettings').classList.remove('active');
-        document.getElementById('navProfile').classList.remove('active');
-
-        if(tab === 'live') {
-            document.getElementById('tabLiveCall').classList.add('active-tab');
-            document.getElementById('navLive').classList.add('active');
-        } else if(tab === 'settings') {
-            document.getElementById('tabSettings').classList.add('active-tab');
-            document.getElementById('navSettings').classList.add('active');
-        } else if(tab === 'profile') {
-            document.getElementById('tabProfile').classList.add('active-tab');
-            document.getElementById('navProfile').classList.add('active');
-        }
-    }
-
-    function saveApiKey() {
-        let key = document.getElementById('apiKeyInput').value.trim();
-        if(!key) {
-            alert("कृपया वैध API Key दर्ज करें!");
-            return;
-        }
-        localStorage.setItem('ai_cid_api_key', key);
-        showToast("API Key सफलतापूर्वक सेव हो गई!");
-        switchTab('live');
-    }
-
-    function toggleVoiceRecording() {
-        let micBtn = document.getElementById('micBtn');
-        let inputField = document.getElementById('userSpeechInput');
-
-        // Check browser speech recognition support
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            alert("आपका ब्राउज़र वॉइस रिकग्निशन सपोर्ट नहीं करता। कृपया लिखकर बयान दें!");
-            return;
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            localStorage.setItem('ai_cid_api_key', key);
+            alert("API Key सुरक्षित सेव हो गई है!");
         }
 
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'hi-IN'; // Set to Hindi / Hinglish
+        function checkEnter(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
 
-        if (!isRecording) {
-            recognition.start();
-            isRecording = true;
-            micBtn.classList.add('recording');
-            document.getElementById('callStatus').innerText = "सुन रहा हूँ... बोलिए तरुण भाई!";
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            if (!apiKey) {
+                alert("कृपया नीचे सेटिंग्स में अपनी Real API Key दर्ज करें!");
+                return;
+            }
+
+            // यूजर का मैसेज चैट में जोड़ें
+            appendMessage(`तरुण भाई: ${text}`, 'user-msg');
+            input.value = '';
+
+            const statusText = document.getElementById('status-text');
+            statusText.innerText = "जांच चल रही है (AI سوچ रहा है)...";
+
+            // AI से असली रिस्पॉन्स लाने के लिए फेच कॉल (OpenAI / Grok Compatible Endpoint)
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo", // आप चाहें तो यहाँ अपना मॉडल बदल सकते हैं
+                        messages: [
+                            {
+                                role: "system", 
+                                content: "तुम एक सख्त और तेजतर्रार AI CID जासूस (विजया सीआईडी) हो। तरुण भाई तुमसे बात कर रहे हैं। उनके हर बयान को गहराई से परखो। विश्लेषण करो कि उनका बयान सच है या झूठ, और उसका प्रतिशत (%) व सटीक कारण हिंदी में बताओ।"
+                            },
+                            {
+                                role: "user", 
+                                content: text
+                            }
+                        ],
+                        temperature: 0.7
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.choices && data.choices.length > 0) {
+                    const aiReply = data.choices[0].message.content;
+                    appendMessage(`AI CID: ${aiReply}`, 'ai-msg');
+                } else if (data.error) {
+                    appendMessage(`AI CID Error: ${data.error.message}`, 'ai-msg');
+                } else {
+                    appendMessage(`AI CID: API से अमान्य उत्तर प्राप्त हुआ।`, 'ai-msg');
+                }
+            } catch (error) {
+                appendMessage(`AI CID नेटवर्क त्रुटि: ${error.message}`, 'ai-msg');
+            } finally {
+                statusText.innerText = "असली AI मॉडल कनेक्टेड है। बयान दें!";
+            }
+        }
+
+        // वॉइस रिकग्निशन (माइक का असली फीचर)
+        let recognition;
+        function toggleMic() {
+            const micBtn = document.getElementById('micBtn');
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert("आपका ब्राउज़र वॉइस रिकग्निशन सपोर्ट नहीं करता है। कृपया टाइप करके बात करें।");
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'hi-IN'; // हिंदी भाषा के लिए
+            recognition.interimResults = false;
+
+            recognition.onstart = function() {
+                micBtn.classList.add('recording');
+                document.getElementById('status-text').innerText = "सुन रहा हूँ... बोलिए तरुण भाई!";
+            };
 
             recognition.onresult = function(event) {
-                let speechToText = event.results[0][0].transcript;
-                inputField.value = speechToText;
-                stopMicState();
-                sendStatement(); // Automatically send after speech ends
+                const speechToText = event.results[0][0].transcript;
+                document.getElementById('userInput').value = speechToText;
+                micBtn.classList.remove('recording');
+                sendMessage(); // बोलते ही ऑटोमैटिक सेंड हो जाएगा
             };
 
             recognition.onerror = function() {
-                stopMicState();
-                showToast("आवाज़ पहचानने में समस्या आई। टाइप करें!");
+                micBtn.classList.remove('recording');
+                document.getElementById('status-text').innerText = "माइक की परमिशन या आवाज़ की दिक्कत है।";
             };
 
             recognition.onend = function() {
-                stopMicState();
+                micBtn.classList.remove('recording');
             };
-        } else {
-            recognition.stop();
-            stopMicState();
+
+            recognition.start();
         }
-    }
 
-    function stopMicState() {
-        isRecording = false;
-        document.getElementById('micBtn').classList.remove('recording');
-        document.getElementById('callStatus').innerText = "कॉल कनेक्टेड है।";
-    }
-
-    function sendStatement() {
-        let inputField = document.getElementById('userSpeechInput');
-        let text = inputField.value.trim();
-        if(!text) return;
-
-        let transcript = document.getElementById('chatTranscript');
-        transcript.innerHTML += `<div class="msg-user"><b>तरुण भाई:</b> ${text}</div>`;
-        inputField.value = "";
-        transcript.scrollTop = transcript.scrollHeight;
-
-        document.getElementById('callStatus').innerText = "AI बयान के पैटर्न और सच की जाँच कर रहा है...";
-
-        // Simulated AI Interrogation logic (Replace this with live API fetch if API Key is configured)
-        setTimeout(() => {
-            let apiKey = localStorage.getItem('ai_cid_api_key');
-            let aiReply = "";
-
-            // Smart mock logic responding based on length and words
-            let lowerText = text.toLowerCase();
-            let isSuspicious = lowerText.includes("pata nahi") || lowerText.includes("nahi pata") || lowerText.includes("kasam") || text.length < 10;
-
-            if(isSuspicious) {
-                aiReply = `<div class="msg-ai"><b>AI CID:</b> 🚨 <b>संदेहजनक (Lie Risk - 91%):</b> तरुण भाई, आपके बयान में "कसम" या अनिश्चितता ("पता नहीं") का इस्तेमाल हुआ है। विजया सीआईडी के एल्गोरिथम के अनुसार यहाँ बात छिपाई जा रही है। दोबारा सच बोलिए!</div>`;
-            } else {
-                aiReply = `<div class="msg-ai"><b>AI CID:</b> ✔️ <b>सच्चाई सत्यापित (Truth Verified - 96%):</b> शानदार! आपके वाक्य में आत्मविश्वास और स्पष्टता पूरी तरह दिख रही है। यह बयान एकदम सच है।</div>`;
-            }
-
-            transcript.innerHTML += aiReply;
-            document.getElementById('callStatus').innerText = "कॉल कनेक्टेड है। अगला बयान दें!";
-            transcript.scrollTop = transcript.scrollHeight;
-        }, 1200);
-    }
-
-    function showToast(msg) {
-        let t = document.getElementById('toast');
-        t.innerText = msg;
-        t.style.display = 'block';
-        setTimeout(() => { t.style.display = 'none'; }, 2000);
-    }
-</script>
-
+        function appendMessage(text, className) {
+            const chatBox = document.getElementById('chatBox');
+            const div = document.createElement('div');
+            div.className = `message ${className}`;
+            div.innerText = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
 </body>
 </html>
