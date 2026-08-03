@@ -371,7 +371,7 @@
         </div>
         <div class="api-status">
             <div class="status-dot"></div>
-            <span>Groq Llama Active</span>
+            <span>Groq Llama 3.3 Active</span>
         </div>
     </header>
 
@@ -384,7 +384,7 @@
     <div class="workspace" id="workspace">
         <div class="welcome-card" id="welcomeCard">
             <h2>Welcome to Vizia InnovateX Engine</h2>
-            <p>Your master universal R&D facility powered by Groq Llama 3. Formulate industrial chemicals, safe repellents, food flavors, IoT sensors, or mechanical designs. Enter your parameters below to execute deep failure analysis and final optimized formulation.</p>
+            <p>Your master universal R&D facility powered by Groq Llama 3.3. Formulate industrial chemicals, safe repellents, food flavors, IoT sensors, or mechanical designs. Enter your parameters below to execute deep failure analysis and final optimized formulation.</p>
         </div>
     </div>
 
@@ -455,7 +455,7 @@
                     <div class="circular-progress" id="circle_${loaderId}">
                         <div class="progress-value" id="val_${loaderId}">0%</div>
                     </div>
-                    <div class="loader-status-text" id="text_${loaderId}">Initializing Groq Llama R&D Protocol...</div>
+                    <div class="loader-status-text" id="text_${loaderId}">Initializing Groq Llama 3.3 Protocol...</div>
                 </div>
             `;
             workspace.appendChild(assistantMsg);
@@ -467,7 +467,7 @@
             const textDisplay = document.getElementById(`text_${loaderId}`);
 
             const stages = [
-                { limit: 30, text: "Llama: Analyzing core physics, chemical structures & safety rules..." },
+                { limit: 30, text: "Llama 3.3: Analyzing core physics, chemical structures & safety rules..." },
                 { limit: 60, text: "Simulating failure points, real-world variables & health limits..." },
                 { limit: 90, text: "Engineering foolproof workaround formulations & exact ratios..." }
             ];
@@ -505,7 +505,7 @@
                         <div class="report-section">
                             <div class="report-title">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                VIZIA INNOVATEX ANALYSIS REPORT (LLAMA 3)
+                                VIZIA INNOVATEX ANALYSIS REPORT (LLAMA 3.3)
                             </div>
                             <div class="blockers-box">
                                 <h4>
@@ -537,7 +537,7 @@
         }
 
         async function callGroqAPI(userPrompt, grokKey) {
-            const systemPrompt = `You are Vizia InnovateX Engine, powered by Llama 3, a master multi-disciplinary R&D AI.
+            const systemPrompt = `You are Vizia InnovateX Engine, powered by Llama 3.3, a master multi-disciplinary R&D AI.
 When the user gives an innovation idea, formulation request, chemical recipe, safe repellent formula, or machinery design:
 1. First, act as a strict failure-first analyst. Identify all physical, chemical, mechanical, or health blockers and reasons why this could fail in the real world.
 2. Second, provide the exact workaround, precise formulation ratios, and step-by-step verified execution blueprint.
@@ -552,7 +552,7 @@ Format your response clearly divided into two sections:
                     'Authorization': `Bearer ${grokKey}`
                 },
                 body: JSON.stringify({
-                    model: 'llama-3.1-70b-versatile',
+                    model: 'llama-3.3-70b-versatile',
                     messages: [
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userPrompt }
