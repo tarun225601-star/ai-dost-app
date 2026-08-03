@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vizia - InnovateX Engine</title>
+    <title>Vizia - InnovateX Engine (Grok Edition)</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -107,7 +107,7 @@
             padding: 6px 10px;
             border-radius: 6px;
             font-size: 0.85rem;
-            width: 200px;
+            width: 260px;
         }
 
         .config-bar label {
@@ -372,23 +372,21 @@
         </div>
         <div class="api-status">
             <div class="status-dot"></div>
-            <span>Claude + Grok Dual-Engine Active</span>
+            <span>Grok Model 3-70B Active</span>
         </div>
     </header>
 
-    <!-- Config Bar with Save Keys Button -->
+    <!-- Config Bar with Save Key Button (Only Grok) -->
     <div class="config-bar">
-        <label>Claude Key:</label>
-        <input type="password" id="claudeKey" placeholder="sk-ant-...">
         <label>Grok Key:</label>
         <input type="password" id="grokKey" placeholder="xai-...">
-        <button class="save-keys-btn" onclick="saveKeys()">Save Keys 💾</button>
+        <button class="save-keys-btn" onclick="saveKey()">Save Key 💾</button>
     </div>
 
     <div class="workspace" id="workspace">
         <div class="welcome-card" id="welcomeCard">
             <h2>Welcome to Vizia InnovateX Engine</h2>
-            <p>Your master universal R&D facility. Formulate industrial chemicals, safe repellents, food flavors, IoT sensors, or mechanical designs. Enter your parameters below to execute deep failure analysis and final optimized formulation.</p>
+            <p>Your master universal R&D facility powered by Grok 3-70B. Formulate industrial chemicals, safe repellents, food flavors, IoT sensors, or mechanical designs. Enter your parameters below to execute deep failure analysis and final optimized formulation.</p>
         </div>
     </div>
 
@@ -402,26 +400,21 @@
     </div>
 
     <script>
-        // Load saved keys on startup
+        // Load saved key on startup
         window.onload = function() {
-            if(localStorage.getItem('vizia_claude_key')) {
-                document.getElementById('claudeKey').value = localStorage.getItem('vizia_claude_key');
-            }
             if(localStorage.getItem('vizia_grok_key')) {
                 document.getElementById('grokKey').value = localStorage.getItem('vizia_grok_key');
             }
         };
 
-        function saveKeys() {
-            const claude = document.getElementById('claudeKey').value.trim();
+        function saveKey() {
             const grok = document.getElementById('grokKey').value.trim();
-            if(!claude || !grok) {
-                alert("Please enter both keys before saving!");
+            if(!grok) {
+                alert("Please enter your Grok API key before saving!");
                 return;
             }
-            localStorage.setItem('vizia_claude_key', claude);
             localStorage.setItem('vizia_grok_key', grok);
-            alert("API Keys saved successfully in browser storage! 🚀");
+            alert("Grok API Key saved successfully! 🚀");
         }
 
         function handleKey(e) {
@@ -436,11 +429,10 @@
             const prompt = inputField.value.trim();
             if (!prompt) return;
 
-            const claudeKey = document.getElementById('claudeKey').value.trim();
             const grokKey = document.getElementById('grokKey').value.trim();
 
-            if (!claudeKey || !grokKey) {
-                alert("Please enter and save both Claude and Grok API keys first.");
+            if (!grokKey) {
+                alert("Please enter and save your Grok API key first.");
                 return;
             }
 
@@ -465,7 +457,7 @@
                     <div class="circular-progress" id="circle_${loaderId}">
                         <div class="progress-value" id="val_${loaderId}">0%</div>
                     </div>
-                    <div class="loader-status-text" id="text_${loaderId}">Initializing Vizia Dual-Engine R&D Protocol...</div>
+                    <div class="loader-status-text" id="text_${loaderId}">Initializing Grok 3-70B R&D Protocol...</div>
                 </div>
             `;
             workspace.appendChild(assistantMsg);
@@ -477,17 +469,16 @@
             const textDisplay = document.getElementById(`text_${loaderId}`);
 
             const stages = [
-                { limit: 25, text: "Claude API: Analyzing core physics, chemical structures & safety rules..." },
-                { limit: 50, text: "Grok API (Model 3 70B): Simulating failure points & real-world variables..." },
-                { limit: 75, text: "Vizia R&D Loop: Bypassing constraints & engineering workaround formulations..." },
-                { limit: 95, text: "Finalizing exact proportions, safe ratios & execution blueprint..." }
+                { limit: 30, text: "Grok 3-70B: Analyzing core physics, chemical structures & safety rules..." },
+                { limit: 60, text: "Simulating failure points, real-world variables & health limits..." },
+                { limit: 90, text: "Engineering foolproof workaround formulations & exact ratios..." }
             ];
 
-            const apiPromise = callDualEngineAPIs(prompt, claudeKey, grokKey);
+            const apiPromise = callGrokAPI(prompt, grokKey);
 
             const progressInterval = setInterval(() => {
                 if (progress < 95) {
-                    progress += Math.floor(Math.random() * 3) + 1;
+                    progress += Math.floor(Math.random() * 4) + 1;
                     if (progress > 95) progress = 95;
                     
                     circle.style.background = `conic-gradient(var(--accent) ${progress * 3.6}deg, #334155 0deg)`;
@@ -500,7 +491,7 @@
                         }
                     }
                 }
-            }, 60);
+            }, 50);
 
             try {
                 const result = await apiPromise;
@@ -516,7 +507,7 @@
                         <div class="report-section">
                             <div class="report-title">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                VIZIA INNOVATEX ANALYSIS REPORT
+                                VIZIA INNOVATEX ANALYSIS REPORT (GROK 3-70B)
                             </div>
                             <div class="blockers-box">
                                 <h4>
@@ -541,14 +532,14 @@
                 clearInterval(progressInterval);
                 assistantMsg.innerHTML = `
                     <div style="color: var(--danger); padding: 15px;">
-                        <strong>API Execution Error:</strong> ${escapeHtml(err.message)}<br><small>Please verify your API keys and network connection.</small>
+                        <strong>API Execution Error:</strong> ${escapeHtml(err.message)}<br><small>Please verify your Grok API key and network connection.</small>
                     </div>
                 `;
             }
         }
 
-        async function callDualEngineAPIs(userPrompt, claudeKey, grokKey) {
-            const systemPrompt = `You are Vizia InnovateX Engine, a master multi-disciplinary R&D AI.
+        async function callGrokAPI(userPrompt, grokKey) {
+            const systemPrompt = `You are Vizia InnovateX Engine, powered by Grok 3-70B, a master multi-disciplinary R&D AI.
 When the user gives an innovation idea, formulation request, chemical recipe, safe repellent formula, or machinery design:
 1. First, act as a strict failure-first analyst. Identify all physical, chemical, mechanical, or health blockers and reasons why this could fail in the real world.
 2. Second, provide the exact workaround, precise formulation ratios, and step-by-step verified execution blueprint.
@@ -556,27 +547,7 @@ Format your response clearly divided into two sections:
 [BLOCKERS]: (List all practical failure points, health limits, physical warnings)
 [SOLUTION]: (Provide the exact foolproof formulation, ingredient ratios, safety measures, or code)`;
 
-            const claudePromise = fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': claudeKey,
-                    'anthropic-version': '2023-06-01',
-                    'anthropic-dangerous-direct-browser-access': 'true'
-                },
-                body: JSON.stringify({
-                    model: 'claude-3-5-sonnet-20241022',
-                    max_tokens: 2000,
-                    system: systemPrompt,
-                    messages: [{ role: 'user', content: userPrompt }]
-                })
-            }).then(async res => {
-                if (!res.ok) throw new Error(`Claude API Error (${res.status}): ${await res.text()}`);
-                return res.json();
-            });
-
-            // Set to Model 3 70B as requested
-            const grokPromise = fetch('https://api.x.ai/v1/chat/completions', {
+            const res = await fetch('https://api.x.ai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -590,20 +561,27 @@ Format your response clearly divided into two sections:
                     ],
                     temperature: 0.3
                 })
-            }).then(async res => {
-                if (!res.ok) throw new Error(`Grok API Error (${res.status}): ${await res.text()}`);
-                return res.json();
             });
 
-            const [claudeRes, grokRes] = await Promise.all([claudePromise, grokPromise]);
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`Grok API Error (${res.status}): ${errText}`);
+            }
 
-            const claudeText = claudeRes.content?.[0]?.text || JSON.stringify(claudeRes);
-            const grokText = grokRes.choices?.[0]?.message?.content || JSON.stringify(grokRes);
+            const data = await res.json();
+            const text = data.choices?.[0]?.message?.content || JSON.stringify(data);
 
-            return {
-                blockers: `[Claude Deep Analysis & Safety Check]\n\n${claudeText}`,
-                solution: `[Grok Model 3 70B Solution & Ratios]\n\n${grokText}`
-            };
+            // Split text if it contains the sections, otherwise put it into solution
+            let blockers = "Analysis completed by Grok 3-70B.";
+            let solution = text;
+
+            if (text.includes("[BLOCKERS]") && text.includes("[SOLUTION]")) {
+                const parts = text.split("[SOLUTION]");
+                blockers = parts[0].replace("[BLOCKERS]", "").trim();
+                solution = parts[1].trim();
+            }
+
+            return { blockers, solution };
         }
 
         function escapeHtml(text) {
