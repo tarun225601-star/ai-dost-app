@@ -478,7 +478,7 @@
 
             const stages = [
                 { limit: 25, text: "Claude API: Analyzing core physics, chemical structures & safety rules..." },
-                { limit: 50, text: "Grok API (grok-beta): Simulating failure points & real-world variables..." },
+                { limit: 50, text: "Grok API (Model 3 70B): Simulating failure points & real-world variables..." },
                 { limit: 75, text: "Vizia R&D Loop: Bypassing constraints & engineering workaround formulations..." },
                 { limit: 95, text: "Finalizing exact proportions, safe ratios & execution blueprint..." }
             ];
@@ -575,6 +575,7 @@ Format your response clearly divided into two sections:
                 return res.json();
             });
 
+            // Set to Model 3 70B as requested
             const grokPromise = fetch('https://api.x.ai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
@@ -582,7 +583,7 @@ Format your response clearly divided into two sections:
                     'Authorization': `Bearer ${grokKey}`
                 },
                 body: JSON.stringify({
-                    model: 'grok-beta',
+                    model: 'grok-3-70b',
                     messages: [
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userPrompt }
@@ -601,7 +602,7 @@ Format your response clearly divided into two sections:
 
             return {
                 blockers: `[Claude Deep Analysis & Safety Check]\n\n${claudeText}`,
-                solution: `[Grok Master Solution & Ratios]\n\n${grokText}`
+                solution: `[Grok Model 3 70B Solution & Ratios]\n\n${grokText}`
             };
         }
 
