@@ -1,11 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 from database import init_db, generate_order_number
+import os
 
-app = Flask(__name__)
+# template_folder='.' करने से Flask बाहर रखी index.html को सीधे पढ़ लेगा
+app = Flask(__name__, template_folder='.')
 app.secret_key = 'tarun_secret_key_secure_system'
 
-# दुकान का फिक्स पूरा पता (फरिदाबाद वाला)
+# दुकान का फिक्स पूरा पता
 SHOP_DETAILS = {
     "name": "Tarun Fresh Fruits & Daily Needs",
     "address": "Shop No. 12, Main Market, Sector 15, Faridabad, Haryana - 121007",
@@ -41,7 +43,7 @@ def index():
     
     cart = session.get('cart', {})
     cart_count = sum(cart.values())
-    return render_template('index.html', products=products, cart_count=cart_count)
+    return render_template('index.html', products=products, cart_count=cart_count, active_tab='shop')
 
 @app.route('/add_to_cart/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
@@ -55,12 +57,12 @@ def add_to_cart(product_id):
 
 @app.route('/cart')
 def view_cart():
-    if 'cart' not in session or not session['cart']:
-        return render_template('cart.html', items=[], total=0)
+    cart = session.get('cart', {})
+    if not cart:
+        return render_template('index.html', items=[], total=0, active_tab='cart')
     
     conn = sqlite3.connect('store.db')
     cursor = conn.cursor()
-    cart = session['cart']
     items = []
     total = 0
     
@@ -78,7 +80,7 @@ def view_cart():
                 'subtotal': subtotal
             })
     conn.close()
-    return render_template('cart.html', items=items, total=total)
+    return render_template('index.html', items=items, total=total, active_tab='cart')
 
 @app.route('/checkout', methods=['POST'])
 def checkout():
@@ -105,7 +107,6 @@ def checkout():
             total_amount += subtotal
             order_items_data.append((order_number, prod[0], qty, prod[1]))
             
-    # आर्डर सेव करें (शॉप और कस्टमर दोनों के पते के साथ)
     cursor.execute('''
         INSERT INTO orders (order_number, customer_name, customer_phone, customer_address, shop_address, total_amount, status)
         VALUES (?, ?, ?, ?, ?, ?, 'New Order - Ready for Broadcast')
@@ -119,7 +120,6 @@ def checkout():
     conn.commit()
     conn.close()
     
-    # व्हाट्सएप समरी टेक्स्ट (पिकअप और ड्रॉप एड्रेस सहित)
     whatsapp_text = f"*🛒 New Order Received!*\n\n" \
                     f"🔢 *Order No:* {order_number}\n" \
                     f"👤 *Customer Name:* {name}\n" \
@@ -132,7 +132,7 @@ def checkout():
     whatsapp_text += f"\n💰 *Total Amount:* ₹{total_amount}"
     
     session.pop('cart', None)
-    return render_template('success.html', order_number=order_number, whatsapp_text=whatsapp_text, shop_phone=SHOP_DETAILS['phone'])
+    return render_template('index.html', order_number=order_number, whatsapp_text=whatsapp_text, shop_phone=SHOP_DETAILS['phone'], active_tab='success')
 
 @app.route('/shop-panel')
 def shop_panel():
@@ -141,7 +141,7 @@ def shop_panel():
     cursor.execute("SELECT * FROM orders ORDER BY id DESC")
     orders = cursor.fetchall()
     conn.close()
-    return render_template('shop_panel.html', orders=orders)
+    return render_template('index.html', orders=orders, active_tab='shop_panel')
 
 @app.route('/broadcast-order/<order_number>', methods=['POST'])
 def broadcast_order(order_number):
@@ -159,7 +159,7 @@ def delivery_panel():
     cursor.execute("SELECT * FROM orders WHERE status LIKE 'Broadcasted%' OR status LIKE 'Picked%' OR status LIKE 'Out%' ORDER BY id DESC")
     orders = cursor.fetchall()
     conn.close()
-    return render_template('delivery_panel.html', orders=orders)
+    return render_template('index.html', orders=orders, active_tab='delivery')
 
 @app.route('/accept-order/<order_number>', methods=['POST'])
 def accept_order(order_number):
