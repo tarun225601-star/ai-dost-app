@@ -1,385 +1,47 @@
-from flask import Flask, render_template_string, request, redirect, url_for, session
-import sqlite3
-import random
-import string
-
-app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'
-
-# दुकान का फिक्स पूरा पता (आप यहाँ अपनी दुकान का सही पता डाल सकते हैं)
-SHOP_DETAILS = {
-    "name": "Tarun Fresh Fruits & Daily Needs",
-    "address": "Shop No. 12, Main Market, Sector 15, Faridabad, Haryana - 121007",
-    "phone": "9876543210"
-}
-
-def init_db():
-    conn = sqlite3.connect('store.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            price REAL NOT NULL
-        )
-    ''')
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS orders (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            order_number TEXT UNIQUE NOT NULL,
-            customer_name TEXT,
-            customer_phone TEXT,
-            customer_address TEXT,
-            shop_address TEXT,
-            total_amount REAL NOT NULL,
-            status TEXT DEFAULT 'New Order - Ready for Broadcast',
-            accepted_by TEXT DEFAULT NULL
-        )
-    ''')
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS order_items (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            order_number TEXT,
-            product_name TEXT,
-            quantity INTEGER,
-            price REAL
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
-def seed_products():
-    conn = sqlite3.connect('store.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM products")
-    if cursor.fetchone()[0] == 0:
-        sample_products = [
-            ("Fresh Apples (1kg)", 150.0),
-            ("Organic Bananas (1 Dozen)", 60.0),
-            ("Fresh Oranges (1kg)", 120.0),
-            ("Alphonso Mangoes (1kg)", 350.0)
-        ]
-        cursor.executemany("INSERT INTO products (name, price) VALUES (?, ?)", sample_products)
-        conn.commit()
-    conn.close()
-
-init_db()
-seed_products()
-
-def generate_order_number():
-    letters = ''.join(random.choices(string.ascii_uppercase, k=3))
-    digits = ''.join(random.choices(string.digits, k=5))
-    return f"ORD-{letters}-{digits}"
-
-@app.route('/')
-def index():
-    conn = sqlite3.connect('store.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM products")
-    products = cursor.fetchall()
-    
-    cart = session.get('cart', {})
-    cart_items = []
-    total = 0
-    for prod_id, qty in cart.items():
-        cursor.execute("SELECT * FROM products WHERE id = ?", (prod_id,))
-        prod = cursor.fetchone()
-        if prod:
-            subtotal = prod[2] * qty
-            total += subtotal
-            cart_items.append({'id': prod[0], 'name': prod[1], 'price': prod[2], 'quantity': qty, 'subtotal': subtotal})
-            
-    conn.close()
-    return render_template_string(HTML_TEMPLATE, products=products, cart_items=cart_items, total=total, active_tab='shop', shop=SHOP_DETAILS)
-
-@app.route('/add_to_cart/<int:product_id>', methods=['POST'])
-def add_to_cart(product_id):
-    if 'cart' not in session:
-        session['cart'] = {}
-    cart = session['cart']
-    str_id = str(product_id)
-    cart[str_id] = cart.get(str_id, 0) + 1
-    session['cart'] = cart
-    return redirect(url_for('index'))
-
-@app.route('/checkout', methods=['POST'])
-def checkout():
-    name = request.form.get('name')
-    phone = request.form.get('phone')
-    address = request.form.get('address')
-    cart = session.get('cart', {})
-    if not cart:
-        return redirect(url_for('index'))
-    
-    conn = sqlite3.connect('store.db')
-    cursor = conn.cursor()
-    order_number = generate_order_number()
-    total_amount = 0
-    order_items_data = []
-    
-    for prod_id, qty in cart.items():
-        cursor.execute("SELECT name, price FROM products WHERE id = ?", (prod_id,))
-        prod = cursor.fetchone()
-        if prod:
-            subtotal = prod[1] * qty
-            total_amount += subtotal
-            order_items_data.append((order_number, prod[0], qty, prod[1]))
-            
-    # आर्डर डेटाबेस में सेव करें (शॉप और कस्टमर दोनों का पूरा पता के साथ)
-    cursor.execute('''
-        INSERT INTO orders (order_number, customer_name, customer_phone, customer_address, shop_address, total_amount, status) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (order_number, name, phone, address, SHOP_DETAILS['address'], total_amount, 'New Order - Ready for Broadcast'))
-    
-    cursor.executemany('''
-        INSERT INTO order_items (order_number, product_name, quantity, price) 
-        VALUES (?, ?, ?, ?)
-    ''', order_items_data)
-    
-    conn.commit()
-    conn.close()
-    
-    # व्हाट्सएप मैसेज टेक्स्ट (इसमें पिकअप और डिलीवरी दोनों पते साफ दिखेंगे)
-    whatsapp_text = f"*🛒 New Order Received!*\n\n" \
-                    f"🔢 *Order No:* {order_number}\n" \
-                    f"👤 *Customer Name:* {name}\n" \
-                    f"📞 *Phone:* {phone}\n\n" \
-                    f"📍 *Pickup Address (Shop):*\n{SHOP_DETAILS['address']}\n\n" \
-                    f"🏠 *Delivery Address (Customer):*\n{address}\n\n" \
-                    f"*📦 Items:*\n"
-    for item in order_items_data:
-        whatsapp_text += f"- {item[1]} x {item[2]} (₹{item[3] * item[2]})\n"
-    whatsapp_text += f"\n💰 *Total Amount:* ₹{total_amount}"
-    
-    session.pop('cart', None)
-    return render_template_string(HTML_TEMPLATE, success_order=order_number, whatsapp_text=whatsapp_text, shop_phone=SHOP_DETAILS['phone'], products=[], cart_items=[], total=0, active_tab='success')
-
-@app.route('/shop-panel')
-def shop_panel():
-    conn = sqlite3.connect('store.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM orders ORDER BY id DESC")
-    orders = cursor.fetchall()
-    conn.close()
-    return render_template_string(HTML_TEMPLATE, orders=orders, active_tab='shop_panel', shop=SHOP_DETAILS)
-
-@app.route('/broadcast-order/<order_number>', methods=['POST'])
-def broadcast_order(order_number):
-    conn = sqlite3.connect('store.db')
-    cursor = conn.cursor()
-    cursor.execute("UPDATE orders SET status = 'Broadcasted (Looking for Delivery Boy)' WHERE order_number = ?", (order_number,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for('shop_panel'))
-
-@app.route('/delivery-panel')
-def delivery_panel():
-    conn = sqlite3.connect('store.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM orders WHERE status LIKE 'Broadcasted%' OR status LIKE 'Picked%' OR status LIKE 'Out%' ORDER BY id DESC")
-    orders = cursor.fetchall()
-    conn.close()
-    return render_template_string(HTML_TEMPLATE, orders=orders, active_tab='delivery', shop=SHOP_DETAILS)
-
-@app.route('/accept-order/<order_number>', methods=['POST'])
-def accept_order(order_number):
-    delivery_boy_name = request.form.get('boy_name', 'Delivery Partner')
-    conn = sqlite3.connect('store.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT accepted_by FROM orders WHERE order_number = ?", (order_number,))
-    row = cursor.fetchone()
-    if row and not row[0]:
-        cursor.execute("UPDATE orders SET accepted_by = ?, status = 'Picked Up by " + delivery_boy_name + "' WHERE order_number = ?", (delivery_boy_name, order_number))
-        conn.commit()
-    conn.close()
-    return redirect(url_for('delivery_panel'))
-
-@app.route('/update-status/<order_number>', methods=['POST'])
-def update_status(order_number):
-    new_status = request.form.get('status')
-    conn = sqlite3.connect('store.db')
-    cursor = conn.cursor()
-    cursor.execute("UPDATE orders SET status = ? WHERE order_number = ?", (new_status, order_number))
-    conn.commit()
-    conn.close()
-    return redirect(url_for('delivery_panel'))
-
-HTML_TEMPLATE = '''
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Smart Store & Delivery System</title>
+    <meta charset="UTF-8">
+    <title>Store Catalog - Tarun Fresh Fruits</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7f6; }
-        nav { background: #222; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        nav div a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; background: #444; padding: 6px 10px; border-radius: 4px; font-size: 14px; }
-        nav div a:hover { background: #555; }
-        .container { max-width: 1050px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .card { border: 1px solid #ddd; padding: 15px; border-radius: 6px; text-align: center; background: #fff; }
-        .btn { background: #28a745; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
-        .btn:hover { background: #218838; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 13px; vertical-align: top; }
-        th { background: #007bff; color: white; }
-        input { width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .wa-btn { background: #25D366; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 15px; }
-        .address-box { background: #f8f9fa; padding: 6px; border-left: 3px solid #007bff; margin: 4px 0; font-size: 12px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #f4f7f6; color: #333; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 20px 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .header h2 { margin: 0; color: #2c3e50; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .card { background: #ffffff; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .card h3 { margin-bottom: 10px; color: #34495e; }
+        .card p { font-size: 18px; color: #27ae60; font-weight: bold; margin-bottom: 15px; }
+        .btn { background: #27ae60; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 14px; width: 100%; }
+        .btn:hover { background: #219653; }
+        .cart-link { background: #2980b9; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; }
+        .nav-links { margin-top: 8px; }
+        .nav-links a { margin-right: 20px; text-decoration: none; color: #7f8c8d; font-weight: 600; font-size: 14px; }
+        .nav-links a:hover { color: #2980b9; }
     </style>
 </head>
 <body>
-    <nav>
-        <h2>🍎 Smart Delivery App (Full Address System)</h2>
+    <div class="header">
         <div>
-            <a href="/">🛍️ Shop Catalog</a>
-            <a href="/shop-panel">🏪 Shop Owner Panel</a>
-            <a href="/delivery-panel">🚚 Delivery Panel</a>
+            <h2>🍎 Tarun Fresh Fruits & Daily Needs</h2>
+            <div class="nav-links">
+                <a href="/shop-panel">🏪 Shop Owner Panel</a>
+                <a href="/delivery-panel">🚚 Delivery Boy Panel</a>
+            </div>
         </div>
-    </nav>
+        <a href="/cart" class="cart-link">🛒 View Cart ({{ cart_count }})</a>
+    </div>
 
-    <div class="container">
-        {% if active_tab == 'shop' %}
-            <div class="grid">
-                <div>
-                    <h3>Our Products</h3>
-                    <div class="products-grid">
-                        {% for prod in products %}
-                        <div class="card">
-                            <h4>{{ prod[1] }}</h4>
-                            <p>₹{{ prod[2] }}</p>
-                            <form action="/add_to_cart/{{ prod[0] }}" method="POST">
-                                <button type="submit" class="btn">Add to Cart</button>
-                            </form>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div>
-                    <h3>🛒 Your Cart</h3>
-                    {% if cart_items %}
-                        <table>
-                            <tr><th>Item</th><th>Qty</th><th>Subtotal</th></tr>
-                            {% for item in cart_items %}
-                            <tr>
-                                <td>{{ item.name }}</td>
-                                <td>{{ item.quantity }}</td>
-                                <td>₹{{ item.subtotal }}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                        <h4>Total: ₹{{ total }}</h4>
-
-                        <h3 style="margin-top: 20px;">Your Delivery Details</h3>
-                        <form action="/checkout" method="POST">
-                            <input type="text" name="name" placeholder="Full Name" required>
-                            <input type="text" name="phone" placeholder="Phone Number" required>
-                            <input type="text" name="address" placeholder="Full Delivery Address (House No, Area, Landmark)" required>
-                            <button type="submit" class="btn" style="width: 100%; padding: 12px; margin-top: 10px;">Send Order via WhatsApp</button>
-                        </form>
-                    {% else %}
-                        <p>Your cart is empty.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-        {% elif active_tab == 'success' %}
-            <div style="text-align: center; padding: 20px;">
-                <h2>Order Placed Successfully! 🎉</h2>
-                <p>Your Random Order Number is: <strong>{{ success_order }}</strong></p>
-                <p>Click below to send the complete order & address summary to WhatsApp:</p>
-                <a id="waLink" class="wa-btn" href="#" target="_blank">Send to WhatsApp 📱</a>
-                <br><br><br>
-                <a href="/">← Back to Shop</a>
-            </div>
-            <script>
-                const text = `{{ whatsapp_text }}`;
-                const encodedText = encodeURIComponent(text);
-                const shopPhone = "{{ shop_phone }}"; 
-                document.getElementById('waLink').href = `https://wa.me/91${shopPhone}?text=${encodedText}`;
-            </script>
-
-        {% elif active_tab == 'shop_panel' %}
-            <h2>🏪 Shop Owner Dashboard</h2>
-            <p>New orders arrive here with complete pickup & delivery details.</p>
-            <table>
-                <tr>
-                    <th>Order No</th>
-                    <th>Customer & Contact</th>
-                    <th>Pickup & Drop Addresses</th>
-                    <th>Total</th>
-                    <th>Action</th>
-                </tr>
-                {% for order in orders %}
-                <tr>
-                    <td><strong>{{ order[1] }}</strong></td>
-                    <td>{{ order[2] }}<br><small>📞 {{ order[3] }}</small></td>
-                    <td>
-                        <div class="address-box"><strong>📍 Pickup (Shop):</strong><br>{{ order[5] }}</div>
-                        <div class="address-box" style="border-left-color: #28a745;"><strong>🏠 Drop (Customer):</strong><br>{{ order[4] }}</div>
-                    </td>
-                    <td>₹{{ order[6] }}</td>
-                    <td>
-                        <span style="background: #e2e8f0; padding: 4px; display:inline-block; margin-bottom:5px; border-radius:4px; font-size:11px;">{{ order[7] }}</span><br>
-                        {% if 'New Order' in order[7] %}
-                        <form action="/broadcast-order/{{ order[1] }}" method="POST">
-                            <button type="submit" class="btn" style="background:#ffc107; color:#000; font-size:12px;">📢 Broadcast to Drivers</button>
-                        </form>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-            <br><a href="/">← Back to Shop</a>
-
-        {% elif active_tab == 'delivery' %}
-            <h2>🚚 Delivery Boy Panel (First-Come, First-Served)</h2>
-            <p>See the shop address (where to pick up) and customer address (where to deliver).</p>
-            <table>
-                <tr>
-                    <th>Order No</th>
-                    <th>Pickup & Delivery Route</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                {% for order in orders %}
-                <tr>
-                    <td><strong>{{ order[1] }}</strong></td>
-                    <td>
-                        <div class="address-box"><strong>🚩 1. Pickup From (Shop):</strong><br>{{ order[5] }}</div>
-                        <div class="address-box" style="border-left-color: #28a745;"><strong>🎯 2. Deliver To (Customer):</strong><br>{{ order[4] }} <br><small>👤 {{ order[2] }} | 📞 {{ order[3] }}</small></div>
-                    </td>
-                    <td>₹{{ order[6] }}</td>
-                    <td><span style="background: #e2e8f0; padding: 4px; border-radius:4px; font-size:11px;">{{ order[7] }}</span></td>
-                    <td>
-                        {% if 'Broadcasted' in order[7] %}
-                        <form action="/accept-order/{{ order[1] }}" method="POST" style="display:flex; flex-direction:column; gap:5px;">
-                            <input type="text" name="boy_name" placeholder="Your Name" required style="margin:0; font-size:12px;">
-                            <button type="submit" class="btn" style="background:#28a745; font-size:12px;">Accept ⚡</button>
-                        </form>
-                        {% elif 'Picked Up' in order[7] or 'Out' in order[7] %}
-                        <form action="/update-status/{{ order[1] }}" method="POST" style="display: flex; flex-direction: column; gap: 5px;">
-                            <select name="status" style="padding: 4px; font-size:12px;">
-                                <option value="Out for Delivery 🚀">Out for Delivery 🚀</option>
-                                <option value="Delivered ✅">Delivered ✅</option>
-                            </select>
-                            <button type="submit" style="background: #007bff; color: white; border: none; padding: 4px; border-radius: 4px; cursor: pointer; font-size:12px;">Update</button>
-                        </form>
-                        {% else %}
-                        <span style="font-size:12px; color:green; font-weight:bold;">Completed ✅</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-            <br><a href="/">← Back to Shop</a>
-        {% endif %}
+    <div class="product-grid">
+        {% for prod in products %}
+        <div class="card">
+            <h3>{{ prod[1] }}</h3>
+            <p>₹{{ prod[2] }}</p>
+            <form action="/add_to_cart/{{ prod[0] }}" method="POST">
+                <button type="submit" class="btn">Add to Cart</button>
+            </form>
+        </div>
+        {% endfor %}
     </div>
 </body>
 </html>
-'''
-
-if __name__ == '__main__':
-    app.run(debug=True)
