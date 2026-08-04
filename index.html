@@ -33,7 +33,7 @@
         </div>
     </header>
 
-    <!-- Settings Modal (Grok API, Model 3.70B, Supabase) -->
+    <!-- Settings Modal -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
             <div class="bg-indigo-900 text-white px-6 py-4 flex justify-between items-center">
@@ -70,9 +70,8 @@
         <div class="max-w-5xl mx-auto text-center">
             <span class="bg-amber-500/20 text-amber-400 text-xs font-semibold px-3 py-1 rounded-full border border-amber-400/30">फरीदाबाद इंडस्ट्रियल हब</span>
             <h1 class="text-3xl md:text-5xl font-extrabold mt-4 mb-4">फैक्ट्री से सीधा दुकान तक</h1>
-            <p class="text-slate-300 text-sm md:text-base max-w-2xl mx-auto mb-6">ऑटो पार्ट्स और इंडस्ट्रियल कंपोनेंट्स के लिए पारदर्शी पर-पार्ट फी B2B प्लेटफॉर्म।</p>
+            <p class="text-slate-300 text-sm md:text-base max-w-2xl mx-auto mb-6">ऑटो पार्ट्स और इंडस्ट्रियल कंपोनेंट्स के लिए पारदर्शी पर-पार्ट फी B2B प्लेटफॉर्म। 10-20 टन बल्क आर्डर सीधे WhatsApp पर करें।</p>
             
-            <!-- Quick Action Tabs -->
             <div class="flex justify-center gap-4">
                 <a href="#sellSection" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-5 py-2.5 rounded-lg text-sm shadow transition flex items-center">
                     <i class="fa-solid fa-plus-circle mr-2"></i> नया कैटलॉग जोड़ें (Sell)
@@ -93,7 +92,7 @@
                 <div class="bg-amber-500 text-slate-900 p-3 rounded-xl text-xl"><i class="fa-solid fa-shop"></i></div>
                 <div>
                     <h2 class="text-xl font-bold text-slate-900">कैटलॉग जोड़ें / सेल (Vendor Listing)</h2>
-                    <p class="text-xs text-slate-500">फरीदाबाद की फैक्ट्रियां यहाँ अपने पार्ट्स और थोक दाम लिस्ट कर सकती हैं।</p>
+                    <p class="text-xs text-slate-500">गैलरी से सीधे फोटो चुनें, मोबाइल नंबर और थोक दाम लिस्ट करें।</p>
                 </div>
             </div>
             
@@ -111,18 +110,27 @@
                     <input type="number" id="partPrice" placeholder="उदा. 1200" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
                 </div>
                 <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">व्हाट्सएप मोबाइल नंबर</label>
+                    <input type="tel" id="whatsappNumber" placeholder="उदा. 9811223344" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">गैलरी से एक या अधिक फोटो चुनें</label>
+                    <input type="file" id="partGallery" accept="image/*" multiple class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm bg-slate-50 focus:outline-none focus:border-indigo-900 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-900 hover:file:bg-indigo-100">
+                </div>
+                <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">कैटेगरी</label>
                     <select id="partCategory" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
                         <option value="ऑटो पार्ट्स">ऑटो पार्ट्स</option>
                         <option value="माइक्रो-इलेक्ट्रॉनिक्स">माइक्रो-इलेक्ट्रॉनिक्स</option>
                         <option value="रॉ मटेरियल / हार्डवेयर">रॉ मटेरियल / हार्डवेयर</option>
+                        <option value="बल्क मेटल (10-20 टन)">बल्क मेटल (10-20 टन)</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">लोकेशन (फरीदाबाद)</label>
                     <input type="text" id="partLocation" placeholder="उदा. सेक्टर 24" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
                 </div>
-                <div class="flex items-end">
+                <div class="md:col-span-2 flex items-end">
                     <button type="submit" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-medium py-2.5 rounded-lg text-sm transition shadow">
                         <i class="fa-solid fa-cloud-arrow-up mr-1"></i> कैटलॉग में पब्लिश करें
                     </button>
@@ -135,18 +143,17 @@
             <div id="purchaseSection" class="flex justify-between items-center mb-6">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-900 border-l-4 border-amber-500 pl-3">इंडस्ट्रियल पार्ट्स कैटलॉग (Purchase)</h2>
-                    <p class="text-xs text-slate-500 mt-1 ml-3">दुकानदार यहाँ से सीधे थोक आर्डर बुक कर सकते हैं।</p>
+                    <p class="text-xs text-slate-500 mt-1 ml-3">डायरेक्ट WhatsApp चैट के जरिए थोक आर्डर बुक करें।</p>
                 </div>
                 <span class="text-sm text-indigo-600 font-semibold bg-indigo-50 px-3 py-1 rounded-lg border border-indigo-100">पर-पार्ट फी मॉडल लागू</span>
             </div>
 
             <!-- Dynamic Product Grid -->
             <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Default Sample Item 1 -->
                 <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition border border-slate-200 overflow-hidden flex flex-col justify-between">
                     <div>
-                        <div class="bg-slate-200 h-36 flex items-center justify-center text-slate-500 relative">
-                            <i class="fa-solid fa-gears text-4xl"></i>
+                        <div class="bg-slate-200 h-40 flex items-center justify-center text-slate-500 relative overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=60" alt="Gear Box" class="w-full h-full object-cover">
                             <span class="absolute top-2 right-2 bg-indigo-900 text-white text-xs px-2 py-1 rounded">सेक्टर 24</span>
                         </div>
                         <div class="p-4">
@@ -155,34 +162,14 @@
                             <p class="text-xs text-slate-500 mt-0.5">कोड: FBD-G-102</p>
                             <div class="mt-3 flex items-baseline space-x-2">
                                 <span class="text-lg font-extrabold text-slate-900">₹1,200</span>
-                                <span class="text-xs text-slate-400 line-through">₹1,500</span>
+                                <span class="text-xs text-slate-400">/ पीस</span>
                             </div>
                         </div>
                     </div>
                     <div class="p-4 pt-0">
-                        <button onclick="alert('आर्डर बुक सफल! पर-पार्ट कमिशन लागू किया गया।')" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white text-sm font-medium py-2 rounded-lg transition">आर्डर दें (Purchase)</button>
-                    </div>
-                </div>
-
-                <!-- Default Sample Item 2 -->
-                <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition border border-slate-200 overflow-hidden flex flex-col justify-between">
-                    <div>
-                        <div class="bg-slate-200 h-36 flex items-center justify-center text-slate-500 relative">
-                            <i class="fa-solid fa-bolt text-4xl"></i>
-                            <span class="absolute top-2 right-2 bg-indigo-900 text-white text-xs px-2 py-1 rounded">एनआईटी</span>
-                        </div>
-                        <div class="p-4">
-                            <span class="text-xs text-amber-600 font-bold uppercase">माइक्रो-इलेक्ट्रॉनिक्स</span>
-                            <h3 class="font-bold text-base text-slate-900 mt-1">Industrial Sensor Module</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">कोड: FBD-S-405</p>
-                            <div class="mt-3 flex items-baseline space-x-2">
-                                <span class="text-lg font-extrabold text-slate-900">₹850</span>
-                                <span class="text-xs text-slate-400 line-through">₹1,000</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4 pt-0">
-                        <button onclick="alert('आर्डर बुक सफल! पर-पार्ट कमिशन लागू किया गया।')" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white text-sm font-medium py-2 rounded-lg transition">आर्डर दें (Purchase)</button>
+                        <a href="https://wa.me/919811223344?text=Hello,%20I%20want%20to%20order%20Heavy%20Duty%20Gear%20Set%20(FBD-G-102)%20via%20Viziag%20Mart." target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 rounded-lg transition flex items-center justify-center shadow">
+                            <i class="fa-brands fa-whatsapp text-lg mr-2"></i> WhatsApp पर आर्डर दें
+                        </a>
                     </div>
                 </div>
             </div>
@@ -192,20 +179,20 @@
         <section id="howitworks" class="bg-slate-200 p-6 md:p-8 rounded-2xl">
             <div class="text-center max-w-2xl mx-auto mb-8">
                 <h2 class="text-xl font-bold text-slate-900">बिजिया मार्ट का वर्किंग मॉडल</h2>
-                <p class="text-xs text-slate-600 mt-1">बिना किसी फिक्स सब्सक्रिप्शन के सिर्फ पार्ट-टू-पार्ट ट्रांजैक्शन फीस।</p>
+                <p class="text-xs text-slate-600 mt-1">बिना किसी फिक्स सब्सक्रिप्शन के सिर्फ पार्ट-टू-पार्ट ट्रांजैक्शन फीस और डायरेक्ट चैट।</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-300">
-                    <div class="text-amber-500 font-bold mb-1">01. कैटलॉग (Sell)</div>
-                    <p class="text-xs text-slate-600">सप्लायर अपने पार्ट्स के दाम सीधे ऐप पर अपडेट करते हैं।</p>
+                    <div class="text-amber-500 font-bold mb-1">01. गैलरी अपलोड</div>
+                    <p class="text-xs text-slate-600">फोन की गैलरी से सीधे एक या अधिक फोटो सेलेक्ट करके कैटलॉग बनाएं।</p>
                 </div>
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-300">
-                    <div class="text-amber-500 font-bold mb-1">02. आर्डर (Purchase)</div>
-                    <p class="text-xs text-slate-600">दुकानदार अपनी जरूरत का माल सीधे थोक भाव में बुक करते हैं।</p>
+                    <div class="text-amber-500 font-bold mb-1">02. डायरेक्ट WhatsApp चैट</div>
+                    <p class="text-xs text-slate-600">खरीदार सीधे बटन दबाकर वेंडर से व्हाट्सएप पर बात करके 10-20 टन का माल बुक करते हैं।</p>
                 </div>
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-300">
                     <div class="text-amber-500 font-bold mb-1">03. पर-पार्ट फी</div>
-                    <p class="text-xs text-slate-600">हर সফল ट्रांजैक्शन पर दोनों तरफ से तय प्रति पार्ट हिस्सा लिया जाता है।</p>
+                    <p class="text-xs text-slate-600">हर सफल डील पर तय प्रति पार्ट या टन हिस्सा प्लेटफॉर्म का रहता है।</p>
                 </div>
             </div>
         </section>
@@ -237,7 +224,7 @@
             localStorage.setItem('viziag_model', document.getElementById('aiModelName').value);
             localStorage.setItem('viziag_sb_url', document.getElementById('supabaseUrl').value);
             localStorage.setItem('viziag_sb_key', document.getElementById('supabaseKey').value);
-            alert('सेटिंग्स (Model 3.70B, Grok API & Supabase) सफलतापूर्वक सेव हो गई हैं!');
+            alert('सेटिंग्स सफलतापूर्वक सेव हो गई हैं!');
             closeSettings();
         }
 
@@ -246,17 +233,34 @@
             const name = document.getElementById('partName').value;
             const code = document.getElementById('partCode').value;
             const price = document.getElementById('partPrice').value;
+            const phone = document.getElementById('whatsappNumber').value;
+            const fileInput = document.getElementById('partGallery');
             const category = document.getElementById('partCategory').value;
             const location = document.getElementById('partLocation').value;
+
+            let mainImage = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&auto=format&fit=crop&q=60";
+            let badgeText = "";
+
+            if (fileInput.files && fileInput.files.length > 0) {
+                // Read the first selected file as local Data URL
+                mainImage = URL.createObjectURL(fileInput.files[0]);
+                if (fileInput.files.length > 1) {
+                    badgeText = `<div class="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center space-x-1"><i class="fa-solid fa-images"></i> <span>${fileInput.files.length} फोटो गैलरी से</span></div>`;
+                }
+            }
+
+            const cleanPhone = phone.replace(/[^0-9]/g, '');
+            const waLink = `https://wa.me/91${cleanPhone}?text=Hello,%20I%20want%20to%20inquire%20about%20${encodeURIComponent(name)}%20(Code:%20${encodeURIComponent(code)})%20listed%20on%20Viziag%20Mart.`;
 
             const grid = document.getElementById('productGrid');
             const card = document.createElement('div');
             card.className = "bg-white rounded-xl shadow-sm hover:shadow-md transition border border-slate-200 overflow-hidden flex flex-col justify-between";
             card.innerHTML = `
                 <div>
-                    <div class="bg-slate-200 h-36 flex items-center justify-center text-slate-500 relative">
-                        <i class="fa-solid fa-box-open text-4xl"></i>
+                    <div class="bg-slate-200 h-40 flex items-center justify-center text-slate-500 relative overflow-hidden">
+                        <img src="${mainImage}" alt="${name}" class="w-full h-full object-cover">
                         <span class="absolute top-2 right-2 bg-indigo-900 text-white text-xs px-2 py-1 rounded">${location}</span>
+                        ${badgeText}
                     </div>
                     <div class="p-4">
                         <span class="text-xs text-amber-600 font-bold uppercase">${category}</span>
@@ -264,16 +268,19 @@
                         <p class="text-xs text-slate-500 mt-0.5">कोड: ${code}</p>
                         <div class="mt-3 flex items-baseline space-x-2">
                             <span class="text-lg font-extrabold text-slate-900">₹${Number(price).toLocaleString('en-IN')}</span>
+                            <span class="text-xs text-slate-400">/ थोक मूल्य</span>
                         </div>
                     </div>
                 </div>
                 <div class="p-4 pt-0">
-                    <button onclick="alert('आर्डर बुक सफल! पर-पार्ट कमिशन लागू किया गया।')" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white text-sm font-medium py-2 rounded-lg transition">आर्डर दें (Purchase)</button>
+                    <a href="${waLink}" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 rounded-lg transition flex items-center justify-center shadow">
+                        <i class="fa-brands fa-whatsapp text-lg mr-2"></i> WhatsApp पर आर्डर दें
+                    </a>
                 </div>
             `;
             grid.prepend(card);
             document.getElementById('catalogForm').reset();
-            alert('नया कैटलॉग सफलतापूर्वक जोड़ दिया गया है!');
+            alert('गैलरी से फोटो लेकर कैटलॉग सफलतापूर्वक पब्लिश हो गया है!');
             window.location.hash = '#products';
         }
     </script>
