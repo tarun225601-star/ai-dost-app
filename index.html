@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viziag Mart - Vendor Portal</title>
+    <title>Viziag Mart - Live Wholesale & Vendor Dashboard</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
@@ -21,20 +22,53 @@
             background: var(--bg-gradient);
             margin: 0; padding: 0; color: var(--text-main); min-height: 100vh;
         }
-        .brand-header {
+        .header {
             background: #111; color: white; padding: 15px 20px;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: sticky; top: 0; z-index: 100;
         }
-        .brand-header h1 { margin: 0; font-size: 22px; color: var(--primary); letter-spacing: 1px; }
-        .settings-btn {
+        .header h1 { margin: 0; font-size: 22px; color: var(--primary); letter-spacing: 1px; cursor: pointer; }
+        .nav-btns { display: flex; gap: 10px; }
+        .btn-nav {
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;
+            color: white; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;
         }
-        .container { max-width: 480px; margin: 20px auto; padding: 0 15px; }
+        .btn-nav.active { background: var(--primary); border-color: var(--primary); }
+        
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+        
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            background: white; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: flex; flex-direction: column;
+            justify-content: space-between; transition: transform 0.2s;
+        }
+        .product-card:hover { transform: translateY(-5px); }
+        .product-img { width: 100%; height: 180px; object-fit: cover; background: #eee; }
+        .product-info { padding: 15px; }
+        .company-badge {
+            font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 3px 8px;
+            border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 8px;
+        }
+        .product-name { font-size: 18px; font-weight: bold; margin: 0 0 5px 0; color: #222; }
+        .product-price { font-size: 16px; color: #16a34a; font-weight: bold; margin-bottom: 10px; }
+        .product-sku { font-size: 12px; color: #666; margin-bottom: 15px; }
+        .whatsapp-btn {
+            background: #25d366; color: white; text-align: center; padding: 12px;
+            text-decoration: none; font-weight: bold; display: block; border-radius: 0 0 12px 12px;
+        }
+        .whatsapp-btn:hover { background: #20ba5a; }
+
+        /* Cards & Forms */
         .card {
             background: var(--card-bg); padding: 25px; border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 480px; margin: 20px auto;
         }
         h2 { margin-top: 0; font-size: 20px; color: #222; }
         .input-group { margin-bottom: 15px; }
@@ -55,6 +89,7 @@
         .error-text { color: #dc3545; font-size: 13px; margin-top: 5px; }
         .success-text { color: #28a745; font-size: 14px; font-weight: 600; text-align: center; margin-top: 10px; }
         .switch-link { text-align: center; margin-top: 15px; color: #007bff; cursor: pointer; font-size: 14px; font-weight: 500; }
+        
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;
@@ -64,16 +99,28 @@
 </head>
 <body>
 
-    <div class="brand-header">
-        <h1>Viziag Mart</h1>
-        <button class="settings-btn" onclick="openSettings()" id="settings-toggle-btn" style="display:none;">⚙️ Settings</button>
+    <!-- Header -->
+    <div class="header">
+        <h1 onclick="switchTab('marketplace')">Viziag Mart</h1>
+        <div class="nav-btns">
+            <button class="btn-nav active" id="nav-market-btn" onclick="switchTab('marketplace')">🏠 Marketplace</button>
+            <button class="btn-nav" id="nav-vendor-btn" onclick="checkVendorSession()">📦 Vendor Portal</button>
+        </div>
     </div>
 
     <div class="container">
 
-        <!-- 1. LOGIN SCREEN (Direct View) -->
-        <div id="login-section" class="card">
-            <h2>🔐 Vendor Login</h2>
+        <!-- 1. Marketplace View (Default) -->
+        <div id="tab-marketplace">
+            <h2 style="margin-bottom: 20px; color: #222;">🔥 Live Wholesale Marketplace</h2>
+            <div id="products-container" class="product-grid">
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">Loading live products...</div>
+            </div>
+        </div>
+
+        <!-- 2A. Vendor Login View -->
+        <div id="tab-login" class="card hidden">
+            <h2>🔐 Vendor Secure Login</h2>
             <div class="input-group">
                 <label>Mobile Number</label>
                 <input type="tel" id="login-mobile" placeholder="10-digit mobile number" maxlength="10">
@@ -84,16 +131,17 @@
             </div>
             <button class="btn" onclick="loginVendor()">Login to Dashboard</button>
             <p id="login-error" class="error-text"></p>
-            <div class="switch-link" onclick="openRegisterModal()">नया वेंडर हूँ? मोबाइल नंबर से रजिस्टर करें 🚀</div>
+            <div class="switch-link" onclick="openRegisterModal()">नया वेंडर हूँ? मोबाइल नंबर और OTP से रजिस्टर करें 🚀</div>
         </div>
 
-        <!-- 2. DIRECT DASHBOARD (After Login) -->
-        <div id="admin-section" class="card hidden">
+        <!-- 2B. Vendor Dashboard View (Product Upload Panel) -->
+        <div id="tab-dashboard" class="card hidden" style="max-width: 600px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                 <div>
                     <h2 id="display-company-name" style="margin:0; color:var(--primary);">Dashboard</h2>
                     <span style="font-size: 12px; color: #666;" id="display-mobile"></span>
                 </div>
+                <button class="btn-nav" style="background:#333; padding:5px 10px;" onclick="openSettings()">⚙️ Settings</button>
             </div>
             <hr style="border:0; border-top:1px solid #eee; margin-bottom:20px;">
 
@@ -130,36 +178,35 @@
 
     </div>
 
-    <!-- 3. OTP & REGISTRATION MODAL -->
+    <!-- 3. OTP & Registration Modal -->
     <div id="register-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>🚀 Mobile OTP & Registration</h2>
+            <h2>🚀 Real SMS OTP Verification</h2>
             
-            <!-- Step A: Mobile & Send OTP -->
             <div id="otp-step-1">
                 <div class="input-group">
-                    <label>Mobile Number</label>
-                    <input type="tel" id="reg-mobile" placeholder="10-digit mobile number" maxlength="10">
+                    <label>Mobile Number (with Country Code)</label>
+                    <input type="tel" id="reg-mobile" placeholder="+919876543210" value="+91">
                 </div>
-                <button class="btn" onclick="sendOtpCode()">Send OTP</button>
+                <div id="recaptcha-container" style="margin-bottom: 15px;"></div>
+                <button class="btn" onclick="sendRealOtp()">Send SMS OTP</button>
                 <p id="reg-error-1" class="error-text"></p>
             </div>
 
-            <!-- Step B: Verify OTP & Set PIN -->
             <div id="otp-step-2" class="hidden">
                 <div class="input-group">
-                    <label>Enter 4-Digit OTP (Demo: 1234)</label>
-                    <input type="text" id="entered-otp" placeholder="Enter OTP" maxlength="4">
+                    <label>Enter 6-Digit SMS OTP</label>
+                    <input type="text" id="entered-otp" placeholder="Enter OTP received on phone" maxlength="6">
                 </div>
                 <div class="input-group">
-                    <label>Company Name</label>
+                    <label>Company / Store Name</label>
                     <input type="text" id="reg-company" placeholder="e.g. JetBlack India">
                 </div>
                 <div class="input-group">
-                    <label>Create Your Secret Password</label>
-                    <input type="password" id="reg-pin" placeholder="Set your password">
+                    <label>Create Secret Password</label>
+                    <input type="password" id="reg-pin" placeholder="Set your login password">
                 </div>
-                <button class="btn" onclick="verifyOtpAndRegister()">Verify & Register</button>
+                <button class="btn" onclick="verifyRealOtpAndRegister()">Verify & Register</button>
                 <p id="reg-error-2" class="error-text"></p>
             </div>
 
@@ -167,16 +214,16 @@
         </div>
     </div>
 
-    <!-- 4. SETTINGS MODAL (Password & Profile Change) -->
+    <!-- 4. Settings Modal -->
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
-            <h3>⚙️ Admin Panel Settings</h3>
+            <h3>⚙️ Vendor Settings</h3>
             <div class="input-group">
                 <label>Company Name</label>
                 <input type="text" id="settings-company">
             </div>
             <div class="input-group">
-                <label>New Secret Password / PIN</label>
+                <label>New Password (Optional)</label>
                 <input type="password" id="settings-new-pin" placeholder="Leave blank to keep old">
             </div>
             <button class="btn" onclick="updateSettings()">Save Changes</button>
@@ -191,83 +238,84 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    const auth = firebase.auth();
 
-    let activeMobile = "";
-    let activeCompanyName = "";
+    let activeMobile = localStorage.getItem('viziag_mobile') || "";
+    let activeCompanyName = localStorage.getItem('viziag_company') || "";
     let base64Image = "";
-    let generatedOtp = "1234"; // Testing OTP
+    let confirmationResultObj = null;
 
     window.onload = function() {
-        let savedMobile = localStorage.getItem('viziag_mobile');
-        let savedCompany = localStorage.getItem('viziag_company');
-        if(savedMobile && savedCompany) {
-            activeMobile = savedMobile;
-            activeCompanyName = savedCompany;
-            showDashboard();
-        }
+        loadMarketplaceProducts();
     };
 
-    function openRegisterModal() {
-        document.getElementById('register-modal').classList.remove('hidden');
-        document.getElementById('otp-step-1').classList.remove('hidden');
-        document.getElementById('otp-step-2').classList.add('hidden');
-    }
-    function closeRegisterModal() {
-        document.getElementById('register-modal').classList.add('hidden');
-    }
+    function switchTab(tabName) {
+        document.getElementById('tab-marketplace').classList.add('hidden');
+        document.getElementById('tab-login').classList.add('hidden');
+        document.getElementById('tab-dashboard').classList.add('hidden');
 
-    function showDashboard() {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('register-modal').classList.add('hidden');
-        document.getElementById('admin-section').classList.remove('hidden');
-        document.getElementById('settings-toggle-btn').style.display = 'block';
-        
-        document.getElementById('display-company-name').innerText = activeCompanyName;
-        document.getElementById('display-mobile').innerText = "Mobile: " + activeMobile;
-    }
+        document.getElementById('nav-market-btn').classList.remove('active');
+        document.getElementById('nav-vendor-btn').classList.remove('active');
 
-    // Step 1: Send OTP
-    function sendOtpCode() {
-        let mobile = document.getElementById('reg-mobile').value.trim();
-        if(mobile.length !== 10) {
-            document.getElementById('reg-error-1').innerText = "कृपया सही 10 अंकों का मोबाइल नंबर डालें।";
-            return;
+        if(tabName === 'marketplace') {
+            document.getElementById('tab-marketplace').classList.remove('hidden');
+            document.getElementById('nav-market-btn').classList.add('active');
+            loadMarketplaceProducts();
+        } else if(tabName === 'vendor') {
+            document.getElementById('nav-vendor-btn').classList.add('active');
+            if(activeMobile && activeCompanyName) {
+                showDashboard();
+            } else {
+                document.getElementById('tab-login').classList.remove('hidden');
+            }
         }
-        // यहाँ वास्तविक एसएमएस गेटवे या Firebase Phone Auth जोड़ा जा सकता है
-        alert("OTP Sent Successfully! (Demo OTP: 1234)");
-        document.getElementById('otp-step-1').classList.add('hidden');
-        document.getElementById('otp-step-2').classList.remove('hidden');
     }
 
-    // Step 2: Verify OTP & Register Company + PIN
-    function verifyOtpAndRegister() {
-        let mobile = document.getElementById('reg-mobile').value.trim();
-        let otp = document.getElementById('entered-otp').value.trim();
-        let companyName = document.getElementById('reg-company').value.trim();
-        let pin = document.getElementById('reg-pin').value.trim();
+    function checkVendorSession() {
+        switchTab('vendor');
+    }
 
-        if(otp !== generatedOtp) {
-            document.getElementById('reg-error-2').innerText = "गलत ओटीपी (OTP)! (डेमो ओटीपी: 1234)";
-            return;
-        }
-        if(!companyName || !pin) {
-            document.getElementById('reg-error-2').innerText = "कंपनी का नाम और पासवर्ड ज़रूर भरें।";
-            return;
-        }
+    function loadMarketplaceProducts() {
+        const container = document.getElementById('products-container');
+        db.ref('vendors_products').on('value', (snapshot) => {
+            container.innerHTML = "";
+            let allProducts = [];
 
-        db.ref('registered_vendors/' + mobile).set({
-            companyName: companyName,
-            mobile: mobile,
-            secretPin: pin
-        }).then(() => {
-            alert("रजिस्ट्रेशन सफल! अब आप लॉगिन कर सकते हैं।");
-            closeRegisterModal();
-        }).catch((error) => {
-            document.getElementById('reg-error-2').innerText = "Error: " + error.message;
+            snapshot.forEach((vendorSnapshot) => {
+                vendorSnapshot.forEach((productSnapshot) => {
+                    allProducts.push(productSnapshot.val());
+                });
+            });
+
+            if (allProducts.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">अभी कोई प्रोडक्ट लाइव नहीं है। वेंडर पोर्टल से जोड़ें।</div>`;
+                return;
+            }
+
+            allProducts.sort((a, b) => b.timestamp - a.timestamp);
+
+            allProducts.forEach(product => {
+                let card = document.createElement('div');
+                card.className = 'product-card';
+                let imgSrc = product.productImage || 'https://via.placeholder.com/300x180?text=No+Image';
+
+                card.innerHTML = `
+                    <div>
+                        <img src="${imgSrc}" class="product-img">
+                        <div class="product-info">
+                            <span class="company-badge">🏢 ${product.companyName || 'Verified Seller'}</span>
+                            <div class="product-name">${product.productName}</div>
+                            <div class="product-price">₹ ${product.price}</div>
+                            <div class="product-sku">📍 ${product.sku || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <a href="${product.whatsappOrderUrl}" target="_blank" class="whatsapp-btn">💬 Order on WhatsApp</a>
+                `;
+                container.appendChild(card);
+            });
         });
     }
 
-    // Login Vendor
     function loginVendor() {
         let mobile = document.getElementById('login-mobile').value.trim();
         let pin = document.getElementById('login-pin').value.trim();
@@ -295,6 +343,80 @@
             .catch((error) => {
                 document.getElementById('login-error').innerText = "Error: " + error.message;
             });
+    }
+
+    function showDashboard() {
+        document.getElementById('tab-login').classList.add('hidden');
+        document.getElementById('tab-dashboard').classList.remove('hidden');
+        document.getElementById('display-company-name').innerText = activeCompanyName;
+        document.getElementById('display-mobile').innerText = "Mobile: " + activeMobile;
+    }
+
+    function openRegisterModal() {
+        document.getElementById('register-modal').classList.remove('hidden');
+        document.getElementById('otp-step-1').classList.remove('hidden');
+        document.getElementById('otp-step-2').classList.add('hidden');
+        
+        if (!window.recaptchaVerifier) {
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'invisible'
+            });
+        }
+    }
+
+    function closeRegisterModal() {
+        document.getElementById('register-modal').classList.add('hidden');
+    }
+
+    function sendRealOtp() {
+        let phoneNumber = document.getElementById('reg-mobile').value.trim();
+        if(phoneNumber.length < 13) {
+            document.getElementById('reg-error-1').innerText = "कृपया सही फॉर्मेट में नंबर डालें (जैसे +919876543210)।";
+            return;
+        }
+
+        let appVerifier = window.recaptchaVerifier;
+        auth.signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((confirmationResult) => {
+                confirmationResultObj = confirmationResult;
+                alert("OTP Sent Successfully!");
+                document.getElementById('otp-step-1').classList.add('hidden');
+                document.getElementById('otp-step-2').classList.remove('hidden');
+            }).catch((error) => {
+                document.getElementById('reg-error-1').innerText = "SMS Error: " + error.message;
+            });
+    }
+
+    function verifyRealOtpAndRegister() {
+        let code = document.getElementById('entered-otp').value.trim();
+        let companyName = document.getElementById('reg-company').value.trim();
+        let pin = document.getElementById('reg-pin').value.trim();
+        let fullMobile = document.getElementById('reg-mobile').value.trim();
+        let cleanMobile = fullMobile.replace('+91', '');
+
+        if(!code || code.length !== 6) {
+            document.getElementById('reg-error-2').innerText = "कृपया 6 अंकों का सही SMS OTP डालें।";
+            return;
+        }
+        if(!companyName || !pin) {
+            document.getElementById('reg-error-2').innerText = "कंपनी का नाम और पासवर्ड ज़रूर भरें।";
+            return;
+        }
+
+        confirmationResultObj.confirm(code).then((result) => {
+            db.ref('registered_vendors/' + cleanMobile).set({
+                companyName: companyName,
+                mobile: cleanMobile,
+                secretPin: pin
+            }).then(() => {
+                alert("रजिस्ट्रेशन सफल! अब लॉगिन करें।");
+                closeRegisterModal();
+                document.getElementById('login-mobile').value = cleanMobile;
+                switchTab('vendor');
+            });
+        }).catch((error) => {
+            document.getElementById('reg-error-2').innerText = "OTP Failed: " + error.message;
+        });
     }
 
     function previewImage() {
@@ -338,7 +460,7 @@
 
         db.ref('vendors_products/' + activeMobile).push(productData)
             .then(() => {
-                document.getElementById('status-msg').innerText = "Product Published Successfully to Live Cloud! 🎉";
+                document.getElementById('status-msg').innerText = "Product Published Successfully! 🎉";
                 document.getElementById('p-name').value = '';
                 document.getElementById('p-price').value = '';
                 document.getElementById('p-sku').value = '';
@@ -351,7 +473,6 @@
             });
     }
 
-    // Settings Modal Functions
     function openSettings() {
         document.getElementById('settings-company').value = activeCompanyName;
         document.getElementById('settings-new-pin').value = "";
@@ -384,7 +505,9 @@
     function logoutVendor() {
         localStorage.removeItem('viziag_mobile');
         localStorage.removeItem('viziag_company');
-        location.reload();
+        activeMobile = "";
+        activeCompanyName = "";
+        switchTab('marketplace');
     }
 </script>
 
