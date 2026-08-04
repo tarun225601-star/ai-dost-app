@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viziag Mart - Marketplace & Vendor Portal</title>
+    <title>Viziag Mart - Multi-Vendor Marketplace</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -22,16 +22,16 @@
             margin: 0; padding: 0; color: var(--text-main); min-height: 100vh;
         }
         .header {
-            background: #111; color: white; padding: 15px 20px;
+            background: #111; color: white; padding: 12px 15px;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             position: sticky; top: 0; z-index: 100;
         }
-        .header h1 { margin: 0; font-size: 22px; color: var(--primary); letter-spacing: 1px; cursor: pointer; }
-        .nav-btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .header h1 { margin: 0; font-size: 20px; color: var(--primary); letter-spacing: 1px; cursor: pointer; }
+        .nav-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
         .btn-nav {
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;
+            color: white; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;
         }
         .btn-nav.active { background: var(--primary); border-color: var(--primary); }
         
@@ -63,7 +63,7 @@
 
         .card {
             background: var(--card-bg); padding: 25px; border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 520px; margin: 20px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 600px; margin: 20px auto;
         }
         h2 { margin-top: 0; font-size: 20px; color: #222; }
         .input-group { margin-bottom: 15px; }
@@ -88,6 +88,17 @@
             background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-content { background: white; padding: 25px; border-radius: 16px; width: 90%; max-width: 420px; }
+
+        /* Vendor Dashboard Product Management List */
+        .my-product-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; margin-bottom: 10px;
+        }
+        .my-product-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; }
+        .action-btns { display: flex; gap: 5px; }
+        .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-edit { background: #3b82f6; color: white; }
+        .btn-del { background: #ef4444; color: white; }
     </style>
 </head>
 <body>
@@ -104,7 +115,7 @@
     <div class="container">
         <!-- Marketplace View -->
         <div id="tab-marketplace">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: gap; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                 <h2 style="margin: 0; color: #222;">🔥 Live Wholesale Marketplace</h2>
                 <div id="buyer-status-banner" style="font-size: 13px; background: #e2e8f0; padding: 6px 12px; border-radius: 20px;">
                     🔒 Login to Order
@@ -117,22 +128,22 @@
 
         <!-- Vendor Login View -->
         <div id="tab-login" class="card hidden">
-            <h2>🔐 Vendor Secure Login</h2>
+            <h2>🔐 Multi-Vendor Secure Login</h2>
             <div class="input-group">
                 <label>Mobile Number (10 Digits)</label>
                 <input type="tel" id="login-mobile" placeholder="e.g. 9876543210" maxlength="10">
             </div>
             <div class="input-group">
-                <label>Secret Security PIN</label>
+                <label>Secret Unique Security PIN</label>
                 <input type="password" id="login-pin" placeholder="Enter your secret PIN">
             </div>
-            <button class="btn" onclick="loginVendor()">Login to Admin Panel</button>
+            <button class="btn" onclick="loginVendor()">Open Admin Panel</button>
             <p id="login-error" class="error-text"></p>
             <div class="switch-link" onclick="openRegisterModal()">नया वेंडर हूँ? रजिस्टर करें 🚀</div>
         </div>
 
         <!-- Vendor Dashboard View -->
-        <div id="tab-dashboard" class="card hidden" style="max-width: 650px;">
+        <div id="tab-dashboard" class="card hidden" style="max-width: 700px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                 <div>
                     <h2 id="display-company-name" style="margin:0; color:var(--primary);">Admin Panel</h2>
@@ -142,8 +153,10 @@
             </div>
             <hr style="border:0; border-top:1px solid #eee; margin-bottom:20px;">
 
-            <h3 style="font-size:16px; margin-bottom:15px;">📦 Add Catalog Item (Product with Photo)</h3>
+            <h3 id="form-title" style="font-size:16px; margin-bottom:15px;">📦 Add Catalog Item (Product with Photo)</h3>
             
+            <input type="hidden" id="edit-product-id" value="">
+
             <div class="input-group">
                 <label>Product Photo</label>
                 <input type="file" id="p-image" accept="image/*" onchange="previewImage()">
@@ -167,14 +180,22 @@
                 <input type="text" id="p-sku" placeholder="e.g. SKU-001">
             </div>
 
-            <button class="btn" onclick="publishProduct()">Publish Product Live 🚀</button>
+            <button class="btn" id="publish-btn" onclick="saveOrUpdateProduct()">Publish Product Live 🚀</button>
+            <button class="btn btn-secondary hidden" id="cancel-edit-btn" onclick="resetProductForm()">Cancel Edit</button>
             <p id="status-msg" class="success-text"></p>
             
-            <button class="btn btn-secondary" onclick="logoutVendor()">Logout</button>
+            <hr style="border:0; border-top:1px solid #eee; margin:25px 0 20px 0;">
+
+            <h3 style="font-size:16px; margin-bottom:15px;">📋 Your Uploaded Products (Manage Items)</h3>
+            <div id="vendor-products-list" style="max-height: 300px; overflow-y: auto;">
+                <div style="text-align: center; color: #666; padding: 20px;">लोड हो रहा है...</div>
+            </div>
+
+            <button class="btn btn-secondary" style="margin-top:20px;" onclick="logoutVendor()">Logout</button>
         </div>
     </div>
 
-    <!-- Buyer Modal (Direct Mobile & Name Login) -->
+    <!-- Buyer Modal -->
     <div id="buyer-modal" class="modal hidden">
         <div class="modal-content">
             <h2>👤 Buyer Mobile Login</h2>
@@ -194,9 +215,9 @@
     <!-- Vendor Registration Modal -->
     <div id="register-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>🚀 Vendor Quick Registration</h2>
+            <h2>🚀 Multi-Vendor Registration</h2>
             <div class="input-group">
-                <label>Mobile Number (10 Digits)</label>
+                <label>Mobile Number (10 Digits - Unique)</label>
                 <input type="tel" id="reg-mobile" placeholder="9876543210" maxlength="10">
             </div>
             <div class="input-group">
@@ -291,12 +312,8 @@
         }
     }
 
-    function openBuyerModal() {
-        document.getElementById('buyer-modal').classList.remove('hidden');
-    }
-    function closeBuyerModal() {
-        document.getElementById('buyer-modal').classList.add('hidden');
-    }
+    function openBuyerModal() { document.getElementById('buyer-modal').classList.remove('hidden'); }
+    function closeBuyerModal() { document.getElementById('buyer-modal').classList.add('hidden'); }
     function saveBuyerLogin() {
         let mob = document.getElementById('buyer-login-mobile').value.trim();
         let name = document.getElementById('buyer-login-name').value.trim();
@@ -329,7 +346,9 @@
 
             snapshot.forEach((vendorSnapshot) => {
                 vendorSnapshot.forEach((productSnapshot) => {
-                    allProducts.push(productSnapshot.val());
+                    let pData = productSnapshot.val();
+                    pData.id = productSnapshot.key;
+                    allProducts.push(pData);
                 });
             });
 
@@ -350,7 +369,7 @@
                     let orderText = encodeURIComponent(`Hello, I am buyer ${activeBuyerName} (${activeBuyerMobile}). I want to order ${product.productName} (₹${product.price}) from ${product.companyName}`);
                     orderBtnHTML = `<a href="https://wa.me/91${product.sellerMobile}?text=${orderText}" target="_blank" class="whatsapp-btn">💬 Order on WhatsApp</a>`;
                 } else {
-                    orderBtnHTML = `<div onclick="openBuyerModal()" class="whatsapp-btn" style="background:#007bff; cursor:pointer;">🔒 Login to Order on WhatsApp</div>`;
+                    orderBtnHTML = `<div onclick="openBuyerModal()" class="whatsapp-btn" style="background:#007bff; cursor:pointer; text-align:center;">🔒 Login to Order on WhatsApp</div>`;
                 }
 
                 card.innerHTML = `
@@ -367,8 +386,6 @@
                 `;
                 container.appendChild(card);
             });
-        }, (error) => {
-            container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 20px; color: red;">डाटा लोड करने में समस्या: ${error.message}</div>`;
         });
     }
 
@@ -404,14 +421,11 @@
         document.getElementById('tab-dashboard').classList.remove('hidden');
         document.getElementById('display-company-name').innerText = activeCompanyName;
         document.getElementById('display-mobile').innerText = "Mobile: " + activeMobile;
+        loadVendorProducts();
     }
 
-    function openRegisterModal() {
-        document.getElementById('register-modal').classList.remove('hidden');
-    }
-    function closeRegisterModal() {
-        document.getElementById('register-modal').classList.add('hidden');
-    }
+    function openRegisterModal() { document.getElementById('register-modal').classList.remove('hidden'); }
+    function closeRegisterModal() { document.getElementById('register-modal').classList.add('hidden'); }
 
     function registerVendorDirect() {
         let mobile = document.getElementById('reg-mobile').value.trim();
@@ -450,34 +464,121 @@
         }
     }
 
-    function publishProduct() {
+    // Load Vendor's own products for management (Edit/Delete)
+    function loadVendorProducts() {
+        const listContainer = document.getElementById('vendor-products-list');
+        db.ref('vendors_products/' + activeMobile).on('value', (snapshot) => {
+            listContainer.innerHTML = "";
+            let items = [];
+            snapshot.forEach((childSnap) => {
+                let item = childSnap.val();
+                item.id = childSnap.key;
+                items.push(item);
+            });
+
+            if(items.length === 0) {
+                listContainer.innerHTML = `<div style="text-align: center; color: #666; padding: 15px; font-size: 13px;">आपने अभी तक कोई प्रोडक्ट नहीं जोड़ा है।</div>`;
+                return;
+            }
+
+            items.reverse().forEach(item => {
+                let div = document.createElement('div');
+                div.className = 'my-product-item';
+                let img = item.productImage || 'https://via.placeholder.com/50?text=No+Img';
+                div.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="${img}">
+                        <div>
+                            <div style="font-weight:bold; font-size:14px;">${item.productName}</div>
+                            <div style="color:#16a34a; font-size:13px; font-weight:600;">₹ ${item.price} | <span style="color:#666; font-weight:normal;">${item.sku || 'N/A'}</span></div>
+                        </div>
+                    </div>
+                    <div class="action-btns">
+                        <button class="btn-sm btn-edit" onclick="editProduct('${item.id}', '${encodeURIComponent(item.productName)}', '${item.price}', '${encodeURIComponent(item.sku || '')}', '${encodeURIComponent(item.productImage || '')}')">Edit</button>
+                        <button class="btn-sm btn-del" onclick="deleteProduct('${item.id}')">Delete</button>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        });
+    }
+
+    function saveOrUpdateProduct() {
         if (!activeMobile) return;
         let name = document.getElementById('p-name').value.trim();
         let price = document.getElementById('p-price').value.trim();
         let sku = document.getElementById('p-sku').value.trim();
+        let editId = document.getElementById('edit-product-id').value;
 
         if(!name || !price) {
-            alert("नाम और कीमत दर्ज करें।");
+            alert("कृपया प्रोडक्ट का नाम और कीमत दर्ज करें।");
             return;
         }
 
-        db.ref('vendors_products/' + activeMobile).push({
+        let productData = {
             productName: name,
             price: price,
             sku: sku,
             companyName: activeCompanyName,
             sellerMobile: activeMobile,
-            productImage: base64Image || "",
+            productImage: base64Image || document.getElementById('img-preview').src || "",
             timestamp: Date.now()
-        }).then(() => {
-            document.getElementById('status-msg').innerText = "Product Published Successfully! 🎉";
-            document.getElementById('p-name').value = '';
-            document.getElementById('p-price').value = '';
-            document.getElementById('p-sku').value = '';
-            document.getElementById('p-image').value = '';
-            document.getElementById('img-preview-container').style.display = 'none';
-            base64Image = "";
-        });
+        };
+
+        if(editId) {
+            // Update existing product
+            db.ref('vendors_products/' + activeMobile + '/' + editId).update(productData).then(() => {
+                document.getElementById('status-msg').innerText = "Product Updated Successfully! ✅";
+                resetProductForm();
+            });
+        } else {
+            // Add new product
+            db.ref('vendors_products/' + activeMobile).push(productData).then(() => {
+                document.getElementById('status-msg').innerText = "Product Published Successfully! 🎉";
+                resetProductForm();
+            });
+        }
+    }
+
+    function editProduct(id, name, price, sku, img) {
+        document.getElementById('edit-product-id').value = id;
+        document.getElementById('p-name').value = decodeURIComponent(name);
+        document.getElementById('p-price').value = price;
+        document.getElementById('p-sku').value = decodeURIComponent(sku);
+        
+        let decodedImg = decodeURIComponent(img);
+        if(decodedImg && decodedImg.startsWith('data:image')) {
+            base64Image = decodedImg;
+            document.getElementById('img-preview').src = decodedImg;
+            document.getElementById('img-preview-container').style.display = 'block';
+        }
+
+        document.getElementById('form-title').innerText = "✏️ Edit Catalog Item";
+        document.getElementById('publish-btn').innerText = "Update Product 🔄";
+        document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function resetProductForm() {
+        document.getElementById('edit-product-id').value = "";
+        document.getElementById('p-name').value = "";
+        document.getElementById('p-price').value = "";
+        document.getElementById('p-sku').value = "";
+        document.getElementById('p-image').value = "";
+        document.getElementById('img-preview-container').style.display = 'none';
+        base64Image = "";
+        document.getElementById('form-title').innerText = "📦 Add Catalog Item (Product with Photo)";
+        document.getElementById('publish-btn').innerText = "Publish Product Live 🚀";
+        document.getElementById('cancel-edit-btn').classList.add('hidden');
+        setTimeout(() => { document.getElementById('status-msg').innerText = ""; }, 3000);
+    }
+
+    function deleteProduct(id) {
+        if(confirm("क्या आप वाकई इस प्रोडक्ट को डिलीट करना चाहते हैं?")) {
+            db.ref('vendors_products/' + activeMobile + '/' + id).remove().then(() => {
+                alert("प्रोडक्ट सफलतापूर्वक डिलीट कर दिया गया है।");
+            });
+        }
     }
 
     function openSettings() {
@@ -485,9 +586,7 @@
         document.getElementById('settings-new-pin').value = "";
         document.getElementById('settings-modal').classList.remove('hidden');
     }
-    function closeSettings() {
-        document.getElementById('settings-modal').classList.add('hidden');
-    }
+    function closeSettings() { document.getElementById('settings-modal').classList.add('hidden'); }
 
     function updateSettings() {
         let newCompany = document.getElementById('settings-company').value.trim();
