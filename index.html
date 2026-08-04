@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viziag Mart - Live Wholesale & Vendor Dashboard</title>
+    <title>Viziag Mart - Ultimate Vendor Marketplace & Dashboard</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -68,7 +68,7 @@
         /* Cards & Forms */
         .card {
             background: var(--card-bg); padding: 25px; border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 480px; margin: 20px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 520px; margin: 20px auto;
         }
         h2 { margin-top: 0; font-size: 20px; color: #222; }
         .input-group { margin-bottom: 15px; }
@@ -94,7 +94,7 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
-        .modal-content { background: white; padding: 25px; border-radius: 16px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content { background: white; padding: 25px; border-radius: 16px; width: 90%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -110,7 +110,7 @@
 
     <div class="container">
 
-        <!-- 1. Marketplace View (Default) -->
+        <!-- 1. Marketplace View -->
         <div id="tab-marketplace">
             <h2 style="margin-bottom: 20px; color: #222;">🔥 Live Wholesale Marketplace</h2>
             <div id="products-container" class="product-grid">
@@ -122,55 +122,55 @@
         <div id="tab-login" class="card hidden">
             <h2>🔐 Vendor Secure Login</h2>
             <div class="input-group">
-                <label>Mobile Number</label>
-                <input type="tel" id="login-mobile" placeholder="10-digit mobile number" maxlength="10">
+                <label>Mobile Number (10 Digits)</label>
+                <input type="tel" id="login-mobile" placeholder="e.g. 9876543210" maxlength="10">
             </div>
             <div class="input-group">
-                <label>Secret Password / PIN</label>
-                <input type="password" id="login-pin" placeholder="Enter your password">
+                <label>Secret Security PIN</label>
+                <input type="password" id="login-pin" placeholder="Enter your secret PIN">
             </div>
-            <button class="btn" onclick="loginVendor()">Login to Dashboard</button>
+            <button class="btn" onclick="loginVendor()">Login to Admin Panel</button>
             <p id="login-error" class="error-text"></p>
-            <div class="switch-link" onclick="openRegisterModal()">नया वेंडर हूँ? मोबाइल नंबर और OTP से रजिस्टर करें 🚀</div>
+            <div class="switch-link" onclick="openRegisterModal()">नया वेंडर हूँ? Real SMS OTP से रजिस्टर करें 🚀</div>
         </div>
 
-        <!-- 2B. Vendor Dashboard View (Product Upload Panel) -->
-        <div id="tab-dashboard" class="card hidden" style="max-width: 600px;">
+        <!-- 2B. Vendor Admin Dashboard View -->
+        <div id="tab-dashboard" class="card hidden" style="max-width: 650px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                 <div>
-                    <h2 id="display-company-name" style="margin:0; color:var(--primary);">Dashboard</h2>
+                    <h2 id="display-company-name" style="margin:0; color:var(--primary);">Admin Panel</h2>
                     <span style="font-size: 12px; color: #666;" id="display-mobile"></span>
                 </div>
-                <button class="btn-nav" style="background:#333; padding:5px 10px;" onclick="openSettings()">⚙️ Settings</button>
+                <button class="btn-nav" style="background:#333; padding:6px 12px;" onclick="openSettings()">⚙️ Settings & PIN</button>
             </div>
             <hr style="border:0; border-top:1px solid #eee; margin-bottom:20px;">
 
-            <h3 style="font-size:16px; margin-bottom:15px;">📦 Add New Product</h3>
+            <h3 style="font-size:16px; margin-bottom:15px;">📦 Add Catalog Item (Product with Photo)</h3>
             
             <div class="input-group">
-                <label>Product Image</label>
+                <label>Product Photo</label>
                 <input type="file" id="p-image" accept="image/*" onchange="previewImage()">
                 <div id="img-preview-container" style="margin-top: 10px; display:none;">
-                    <img id="img-preview" src="" style="max-height: 100px; border-radius: 6px; border: 1px solid #ddd;">
+                    <img id="img-preview" src="" style="max-height: 120px; border-radius: 6px; border: 1px solid #ddd;">
                 </div>
             </div>
 
             <div class="input-group">
                 <label>Product Name</label>
-                <input type="text" id="p-name" placeholder="e.g. Premium Apple">
+                <input type="text" id="p-name" placeholder="e.g. Designer Kurti / Fresh Fruit">
             </div>
 
             <div class="input-group">
                 <label>Wholesale Price (₹)</label>
-                <input type="number" id="p-price" placeholder="e.g. 200">
+                <input type="number" id="p-price" placeholder="e.g. 450">
             </div>
 
             <div class="input-group">
                 <label>SKU Code / Location</label>
-                <input type="text" id="p-sku" placeholder="e.g. SKU12 / Sector 15">
+                <input type="text" id="p-sku" placeholder="e.g. SKU-001 / Sec 16">
             </div>
 
-            <button class="btn" onclick="publishProduct()">Publish to Live Cloud 🚀</button>
+            <button class="btn" onclick="publishProduct()">Publish Product Live 🚀</button>
             <p id="status-msg" class="success-text"></p>
             
             <button class="btn btn-secondary" onclick="logoutVendor()">Logout</button>
@@ -178,7 +178,7 @@
 
     </div>
 
-    <!-- 3. OTP & Registration Modal -->
+    <!-- 3. Real SMS OTP & Registration Modal -->
     <div id="register-modal" class="modal hidden">
         <div class="modal-content">
             <h2>🚀 Real SMS OTP Verification</h2>
@@ -200,13 +200,13 @@
                 </div>
                 <div class="input-group">
                     <label>Company / Store Name</label>
-                    <input type="text" id="reg-company" placeholder="e.g. JetBlack India">
+                    <input type="text" id="reg-company" placeholder="e.g. Viziag Wholesale Hub">
                 </div>
                 <div class="input-group">
-                    <label>Create Secret Password</label>
-                    <input type="password" id="reg-pin" placeholder="Set your login password">
+                    <label>Create Secret Security PIN</label>
+                    <input type="password" id="reg-pin" placeholder="Set your login PIN">
                 </div>
-                <button class="btn" onclick="verifyRealOtpAndRegister()">Verify & Register</button>
+                <button class="btn" onclick="verifyRealOtpAndRegister()">Verify OTP & Register</button>
                 <p id="reg-error-2" class="error-text"></p>
             </div>
 
@@ -214,17 +214,17 @@
         </div>
     </div>
 
-    <!-- 4. Settings Modal -->
+    <!-- 4. Settings & PIN Change Modal -->
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
-            <h3>⚙️ Vendor Settings</h3>
+            <h3>⚙️ Vendor System Settings</h3>
             <div class="input-group">
                 <label>Company Name</label>
                 <input type="text" id="settings-company">
             </div>
             <div class="input-group">
-                <label>New Password (Optional)</label>
-                <input type="password" id="settings-new-pin" placeholder="Leave blank to keep old">
+                <label>New Security PIN (Optional)</label>
+                <input type="password" id="settings-new-pin" placeholder="Leave blank to keep current PIN">
             </div>
             <button class="btn" onclick="updateSettings()">Save Changes</button>
             <button class="btn btn-secondary" onclick="closeSettings()">Close</button>
@@ -233,10 +233,13 @@
     </div>
 
 <script>
+    // Firebase Config & Real Database Connection
     const firebaseConfig = {
         databaseURL: "https://viziamart-default-rtdb.firebaseio.com/"
     };
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.database();
     const auth = firebase.auth();
 
@@ -303,7 +306,7 @@
                     <div>
                         <img src="${imgSrc}" class="product-img">
                         <div class="product-info">
-                            <span class="company-badge">🏢 ${product.companyName || 'Verified Seller'}</span>
+                            <span class="company-badge">🏢 ${product.companyName || 'Verified Vendor'}</span>
                             <div class="product-name">${product.productName}</div>
                             <div class="product-price">₹ ${product.price}</div>
                             <div class="product-sku">📍 ${product.sku || 'N/A'}</div>
@@ -337,7 +340,7 @@
 
                     showDashboard();
                 } else {
-                    document.getElementById('login-error').innerText = "गलत मोबाइल नंबर या पासवर्ड!";
+                    document.getElementById('login-error').innerText = "गलत मोबाइल नंबर या सिक्योरिटी पिन!";
                 }
             })
             .catch((error) => {
@@ -379,7 +382,7 @@
         auth.signInWithPhoneNumber(phoneNumber, appVerifier)
             .then((confirmationResult) => {
                 confirmationResultObj = confirmationResult;
-                alert("OTP Sent Successfully!");
+                alert("Real SMS OTP Sent Successfully!");
                 document.getElementById('otp-step-1').classList.add('hidden');
                 document.getElementById('otp-step-2').classList.remove('hidden');
             }).catch((error) => {
@@ -399,7 +402,7 @@
             return;
         }
         if(!companyName || !pin) {
-            document.getElementById('reg-error-2').innerText = "कंपनी का नाम और पासवर्ड ज़रूर भरें।";
+            document.getElementById('reg-error-2').innerText = "कंपनी का नाम और सिक्योरिटी पिन ज़रूर भरें।";
             return;
         }
 
@@ -409,13 +412,13 @@
                 mobile: cleanMobile,
                 secretPin: pin
             }).then(() => {
-                alert("रजिस्ट्रेशन सफल! अब लॉगिन करें।");
+                alert("रजिस्ट्रेशन सफल! अब अपने नए पिन से लॉगिन करें।");
                 closeRegisterModal();
                 document.getElementById('login-mobile').value = cleanMobile;
                 switchTab('vendor');
             });
         }).catch((error) => {
-            document.getElementById('reg-error-2').innerText = "OTP Failed: " + error.message;
+            document.getElementById('reg-error-2').innerText = "OTP Verification Failed: " + error.message;
         });
     }
 
@@ -460,7 +463,7 @@
 
         db.ref('vendors_products/' + activeMobile).push(productData)
             .then(() => {
-                document.getElementById('status-msg').innerText = "Product Published Successfully! 🎉";
+                document.getElementById('status-msg').innerText = "Product Published Successfully with Photo! 🎉";
                 document.getElementById('p-name').value = '';
                 document.getElementById('p-price').value = '';
                 document.getElementById('p-sku').value = '';
@@ -478,6 +481,7 @@
         document.getElementById('settings-new-pin').value = "";
         document.getElementById('settings-modal').classList.remove('hidden');
     }
+    
     function closeSettings() {
         document.getElementById('settings-modal').classList.add('hidden');
     }
@@ -494,7 +498,7 @@
                 activeCompanyName = newCompany;
                 localStorage.setItem('viziag_company', newCompany);
                 document.getElementById('display-company-name').innerText = newCompany;
-                document.getElementById('settings-msg').innerText = "Settings Updated Successfully!";
+                document.getElementById('settings-msg').innerText = "Settings & PIN Updated Successfully!";
                 setTimeout(() => { closeSettings(); }, 1500);
             })
             .catch((error) => {
