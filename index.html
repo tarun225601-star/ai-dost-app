@@ -186,8 +186,8 @@
                     <input type="tel" id="whatsappNumber" placeholder="9811223344" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Product Images (Gallery)</label>
-                    <input type="file" id="partGallery" accept="image/*" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm bg-slate-50 focus:outline-none">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Product Image Link or URL</label>
+                    <input type="text" id="partImage" placeholder="https://images.unsplash.com/... (image link)" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-slate-50 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Location (Faridabad)</label>
@@ -195,7 +195,7 @@
                 </div>
                 <div class="md:col-span-3 flex items-end">
                     <button type="submit" class="w-full bg-[#ff6600] hover:bg-orange-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow">
-                        <i class="fa-solid fa-circle-check mr-1"></i> Publish Verified Catalog (Sync to Supabase/Firebase)
+                        <i class="fa-solid fa-circle-check mr-1"></i> Publish Verified Catalog (Permanent Save)
                     </button>
                 </div>
             </form>
@@ -249,31 +249,7 @@
             </div>
 
             <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Sample Product Card -->
-                <div class="bg-white rounded-xl shadow-xs hover:shadow-md transition border border-slate-200 overflow-hidden flex flex-col justify-between">
-                    <div>
-                        <div class="bg-slate-200 h-44 flex items-center justify-center text-slate-500 relative overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=60" alt="Gear Box" class="w-full h-full object-cover">
-                            <span class="absolute top-2 right-2 bg-slate-900 text-white text-xs px-2 py-1 rounded">Sector 24</span>
-                            <span class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-shield-check mr-1"></i> GST Verified</span>
-                        </div>
-                        <div class="p-4">
-                            <span class="text-xs text-[#ff6600] font-bold">Sharma Engineering Works</span>
-                            <h3 class="font-bold text-base text-slate-900 mt-1">Heavy Duty Gear Set</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">SKU: FBD-G-102</p>
-                            <p class="text-[10px] text-emerald-700 font-semibold mt-1"><i class="fa-solid fa-rotate-left mr-1"></i> 100% Returnable if Damaged</p>
-                            <div class="mt-3 flex items-baseline space-x-2">
-                                <span class="text-lg font-extrabold text-slate-900">₹1,200</span>
-                                <span class="text-xs text-slate-400">/ piece (Min. 10 pcs)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4 pt-0">
-                        <a href="https://wa.me/919811223344?text=Hello,%20I%20want%20to%20order%20Heavy%20Duty%20Gear%20Set%20(FBD-G-102)%20under%20Return%20Policy." target="_blank" class="w-full bg-[#ff6600] hover:bg-orange-700 text-white text-sm font-medium py-2 rounded-lg transition flex items-center justify-center shadow">
-                            <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Contact Supplier (WhatsApp)
-                        </a>
-                    </div>
-                </div>
+                <!-- Products will be dynamically loaded here -->
             </div>
         </section>
     </main>
@@ -285,8 +261,13 @@
         <p class="mt-4">&copy; 2026 Viziag Mart. All Rights Reserved.</p>
     </footer>
 
-    <!-- JavaScript Logic & API Configuration Handler -->
+    <!-- JavaScript Logic & Data Persistence -->
     <script>
+        // Load products on page load
+        window.onload = function() {
+            renderProducts();
+        };
+
         function openSettings() {
             document.getElementById('grokApiKey').value = localStorage.getItem('viziag_grok_key') || '';
             document.getElementById('supabaseUrl').value = localStorage.getItem('viziag_supabase_url') || '';
@@ -322,7 +303,7 @@
             box.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> AI Sourcing in progress using Grok API... Matching verified Faridabad manufacturers for: "<strong>${prompt}</strong>"`;
             
             setTimeout(() => {
-                box.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> <strong>AI Match Found:</strong> 3 Verified Manufacturers found with active GSTIN and 100% Return Policy protection.`;
+                box.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> <strong>AI Match Found:</strong> Verified manufacturers found with active GSTIN and 100% Return Policy protection.`;
             }, 1500);
         }
 
@@ -349,49 +330,90 @@
             const code = document.getElementById('partCode').value;
             const price = document.getElementById('partPrice').value;
             const phone = document.getElementById('whatsappNumber').value;
-            const fileInput = document.getElementById('partGallery');
+            const imgInput = document.getElementById('partImage').value;
             const location = document.getElementById('partLocation').value;
 
-            let mainImage = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&auto=format&fit=crop&q=60";
-            if (fileInput.files && fileInput.files.length > 0) {
-                mainImage = URL.createObjectURL(fileInput.files[0]);
+            const mainImage = imgInput ? imgInput : "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&auto=format&fit=crop&q=60";
+
+            const newProduct = {
+                id: Date.now(),
+                compName,
+                compGst,
+                name,
+                code,
+                price,
+                phone,
+                mainImage,
+                location
+            };
+
+            // Get existing products or empty array
+            let products = JSON.parse(localStorage.getItem('viziag_products')) || [];
+            products.unshift(newProduct); // Add to the beginning
+            localStorage.setItem('viziag_products', JSON.stringify(products));
+
+            document.getElementById('catalogForm').reset();
+            renderProducts();
+            alert('Catalog published successfully and saved permanently in browser storage!');
+            window.location.hash = '#products';
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            let products = JSON.parse(localStorage.getItem('viziag_products')) || [];
+
+            // Default sample product if list is empty
+            if (products.length === 0) {
+                products = [
+                    {
+                        id: 1,
+                        compName: "Sharma Engineering Works",
+                        compGst: "06AAAAA0000A1Z5",
+                        name: "Heavy Duty Gear Set",
+                        code: "FBD-G-102",
+                        price: "1200",
+                        phone: "9811223344",
+                        mainImage: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=60",
+                        location: "Sector 24"
+                    }
+                ];
+                localStorage.setItem('viziag_products', JSON.stringify(products));
             }
 
-            const cleanPhone = phone.replace(/[^0-9]/g, '');
-            const registeredBuyer = localStorage.getItem('viziag_buyer_firm') || 'General Buyer';
-            const waLink = `https://wa.me/91${cleanPhone}?text=Hello%20${encodeURIComponent(compName)},%20I%20am%20${encodeURIComponent(registeredBuyer)}.%20I%20want%20to%20order%20${encodeURIComponent(name)}%20(Code:%20${encodeURIComponent(code)})%20under%20Return%20Policy.`;
+            grid.innerHTML = "";
+            products.forEach(p => {
+                const cleanPhone = p.phone.replace(/[^0-9]/g, '');
+                const registeredBuyer = localStorage.getItem('viziag_buyer_firm') || 'General Buyer';
+                const waLink = `https://wa.me/91${cleanPhone}?text=Hello%20${encodeURIComponent(p.compName)},%20I%20am%20${encodeURIComponent(registeredBuyer)}.%20I%20want%20to%20order%20${encodeURIComponent(p.name)}%20(SKU:%20${encodeURIComponent(p.code)})%20under%20Return%20Policy.`;
 
-            const grid = document.getElementById('productGrid');
-            const card = document.createElement('div');
-            card.className = "bg-white rounded-xl shadow-xs hover:shadow-md transition border border-slate-200 overflow-hidden flex flex-col justify-between";
-            card.innerHTML = `
-                <div>
-                    <div class="bg-slate-200 h-44 flex items-center justify-center text-slate-500 relative overflow-hidden">
-                        <img src="${mainImage}" alt="${name}" class="w-full h-full object-cover">
-                        <span class="absolute top-2 right-2 bg-slate-900 text-white text-xs px-2 py-1 rounded">${location}</span>
-                        <span class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-shield-check mr-1"></i> GST: ${compGst}</span>
-                    </div>
-                    <div class="p-4">
-                        <span class="text-xs text-[#ff6600] font-bold">${compName}</span>
-                        <h3 class="font-bold text-base text-slate-900 mt-1">${name}</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">SKU: ${code}</p>
-                        <p class="text-[10px] text-emerald-700 font-semibold mt-1"><i class="fa-solid fa-rotate-left mr-1"></i> 100% Returnable if Damaged</p>
-                        <div class="mt-3 flex items-baseline space-x-2">
-                            <span class="text-lg font-extrabold text-slate-900">₹${Number(price).toLocaleString('en-IN')}</span>
-                            <span class="text-xs text-slate-400">/ wholesale price</span>
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl shadow-xs hover:shadow-md transition border border-slate-200 overflow-hidden flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="bg-slate-200 h-44 flex items-center justify-center text-slate-500 relative overflow-hidden">
+                            <img src="${p.mainImage}" alt="${p.name}" class="w-full h-full object-cover">
+                            <span class="absolute top-2 right-2 bg-slate-900 text-white text-xs px-2 py-1 rounded">${p.location}</span>
+                            <span class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-shield-check mr-1"></i> GST: ${p.compGst}</span>
+                        </div>
+                        <div class="p-4">
+                            <span class="text-xs text-[#ff6600] font-bold">${p.compName}</span>
+                            <h3 class="font-bold text-base text-slate-900 mt-1">${p.name}</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">SKU: ${p.code}</p>
+                            <p class="text-[10px] text-emerald-700 font-semibold mt-1"><i class="fa-solid fa-rotate-left mr-1"></i> 100% Returnable if Damaged</p>
+                            <div class="mt-3 flex items-baseline space-x-2">
+                                <span class="text-lg font-extrabold text-slate-900">₹${Number(p.price).toLocaleString('en-IN')}</span>
+                                <span class="text-xs text-slate-400">/ wholesale price</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="p-4 pt-0">
-                    <a href="${waLink}" target="_blank" class="w-full bg-[#ff6600] hover:bg-orange-700 text-white text-sm font-medium py-2 rounded-lg transition flex items-center justify-center shadow">
-                        <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Contact Supplier (WhatsApp)
-                    </a>
-                </div>
-            `;
-            grid.prepend(card);
-            document.getElementById('catalogForm').reset();
-            alert('Catalog published successfully and synced with local memory (Supabase/Firebase ready)!');
-            window.location.hash = '#products';
+                    <div class="p-4 pt-0">
+                        <a href="${waLink}" target="_blank" class="w-full bg-[#ff6600] hover:bg-orange-700 text-white text-sm font-medium py-2 rounded-lg transition flex items-center justify-center shadow">
+                            <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Contact Supplier (WhatsApp)
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
         }
     </script>
 </body>
