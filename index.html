@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viziag Mart - Ultimate Vendor Marketplace & Dashboard</title>
+    <title>Viziag Mart - Secure Marketplace & Vendor Portal</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -29,7 +29,7 @@
             position: sticky; top: 0; z-index: 100;
         }
         .header h1 { margin: 0; font-size: 22px; color: var(--primary); letter-spacing: 1px; cursor: pointer; }
-        .nav-btns { display: flex; gap: 10px; }
+        .nav-btns { display: flex; gap: 10px; align-items: center; }
         .btn-nav {
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
             color: white; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;
@@ -38,7 +38,6 @@
         
         .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
         
-        /* Product Grid */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -49,7 +48,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: flex; flex-direction: column;
             justify-content: space-between; transition: transform 0.2s;
         }
-        .product-card:hover { transform: translateY(-5px); }
         .product-img { width: 100%; height: 180px; object-fit: cover; background: #eee; }
         .product-info { padding: 15px; }
         .company-badge {
@@ -63,9 +61,7 @@
             background: #25d366; color: white; text-align: center; padding: 12px;
             text-decoration: none; font-weight: bold; display: block; border-radius: 0 0 12px 12px;
         }
-        .whatsapp-btn:hover { background: #20ba5a; }
 
-        /* Cards & Forms */
         .card {
             background: var(--card-bg); padding: 25px; border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 520px; margin: 20px auto;
@@ -77,14 +73,12 @@
             width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
             box-sizing: border-box; font-size: 15px; background: var(--gray-light);
         }
-        input:focus { border-color: var(--primary); background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(255,87,34,0.15); }
+        input:focus { border-color: var(--primary); background: #fff; outline: none; }
         .btn {
             width: 100%; padding: 14px; background: var(--primary); color: white;
             font-weight: bold; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
-            box-shadow: 0 4px 12px rgba(255,87,34,0.3);
         }
-        .btn:hover { background: var(--primary-dark); }
-        .btn-secondary { background: #6c757d; box-shadow: none; margin-top: 10px; }
+        .btn-secondary { background: #6c757d; margin-top: 10px; }
         .hidden { display: none !important; }
         .error-text { color: #dc3545; font-size: 13px; margin-top: 5px; }
         .success-text { color: #28a745; font-size: 14px; font-weight: 600; text-align: center; margin-top: 10px; }
@@ -94,54 +88,63 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
-        .modal-content { background: white; padding: 25px; border-radius: 16px; width: 90%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content { background: white; padding: 25px; border-radius: 16px; width: 90%; max-width: 420px; }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
     <div class="header">
         <h1 onclick="switchTab('marketplace')">Viziag Mart</h1>
         <div class="nav-btns">
             <button class="btn-nav active" id="nav-market-btn" onclick="switchTab('marketplace')">🏠 Marketplace</button>
+            <button class="btn-nav" id="nav-buyer-btn" onclick="openBuyerAuthModal()">👤 Buyer Login</button>
             <button class="btn-nav" id="nav-vendor-btn" onclick="checkVendorSession()">📦 Vendor Portal</button>
         </div>
     </div>
 
     <div class="container">
-
-        <!-- 1. Marketplace View -->
+        <!-- Marketplace View -->
         <div id="tab-marketplace">
-            <h2 style="margin-bottom: 20px; color: #222;">🔥 Live Wholesale Marketplace</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #222;">🔥 Live Wholesale Marketplace</h2>
+                <div id="buyer-status-banner" style="font-size: 13px; background: #e2e8f0; padding: 6px 12px; border-radius: 20px;">
+                    🔒 Login to Order / Chat
+                </div>
+            </div>
             <div id="products-container" class="product-grid">
-                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">Loading live products...</div>
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">लोड हो रहा है...</div>
             </div>
         </div>
 
-        <!-- 2A. Vendor Login View -->
+        <!-- Vendor Login View -->
         <div id="tab-login" class="card hidden">
-            <h2>🔐 Vendor Secure Login</h2>
+            <h2>🔐 Vendor Secure Login (Real SMS OTP)</h2>
             <div class="input-group">
-                <label>Mobile Number (10 Digits)</label>
-                <input type="tel" id="login-mobile" placeholder="e.g. 9876543210" maxlength="10">
+                <label>Mobile Number (with +91)</label>
+                <input type="tel" id="vendor-login-mobile" value="+91">
             </div>
-            <div class="input-group">
-                <label>Secret Security PIN</label>
-                <input type="password" id="login-pin" placeholder="Enter your secret PIN">
+            <div id="vendor-recaptcha-container" style="margin-bottom: 15px;"></div>
+            <button class="btn" onclick="sendVendorLoginOtp()">Send OTP & Login</button>
+            
+            <div id="vendor-login-otp-section" class="hidden" style="margin-top: 15px;">
+                <div class="input-group">
+                    <label>Enter 6-Digit OTP</label>
+                    <input type="text" id="vendor-entered-otp" maxlength="6">
+                </div>
+                <button class="btn" onclick="verifyVendorLoginOtp()">Verify OTP & Open Panel</button>
             </div>
-            <button class="btn" onclick="loginVendor()">Login to Admin Panel</button>
-            <p id="login-error" class="error-text"></p>
-            <div class="switch-link" onclick="openRegisterModal()">नया वेंडर हूँ? Real SMS OTP से रजिस्टर करें 🚀</div>
+            <p id="vendor-login-error" class="error-text"></p>
+            <div class="switch-link" onclick="openVendorRegisterModal()">नया वेंडर हूँ? यहाँ रजिस्टर करें 🚀</div>
         </div>
 
-        <!-- 2B. Vendor Admin Dashboard View -->
+        <!-- Vendor Dashboard View -->
         <div id="tab-dashboard" class="card hidden" style="max-width: 650px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                 <div>
                     <h2 id="display-company-name" style="margin:0; color:var(--primary);">Admin Panel</h2>
                     <span style="font-size: 12px; color: #666;" id="display-mobile"></span>
                 </div>
-                <button class="btn-nav" style="background:#333; padding:6px 12px;" onclick="openSettings()">⚙️ Settings & PIN</button>
+                <button class="btn-nav" style="background:#333; padding:6px 12px;" onclick="openSettings()">⚙️ Settings</button>
             </div>
             <hr style="border:0; border-top:1px solid #eee; margin-bottom:20px;">
 
@@ -157,7 +160,7 @@
 
             <div class="input-group">
                 <label>Product Name</label>
-                <input type="text" id="p-name" placeholder="e.g. Designer Kurti / Fresh Fruit">
+                <input type="text" id="p-name" placeholder="e.g. Designer Item">
             </div>
 
             <div class="input-group">
@@ -167,7 +170,7 @@
 
             <div class="input-group">
                 <label>SKU Code / Location</label>
-                <input type="text" id="p-sku" placeholder="e.g. SKU-001 / Sec 16">
+                <input type="text" id="p-sku" placeholder="e.g. SKU-001">
             </div>
 
             <button class="btn" onclick="publishProduct()">Publish Product Live 🚀</button>
@@ -175,56 +178,73 @@
             
             <button class="btn btn-secondary" onclick="logoutVendor()">Logout</button>
         </div>
-
     </div>
 
-    <!-- 3. Real SMS OTP & Registration Modal -->
-    <div id="register-modal" class="modal hidden">
+    <!-- Buyer Authentication Modal (Real OTP) -->
+    <div id="buyer-auth-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>🚀 Real SMS OTP Verification</h2>
-            
-            <div id="otp-step-1">
+            <h2>👤 Buyer Mobile Verification</h2>
+            <div id="buyer-otp-step-1">
                 <div class="input-group">
-                    <label>Mobile Number (with Country Code)</label>
-                    <input type="tel" id="reg-mobile" placeholder="+919876543210" value="+91">
+                    <label>Mobile Number (with +91)</label>
+                    <input type="tel" id="buyer-mobile" value="+91">
                 </div>
-                <div id="recaptcha-container" style="margin-bottom: 15px;"></div>
-                <button class="btn" onclick="sendRealOtp()">Send SMS OTP</button>
-                <p id="reg-error-1" class="error-text"></p>
+                <div id="buyer-recaptcha-container" style="margin-bottom: 15px;"></div>
+                <button class="btn" onclick="sendBuyerOtp()">Send SMS OTP</button>
+                <p id="buyer-err-1" class="error-text"></p>
             </div>
-
-            <div id="otp-step-2" class="hidden">
+            <div id="buyer-otp-step-2" class="hidden">
                 <div class="input-group">
                     <label>Enter 6-Digit SMS OTP</label>
-                    <input type="text" id="entered-otp" placeholder="Enter OTP received on phone" maxlength="6">
+                    <input type="text" id="buyer-entered-otp" maxlength="6">
                 </div>
                 <div class="input-group">
-                    <label>Company / Store Name</label>
-                    <input type="text" id="reg-company" placeholder="e.g. Viziag Wholesale Hub">
+                    <label>Your Name (Buyer)</label>
+                    <input type="text" id="buyer-name" placeholder="Enter your name">
                 </div>
-                <div class="input-group">
-                    <label>Create Secret Security PIN</label>
-                    <input type="password" id="reg-pin" placeholder="Set your login PIN">
-                </div>
-                <button class="btn" onclick="verifyRealOtpAndRegister()">Verify OTP & Register</button>
-                <p id="reg-error-2" class="error-text"></p>
+                <button class="btn" onclick="verifyBuyerOtp()">Verify & Continue</button>
+                <p id="buyer-err-2" class="error-text"></p>
             </div>
-
-            <div class="switch-link" onclick="closeRegisterModal()" style="margin-top:15px;">Back to Login</div>
+            <div class="switch-link" onclick="closeBuyerAuthModal()" style="margin-top:15px;">Cancel</div>
         </div>
     </div>
 
-    <!-- 4. Settings & PIN Change Modal -->
+    <!-- Vendor Registration Modal (Real OTP) -->
+    <div id="vendor-register-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🚀 Vendor Registration (Real SMS OTP)</h2>
+            <div id="v-reg-step-1">
+                <div class="input-group">
+                    <label>Mobile Number (with +91)</label>
+                    <input type="tel" id="v-reg-mobile" value="+91">
+                </div>
+                <div id="v-recaptcha-container" style="margin-bottom: 15px;"></div>
+                <button class="btn" onclick="sendVendorRegOtp()">Send SMS OTP</button>
+                <p id="v-reg-err-1" class="error-text"></p>
+            </div>
+            <div id="v-reg-step-2" class="hidden">
+                <div class="input-group">
+                    <label>Enter 6-Digit OTP</label>
+                    <input type="text" id="v-reg-otp" maxlength="6">
+                </div>
+                <div class="input-group">
+                    <label>Company / Store Name</label>
+                    <input type="text" id="v-reg-company" placeholder="Store Name">
+                </div>
+                <button class="btn" onclick="verifyVendorRegOtp()">Verify & Register</button>
+                <p id="v-reg-err-2" class="error-text"></p>
+            </div>
+            <div class="switch-link" onclick="closeVendorRegisterModal()" style="margin-top:15px;">Back to Login</div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
-            <h3>⚙️ Vendor System Settings</h3>
+            <h3>⚙️ Vendor Profile Settings</h3>
             <div class="input-group">
                 <label>Company Name</label>
                 <input type="text" id="settings-company">
-            </div>
-            <div class="input-group">
-                <label>New Security PIN (Optional)</label>
-                <input type="password" id="settings-new-pin" placeholder="Leave blank to keep current PIN">
             </div>
             <button class="btn" onclick="updateSettings()">Save Changes</button>
             <button class="btn btn-secondary" onclick="closeSettings()">Close</button>
@@ -233,7 +253,6 @@
     </div>
 
 <script>
-    // Firebase Config & Real Database Connection
     const firebaseConfig = {
         databaseURL: "https://viziamart-default-rtdb.firebaseio.com/"
     };
@@ -243,13 +262,23 @@
     const db = firebase.database();
     const auth = firebase.auth();
 
-    let activeMobile = localStorage.getItem('viziag_mobile') || "";
-    let activeCompanyName = localStorage.getItem('viziag_company') || "";
+    let activeVendorMobile = localStorage.getItem('viziag_vendor_mobile') || "";
+    let activeCompanyName = localStorage.getItem('viziag_vendor_company') || "";
+    let activeBuyerMobile = localStorage.getItem('viziag_buyer_mobile') || "";
+    let activeBuyerName = localStorage.getItem('viziag_buyer_name') || "";
     let base64Image = "";
+    
     let confirmationResultObj = null;
+    let vendorLoginConfirmObj = null;
+    let vendorRegConfirmObj = null;
 
     window.onload = function() {
-        loadMarketplaceProducts();
+        try {
+            checkBuyerSessionUI();
+            loadMarketplaceProducts();
+        } catch(e) {
+            console.error(e);
+        }
     };
 
     function switchTab(tabName) {
@@ -266,16 +295,200 @@
             loadMarketplaceProducts();
         } else if(tabName === 'vendor') {
             document.getElementById('nav-vendor-btn').classList.add('active');
-            if(activeMobile && activeCompanyName) {
+            if(activeVendorMobile && activeCompanyName) {
                 showDashboard();
             } else {
                 document.getElementById('tab-login').classList.remove('hidden');
+                initVendorLoginRecaptcha();
             }
         }
     }
 
     function checkVendorSession() {
         switchTab('vendor');
+    }
+
+    function checkBuyerSessionUI() {
+        let banner = document.getElementById('buyer-status-banner');
+        let buyerBtn = document.getElementById('nav-buyer-btn');
+        if(activeBuyerMobile) {
+            banner.innerHTML = `✅ Verified: <b>${activeBuyerName || activeBuyerMobile}</b> (<span style="color:red; cursor:pointer;" onclick="logoutBuyer()">Logout</span>)`;
+            buyerBtn.innerText = "👤 " + (activeBuyerName || "Account");
+        } else {
+            banner.innerHTML = `🔒 <span style="color:#007bff; cursor:pointer;" onclick="openBuyerAuthModal()">Login with Mobile OTP to Order</span>`;
+            buyerBtn.innerText = "👤 Buyer Login";
+        }
+    }
+
+    // --- BUYER OTP AUTH ---
+    function openBuyerAuthModal() {
+        document.getElementById('buyer-auth-modal').classList.remove('hidden');
+        document.getElementById('buyer-otp-step-1').classList.remove('hidden');
+        document.getElementById('buyer-otp-step-2').classList.add('hidden');
+        setTimeout(() => {
+            if (!window.buyerRecaptchaVerifier) {
+                try {
+                    window.buyerRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('buyer-recaptcha-container', { size: 'invisible' });
+                } catch(e) { console.log(e); }
+            }
+        }, 500);
+    }
+    function closeBuyerAuthModal() {
+        document.getElementById('buyer-auth-modal').classList.add('hidden');
+    }
+    function sendBuyerOtp() {
+        let phone = document.getElementById('buyer-mobile').value.trim();
+        if(phone.length < 13) {
+            document.getElementById('buyer-err-1').innerText = "सही मोबाइल नंबर दर्ज करें (+91...)";
+            return;
+        }
+        auth.signInWithPhoneNumber(phone, window.buyerRecaptchaVerifier)
+            .then((result) => {
+                confirmationResultObj = result;
+                alert("OTP भेजा गया!");
+                document.getElementById('buyer-otp-step-1').classList.add('hidden');
+                document.getElementById('buyer-otp-step-2').classList.remove('hidden');
+            }).catch((err) => {
+                document.getElementById('buyer-err-1').innerText = "OTP Error: " + err.message;
+            });
+    }
+    function verifyBuyerOtp() {
+        let code = document.getElementById('buyer-entered-otp').value.trim();
+        let name = document.getElementById('buyer-name').value.trim();
+        let cleanMobile = document.getElementById('buyer-mobile').value.trim().replace('+91', '');
+        if(!code || !name) {
+            document.getElementById('buyer-err-2').innerText = "OTP और नाम दर्ज करना अनिवार्य है।";
+            return;
+        }
+        confirmationResultObj.confirm(code).then(() => {
+            activeBuyerMobile = cleanMobile;
+            activeBuyerName = name;
+            localStorage.setItem('viziag_buyer_mobile', cleanMobile);
+            localStorage.setItem('viziag_buyer_name', name);
+            closeBuyerAuthModal();
+            checkBuyerSessionUI();
+            loadMarketplaceProducts();
+            alert("लॉगिन सफल!");
+        }).catch((err) => {
+            document.getElementById('buyer-err-2').innerText = "गलत OTP: " + err.message;
+        });
+    }
+    function logoutBuyer() {
+        localStorage.removeItem('viziag_buyer_mobile');
+        localStorage.removeItem('viziag_buyer_name');
+        activeBuyerMobile = "";
+        activeBuyerName = "";
+        checkBuyerSessionUI();
+        loadMarketplaceProducts();
+    }
+
+    // --- VENDOR LOGIN & REGISTRATION OTP AUTH ---
+    function initVendorLoginRecaptcha() {
+        setTimeout(() => {
+            if (!window.vendorLoginRecaptcha) {
+                try {
+                    window.vendorLoginRecaptcha = new firebase.auth.RecaptchaVerifier('vendor-recaptcha-container', { size: 'invisible' });
+                } catch(e) { console.log(e); }
+            }
+        }, 500);
+    }
+    function sendVendorLoginOtp() {
+        let phone = document.getElementById('vendor-login-mobile').value.trim();
+        if(phone.length < 13) {
+            document.getElementById('vendor-login-error').innerText = "सही फॉर्मेट में नंबर डालें (+91...)";
+            return;
+        }
+        let cleanMobile = phone.replace('+91', '');
+        
+        // Check if vendor exists in database first
+        db.ref('registered_vendors/' + cleanMobile).once('value').then((snapshot) => {
+            if(!snapshot.exists()) {
+                document.getElementById('vendor-login-error').innerText = "यह नंबर वेंडर के रूप में रजिस्टर्ड नहीं है। पहले रजिस्टर करें।";
+                return;
+            }
+            auth.signInWithPhoneNumber(phone, window.vendorLoginRecaptcha)
+                .then((result) => {
+                    vendorLoginConfirmObj = result;
+                    alert("OTP भेजा गया!");
+                    document.getElementById('vendor-login-otp-section').classList.remove('hidden');
+                }).catch((err) => {
+                    document.getElementById('vendor-login-error').innerText = "OTP Error: " + err.message;
+                });
+        });
+    }
+    function verifyVendorLoginOtp() {
+        let code = document.getElementById('vendor-entered-otp').value.trim();
+        let cleanMobile = document.getElementById('vendor-login-mobile').value.trim().replace('+91', '');
+        
+        vendorLoginConfirmObj.confirm(code).then(() => {
+            db.ref('registered_vendors/' + cleanMobile).once('value').then((snapshot) => {
+                let data = snapshot.val();
+                activeVendorMobile = cleanMobile;
+                activeCompanyName = data.companyName;
+                localStorage.setItem('viziag_vendor_mobile', cleanMobile);
+                localStorage.setItem('viziag_vendor_company', data.companyName);
+                showDashboard();
+            });
+        }).catch((err) => {
+            document.getElementById('vendor-login-error').innerText = "गलत OTP: " + err.message;
+        });
+    }
+
+    function openVendorRegisterModal() {
+        document.getElementById('vendor-register-modal').classList.remove('hidden');
+        document.getElementById('v-reg-step-1').classList.remove('hidden');
+        document.getElementById('v-reg-step-2').classList.add('hidden');
+        setTimeout(() => {
+            if (!window.vendorRegRecaptcha) {
+                try {
+                    window.vendorRegRecaptcha = new firebase.auth.RecaptchaVerifier('v-recaptcha-container', { size: 'invisible' });
+                } catch(e) { console.log(e); }
+            }
+        }, 500);
+    }
+    function closeVendorRegisterModal() {
+        document.getElementById('vendor-register-modal').classList.add('hidden');
+    }
+    function sendVendorRegOtp() {
+        let phone = document.getElementById('v-reg-mobile').value.trim();
+        if(phone.length < 13) {
+            document.getElementById('v-reg-err-1').innerText = "सही फॉर्मेट में नंबर डालें (+91...)";
+            return;
+        }
+        auth.signInWithPhoneNumber(phone, window.vendorRegRecaptcha)
+            .then((result) => {
+                vendorRegConfirmObj = result;
+                alert("OTP भेजा गया!");
+                document.getElementById('v-reg-step-1').classList.add('hidden');
+                document.getElementById('v-reg-step-2').classList.remove('hidden');
+            }).catch((err) => {
+                document.getElementById('v-reg-err-1').innerText = "OTP Error: " + err.message;
+            });
+    }
+    function verifyVendorRegOtp() {
+        let code = document.getElementById('v-reg-otp').value.trim();
+        let companyName = document.getElementById('v-reg-company').value.trim();
+        let cleanMobile = document.getElementById('v-reg-mobile').value.trim().replace('+91', '');
+        if(!code || !companyName) {
+            document.getElementById('v-reg-err-2').innerText = "सभी विवरण भरें।";
+            return;
+        }
+        vendorRegConfirmObj.confirm(code).then(() => {
+            db.ref('registered_vendors/' + cleanMobile).set({
+                companyName: companyName,
+                mobile: cleanMobile
+            }).then(() => {
+                alert("वेंडर रजिस्ट्रेशन सफल!");
+                closeVendorRegisterModal();
+                activeVendorMobile = cleanMobile;
+                activeCompanyName = companyName;
+                localStorage.setItem('viziag_vendor_mobile', cleanMobile);
+                localStorage.setItem('viziag_vendor_company', companyName);
+                showDashboard();
+            });
+        }).catch((err) => {
+            document.getElementById('v-reg-err-2').innerText = "OTP Verification Failed: " + err.message;
+        });
     }
 
     function loadMarketplaceProducts() {
@@ -291,7 +504,7 @@
             });
 
             if (allProducts.length === 0) {
-                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">अभी कोई प्रोडक्ट लाइव नहीं है। वेंडर पोर्टल से जोड़ें।</div>`;
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">अभी कोई प्रोडक्ट लाइव नहीं है।</div>`;
                 return;
             }
 
@@ -301,6 +514,14 @@
                 let card = document.createElement('div');
                 card.className = 'product-card';
                 let imgSrc = product.productImage || 'https://via.placeholder.com/300x180?text=No+Image';
+
+                let orderActionHTML = "";
+                if(activeBuyerMobile) {
+                    let orderText = encodeURIComponent(`Hello, I am buyer ${activeBuyerName} (${activeBuyerMobile}). I want to order ${product.productName} (₹${product.price}) from ${product.companyName}`);
+                    orderActionHTML = `<a href="https://wa.me/91${product.sellerMobile}?text=${orderText}" target="_blank" class="whatsapp-btn">💬 Order on WhatsApp</a>`;
+                } else {
+                    orderActionHTML = `<div onclick="openBuyerAuthModal()" class="whatsapp-btn" style="background:#007bff; cursor:pointer;">🔒 Login to Order via WhatsApp</div>`;
+                }
 
                 card.innerHTML = `
                     <div>
@@ -312,114 +533,18 @@
                             <div class="product-sku">📍 ${product.sku || 'N/A'}</div>
                         </div>
                     </div>
-                    <a href="${product.whatsappOrderUrl}" target="_blank" class="whatsapp-btn">💬 Order on WhatsApp</a>
+                    ${orderActionHTML}
                 `;
                 container.appendChild(card);
             });
         });
     }
 
-    function loginVendor() {
-        let mobile = document.getElementById('login-mobile').value.trim();
-        let pin = document.getElementById('login-pin').value.trim();
-
-        if (mobile.length !== 10) {
-            document.getElementById('login-error').innerText = "कृपया सही 10 अंकों का मोबाइल नंबर डालें।";
-            return;
-        }
-
-        db.ref('registered_vendors/' + mobile).once('value')
-            .then((snapshot) => {
-                let data = snapshot.val();
-                if (data && data.secretPin === pin) {
-                    activeMobile = mobile;
-                    activeCompanyName = data.companyName;
-                    
-                    localStorage.setItem('viziag_mobile', mobile);
-                    localStorage.setItem('viziag_company', data.companyName);
-
-                    showDashboard();
-                } else {
-                    document.getElementById('login-error').innerText = "गलत मोबाइल नंबर या सिक्योरिटी पिन!";
-                }
-            })
-            .catch((error) => {
-                document.getElementById('login-error').innerText = "Error: " + error.message;
-            });
-    }
-
     function showDashboard() {
         document.getElementById('tab-login').classList.add('hidden');
         document.getElementById('tab-dashboard').classList.remove('hidden');
         document.getElementById('display-company-name').innerText = activeCompanyName;
-        document.getElementById('display-mobile').innerText = "Mobile: " + activeMobile;
-    }
-
-    function openRegisterModal() {
-        document.getElementById('register-modal').classList.remove('hidden');
-        document.getElementById('otp-step-1').classList.remove('hidden');
-        document.getElementById('otp-step-2').classList.add('hidden');
-        
-        if (!window.recaptchaVerifier) {
-            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                'size': 'invisible'
-            });
-        }
-    }
-
-    function closeRegisterModal() {
-        document.getElementById('register-modal').classList.add('hidden');
-    }
-
-    function sendRealOtp() {
-        let phoneNumber = document.getElementById('reg-mobile').value.trim();
-        if(phoneNumber.length < 13) {
-            document.getElementById('reg-error-1').innerText = "कृपया सही फॉर्मेट में नंबर डालें (जैसे +919876543210)।";
-            return;
-        }
-
-        let appVerifier = window.recaptchaVerifier;
-        auth.signInWithPhoneNumber(phoneNumber, appVerifier)
-            .then((confirmationResult) => {
-                confirmationResultObj = confirmationResult;
-                alert("Real SMS OTP Sent Successfully!");
-                document.getElementById('otp-step-1').classList.add('hidden');
-                document.getElementById('otp-step-2').classList.remove('hidden');
-            }).catch((error) => {
-                document.getElementById('reg-error-1').innerText = "SMS Error: " + error.message;
-            });
-    }
-
-    function verifyRealOtpAndRegister() {
-        let code = document.getElementById('entered-otp').value.trim();
-        let companyName = document.getElementById('reg-company').value.trim();
-        let pin = document.getElementById('reg-pin').value.trim();
-        let fullMobile = document.getElementById('reg-mobile').value.trim();
-        let cleanMobile = fullMobile.replace('+91', '');
-
-        if(!code || code.length !== 6) {
-            document.getElementById('reg-error-2').innerText = "कृपया 6 अंकों का सही SMS OTP डालें।";
-            return;
-        }
-        if(!companyName || !pin) {
-            document.getElementById('reg-error-2').innerText = "कंपनी का नाम और सिक्योरिटी पिन ज़रूर भरें।";
-            return;
-        }
-
-        confirmationResultObj.confirm(code).then((result) => {
-            db.ref('registered_vendors/' + cleanMobile).set({
-                companyName: companyName,
-                mobile: cleanMobile,
-                secretPin: pin
-            }).then(() => {
-                alert("रजिस्ट्रेशन सफल! अब अपने नए पिन से लॉगिन करें।");
-                closeRegisterModal();
-                document.getElementById('login-mobile').value = cleanMobile;
-                switchTab('vendor');
-            });
-        }).catch((error) => {
-            document.getElementById('reg-error-2').innerText = "OTP Verification Failed: " + error.message;
-        });
+        document.getElementById('display-mobile').innerText = "Mobile: " + activeVendorMobile;
     }
 
     function previewImage() {
@@ -436,84 +561,60 @@
     }
 
     function publishProduct() {
-        if (!activeMobile) return;
-
+        if (!activeVendorMobile) return;
         let name = document.getElementById('p-name').value.trim();
         let price = document.getElementById('p-price').value.trim();
         let sku = document.getElementById('p-sku').value.trim();
 
         if(!name || !price) {
-            alert("कृपया प्रोडक्ट का नाम और कीमत भरें।");
+            alert("नाम और कीमत दर्ज करें।");
             return;
         }
 
-        let whatsAppText = encodeURIComponent(`Hello, I want to order ${name} (Price: ₹${price}) from ${activeCompanyName}`);
-        let whatsappLink = `https://wa.me/91${activeMobile}?text=${whatsAppText}`;
-
-        let productData = {
+        db.ref('vendors_products/' + activeVendorMobile).push({
             productName: name,
             price: price,
             sku: sku,
             companyName: activeCompanyName,
-            sellerMobile: activeMobile,
+            sellerMobile: activeVendorMobile,
             productImage: base64Image || "",
-            whatsappOrderUrl: whatsappLink,
             timestamp: Date.now()
-        };
-
-        db.ref('vendors_products/' + activeMobile).push(productData)
-            .then(() => {
-                document.getElementById('status-msg').innerText = "Product Published Successfully with Photo! 🎉";
-                document.getElementById('p-name').value = '';
-                document.getElementById('p-price').value = '';
-                document.getElementById('p-sku').value = '';
-                document.getElementById('p-image').value = '';
-                document.getElementById('img-preview-container').style.display = 'none';
-                base64Image = "";
-            })
-            .catch((error) => {
-                alert("Error: " + error.message);
-            });
+        }).then(() => {
+            document.getElementById('status-msg').innerText = "Product Published Successfully! 🎉";
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-price').value = '';
+            document.getElementById('p-sku').value = '';
+            document.getElementById('p-image').value = '';
+            document.getElementById('img-preview-container').style.display = 'none';
+            base64Image = "";
+        });
     }
 
     function openSettings() {
         document.getElementById('settings-company').value = activeCompanyName;
-        document.getElementById('settings-new-pin').value = "";
         document.getElementById('settings-modal').classList.remove('hidden');
     }
-    
     function closeSettings() {
         document.getElementById('settings-modal').classList.add('hidden');
     }
-
     function updateSettings() {
         let newCompany = document.getElementById('settings-company').value.trim();
-        let newPin = document.getElementById('settings-new-pin').value.trim();
-
-        let updateData = { companyName: newCompany };
-        if(newPin) { updateData.secretPin = newPin; }
-
-        db.ref('registered_vendors/' + activeMobile).update(updateData)
-            .then(() => {
-                activeCompanyName = newCompany;
-                localStorage.setItem('viziag_company', newCompany);
-                document.getElementById('display-company-name').innerText = newCompany;
-                document.getElementById('settings-msg').innerText = "Settings & PIN Updated Successfully!";
-                setTimeout(() => { closeSettings(); }, 1500);
-            })
-            .catch((error) => {
-                alert("Error: " + error.message);
-            });
+        db.ref('registered_vendors/' + activeVendorMobile).update({ companyName: newCompany }).then(() => {
+            activeCompanyName = newCompany;
+            localStorage.setItem('viziag_vendor_company', newCompany);
+            document.getElementById('display-company-name').innerText = newCompany;
+            document.getElementById('settings-msg').innerText = "Updated Successfully!";
+            setTimeout(closeSettings, 1500);
+        });
     }
 
     function logoutVendor() {
-        localStorage.removeItem('viziag_mobile');
-        localStorage.removeItem('viziag_company');
-        activeMobile = "";
+        localStorage.removeItem('viziag_vendor_mobile');
+        localStorage.removeItem('viziag_vendor_company');
+        activeVendorMobile = "";
         activeCompanyName = "";
         switchTab('marketplace');
     }
 </script>
-
 </body>
 </html>
