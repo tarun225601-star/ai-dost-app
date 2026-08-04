@@ -3,575 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viziag Mart - Alibaba Style B2B Global Platform</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDK (Realtime Cloud Sync) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <title>Vendor Portal - Viziag Mart</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #ff5722; color: white; font-weight: bold; border: none; cursor: pointer; }
+        button:hover { background: #e64a19; }
+        .secondary-btn { background: #555; }
+        .hidden { display: none; }
+        .switch-text { text-align: center; margin-top: 10px; color: #007bff; cursor: pointer; }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans">
+<body>
 
-    <!-- Top Alibaba-Style Utility Bar -->
-    <div class="bg-slate-900 text-slate-300 text-xs py-1.5 px-4 hidden md:block">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex space-x-4">
-                <span><i class="fa-solid fa-globe text-amber-400 mr-1"></i> फरीदाबाद से ग्लोबल B2B मार्केटप्लेस (All India Visible)</span>
-                <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> 100% Verified Suppliers & Live Cloud Sync</span>
-            </div>
-            <div class="flex space-x-4">
-                <button onclick="openSettings()" class="text-amber-400 hover:underline font-semibold flex items-center">
-                    <i class="fa-solid fa-gear mr-1"></i> Admin Settings, Add & Edit Products
-                </button>
-            </div>
-        </div>
+    <!-- 1. LOGIN SECTION -->
+    <div id="login-section" class="card">
+        <h2>Vendor Login</h2>
+        <input type="tel" id="login-mobile" placeholder="Registered Mobile Number" maxlength="10">
+        <input type="password" id="login-pin" placeholder="Enter Your Secret Password/PIN">
+        <button onclick="loginVendor()">Login to My Panel</button>
+        <p id="login-error" style="color:red;"></p>
+        <div class="switch-text" onclick="showRegister()">नया वेंडर हूँ? यहाँ रजिस्टर करें</div>
     </div>
 
-    <!-- Main Header / Navbar -->
-    <header class="bg-[#ff6600] text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <!-- Logo -->
-            <div class="flex items-center space-x-2">
-                <span class="text-2xl font-black tracking-wider italic bg-white text-[#ff6600] px-2 py-0.5 rounded shadow">Viziag</span>
-                <span class="text-xl font-bold tracking-wide">Mart</span>
-            </div>
-
-            <!-- Search Bar with Visual AI Camera Search -->
-            <div class="hidden md:flex flex-1 max-w-2xl mx-8">
-                <div class="flex w-full bg-white rounded-full overflow-hidden p-1 shadow-inner items-center">
-                    <select class="bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-2 outline-none rounded-l-full border-r">
-                        <option>Products</option>
-                        <option>Manufacturers</option>
-                    </select>
-                    
-                    <input type="text" id="textSearchInput" onkeyup="filterProducts()" placeholder="Search product name, SKU or category..." class="flex-1 px-4 text-sm text-slate-800 outline-none">
-                    
-                    <!-- Camera / Image Visual Search Button -->
-                    <label title="Search by Product Photo" class="cursor-pointer bg-slate-100 hover:bg-orange-100 text-slate-700 hover:text-[#ff6600] px-3 py-2 rounded-full transition flex items-center justify-center mr-1">
-                        <i class="fa-solid fa-camera text-base"></i>
-                        <input type="file" id="visualSearchFile" accept="image/*" class="hidden" onchange="runVisualSearch(event)">
-                    </label>
-
-                    <button onclick="filterProducts()" class="bg-[#ff4400] hover:bg-orange-700 text-white px-5 py-2 rounded-full text-sm font-bold transition flex items-center">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Right Actions -->
-            <div class="flex items-center space-x-4">
-                <button onclick="openSettings()" class="bg-white text-[#ff6600] px-3.5 py-2 rounded-lg text-xs font-bold shadow flex items-center space-x-1 hover:bg-slate-100 transition">
-                    <i class="fa-solid fa-screwdriver-wrench text-sm"></i> <span>Admin Panel / Edit Catalog</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Sub Navbar -->
-    <nav class="bg-white border-b shadow-xs sticky top-[57px] z-30">
-        <div class="max-w-7xl mx-auto px-4 flex space-x-8 text-sm font-semibold overflow-x-auto whitespace-nowrap py-2.5">
-            <a href="#products" class="text-slate-700 hover:text-[#ff6600]">All Categories</a>
-            <a href="#products" class="text-orange-600 font-bold">Live Cloud Catalog</a>
-            <a href="#buyerSection" class="text-slate-700 hover:text-[#ff6600]">Buyer Registration</a>
-        </div>
-    </nav>
-
-    <!-- Visual Search Alert -->
-    <div id="visualSearchAlert" class="hidden max-w-7xl mx-auto px-4 mt-4">
-        <div class="bg-orange-50 border border-orange-300 text-orange-900 p-4 rounded-xl flex justify-between items-center text-xs">
-            <div class="flex items-center space-x-3">
-                <img id="searchedThumb" src="" class="w-12 h-12 object-cover rounded-lg border">
-                <div>
-                    <p class="font-bold text-sm text-[#ff6600]">Visual Photo Search Active</p>
-                    <p id="visualSearchStatus" class="text-slate-600">Scanning live database...</p>
-                </div>
-            </div>
-            <button onclick="clearVisualSearch()" class="bg-white text-slate-700 px-3 py-1.5 rounded-lg border hover:bg-slate-100 font-bold">Reset Search</button>
-        </div>
+    <!-- 2. REGISTER / SETUP PIN SECTION -->
+    <div id="register-section" class="card hidden">
+        <h2>New Vendor Registration</h2>
+        <input type="text" id="reg-company" placeholder="Company Name (e.g. JetBlack India)">
+        <input type="tel" id="reg-mobile" placeholder="Mobile Number (10 Digits)" maxlength="10">
+        <input type="password" id="reg-pin" placeholder="Create Your Own Secret PIN/Password">
+        <button onclick="registerVendor()">Register & Set Password</button>
+        <p id="reg-error" style="color:red;"></p>
+        <div class="switch-text" onclick="showLogin()">पहिले से खाता है? लॉगिन करें</div>
     </div>
 
-    <!-- Admin Settings & Edit Modal -->
-    <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 max-h-[90vh] flex flex-col">
-            <div class="bg-[#ff6600] text-white px-6 py-4 flex justify-between items-center">
-                <h3 class="font-bold text-base flex items-center"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Admin Panel: Add, Edit & Cloud Settings</h3>
-                <button onclick="closeSettings()" class="text-white hover:text-slate-200 text-2xl font-bold">&times;</button>
-            </div>
-            
-            <div class="p-6 overflow-y-auto space-y-8 flex-1 text-xs">
-                
-                <!-- Add / Edit Product Form -->
-                <div>
-                    <h4 id="formTitleText" class="font-bold text-sm text-slate-900 mb-3 pb-2 border-b flex items-center justify-between">
-                        <span class="flex items-center"><i class="fa-solid fa-circle-plus text-[#ff6600] mr-2"></i> Register New Product (Live Cloud Sync)</span>
-                        <span id="editingBadge" class="hidden bg-amber-500 text-white px-2 py-0.5 rounded text-[10px]">Editing Mode Active</span>
-                    </h4>
-                    
-                    <form id="catalogForm" onsubmit="handleFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <input type="hidden" id="editProductId">
-                        <div>
-                            <label class="block font-bold text-slate-700 uppercase mb-1">Company / Firm Name</label>
-                            <input type="text" id="companyName" placeholder="e.g. Viziag Global" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 uppercase mb-1">GSTIN Number</label>
-                            <input type="text" id="companyGst" placeholder="06AAAAA0000A1Z5" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm uppercase focus:outline-none focus:border-orange-500">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 uppercase mb-1">Product / Part Name</label>
-                            <input type="text" id="partName" placeholder="Product Name" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 uppercase mb-1">Product Code / SKU</label>
-                            <input type="text" id="partCode" placeholder="SKU-001" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 uppercase mb-1">Wholesale Price (₹)</label>
-                            <input type="number" id="partPrice" placeholder="500" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 uppercase mb-1">WhatsApp Mobile Number</label>
-                            <input type="tel" id="whatsappNumber" placeholder="9811223344" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block font-bold text-slate-700 uppercase mb-1">Upload Product Photo</label>
-                            <input type="file" id="partImageFile" accept="image/*" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-slate-50 focus:outline-none file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-orange-50 file:text-[#ff6600]">
-                            <p class="text-[10px] text-slate-400 mt-1">If editing, leave empty to keep existing photo.</p>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 uppercase mb-1">Location (Faridabad)</label>
-                            <input type="text" id="partLocation" placeholder="Sector 24" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-                        </div>
-                        <div class="md:col-span-2 pt-2 flex space-x-2">
-                            <button type="submit" id="saveBtn" class="flex-1 bg-[#ff6600] hover:bg-orange-700 text-white font-bold py-2.5 rounded-lg text-sm transition shadow">
-                                <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Publish to Live Cloud
-                            </button>
-                            <button type="button" id="cancelEditBtn" onclick="resetForm()" class="hidden bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold px-4 py-2.5 rounded-lg text-sm transition">
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Existing Products Management List (Edit & Delete Panel) -->
-                <div class="pt-4 border-t">
-                    <h4 class="font-bold text-sm text-slate-900 mb-3 pb-2 border-b flex items-center">
-                        <i class="fa-solid fa-list-check text-emerald-600 mr-2"></i> Manage / Edit / Delete Live Products
-                    </h4>
-                    <div id="adminProductList" class="space-y-2 max-h-48 overflow-y-auto pr-2">
-                        <!-- Populated via JS -->
-                    </div>
-                </div>
-
-                <!-- Firebase Cloud URL Config -->
-                <div class="pt-4 border-t">
-                    <h4 class="font-bold text-sm text-slate-900 mb-3 pb-2 border-b flex items-center">
-                        <i class="fa-solid fa-database text-indigo-600 mr-2"></i> Firebase Realtime Database Cloud URL
-                    </h4>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block font-bold text-slate-700 uppercase mb-1">Firebase Database URL</label>
-                            <input type="text" id="firebaseUrlInput" placeholder="https://viziag-mart-default-rtdb.firebaseio.com" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-                        </div>
-                        <button onclick="saveFirebaseConfig()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg text-xs transition">
-                            Save & Connect Live Database
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+    <!-- 3. VENDOR ADMIN PANEL SECTION (Hidden by default) -->
+    <div id="admin-section" class="card hidden">
+        <h2>Welcome, <span id="display-company-name"></span></h2>
+        <p style="font-size: 12px; color: gray;">Mobile: <span id="display-mobile"></span></p>
+        <hr>
+        <h3>Add New Product</h3>
+        <input type="text" id="p-name" placeholder="Product Name (e.g. Apple)">
+        <input type="text" id="p-price" placeholder="Wholesale Price (₹)">
+        <input type="text" id="p-sku" placeholder="SKU Code">
+        <button onclick="publishProduct()">Publish Product to Live Cloud</button>
+        <button onclick="logoutVendor()" class="secondary-btn">Logout</button>
+        <p id="status-msg" style="color:green;"></p>
     </div>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-10">
+<script>
+    // Firebase Database URL
+    const firebaseConfig = {
+        databaseURL: "https://viziamart-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-        <!-- Buyer Registration Section -->
-        <section id="buyerSection" class="bg-white p-6 md:p-8 rounded-2xl shadow-xs border border-slate-200">
-            <div class="flex items-center space-x-3 mb-6 border-b pb-4">
-                <div class="bg-emerald-600 text-white p-3 rounded-xl text-xl"><i class="fa-solid fa-user-tie"></i></div>
-                <div>
-                    <h2 class="text-xl font-bold text-slate-900">Buyer / Client Registration (Wholesale Buyer Verification)</h2>
-                    <p class="text-xs text-slate-500">Register your shop or business to place secure B2B orders.</p>
-                </div>
-            </div>
-            
-            <form id="buyerForm" onsubmit="registerBuyer(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Buyer Name</label>
-                    <input type="text" id="buyerName" placeholder="Tarun Kumar" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-600">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Shop / Firm Name</label>
-                    <input type="text" id="buyerFirm" placeholder="Viziag Mart" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-600">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">WhatsApp Phone</label>
-                    <input type="tel" id="buyerPhone" placeholder="9811223344" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-600">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Business Type / Trade</label>
-                    <input type="text" id="buyerBusinessType" placeholder="Wholesaler / Dealer" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-600">
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow">
-                        <i class="fa-solid fa-id-card mr-1"></i> Register Client
-                    </button>
-                </div>
-            </form>
-            <div id="buyerSuccessMsg" class="hidden mt-4 p-3 bg-emerald-50 text-emerald-800 text-xs rounded-lg border border-emerald-200">
-                <i class="fa-solid fa-check-circle mr-1"></i> Client registered successfully! Ready for secure wholesale sourcing.
-            </div>
-        </section>
+    let activeMobile = "";
 
-        <!-- Product Catalog Grid -->
-        <section id="products">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-900 border-l-4 border-[#ff6600] pl-3">Verified Global B2B Catalog (Live Cloud)</h2>
-                    <p class="text-xs text-slate-500 mt-1 ml-3">Direct wholesale orders with damage protection and return policy.</p>
-                </div>
-                <button onclick="openSettings()" class="bg-[#ff6600] text-white text-xs px-4 py-2 rounded-lg font-bold shadow hover:bg-orange-700 transition flex items-center">
-                    <i class="fa-solid fa-plus mr-1"></i> Add / Edit Product
-                </button>
-            </div>
+    function showRegister() {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('register-section').classList.remove('hidden');
+    }
 
-            <!-- Dynamic Product Grid -->
-            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Rendered dynamically -->
-            </div>
-            
-            <div id="emptyCatalogMsg" class="hidden text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300">
-                <i class="fa-solid fa-box-open text-4xl text-slate-300 mb-2"></i>
-                <p class="text-sm font-semibold text-slate-600">No products added yet.</p>
-                <p class="text-xs text-slate-400 mt-1">Click on "Admin Panel / Edit Catalog" above to add your products.</p>
-            </div>
-        </section>
-    </main>
+    function showLogin() {
+        document.getElementById('register-section').classList.add('hidden');
+        document.getElementById('login-section').classList.remove('hidden');
+    }
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-6 px-4 text-center text-xs mt-12">
-        <p class="font-bold text-white text-sm">Viziag Mart (बिजिया मार्ट) - Alibaba Style B2B Faridabad Platform</p>
-        <p class="text-slate-500 mt-1">Powered by Firebase Realtime Database Live Sync</p>
-        <p class="mt-4">&copy; 2026 Viziag Mart. All Rights Reserved.</p>
-    </footer>
+    // नया वेंडर रजिस्टर करके अपना खुद का पिन सेट करेगा
+    function registerVendor() {
+        let companyName = document.getElementById('reg-company').value.trim();
+        let mobile = document.getElementById('reg-mobile').value.trim();
+        let pin = document.getElementById('reg-pin').value.trim();
 
-    <!-- Firebase & App JavaScript Logic -->
-    <script>
-        let db;
-        let globalProducts = [];
+        if(!companyName || mobile.length !== 10 || !pin) {
+            document.getElementById('reg-error').innerText = "कृपया सभी जानकारी सही से भरें।";
+            return;
+        }
 
-        window.onload = function() {
-            initFirebase();
+        db.ref('registered_vendors/' + mobile).set({
+            companyName: companyName,
+            mobile: mobile,
+            secretPin: pin
+        }).then(() => {
+            alert("रजिस्ट्रेशन सफल! अब आप अपने पिन से लॉगिन कर सकते हैं।");
+            showLogin();
+        }).catch((error) => {
+            document.getElementById('reg-error').innerText = "Error: " + error.message;
+        });
+    }
+
+    // वेंडर अपने मोबाइल और पिन से लॉगिन करेगा
+    function loginVendor() {
+        let mobile = document.getElementById('login-mobile').value.trim();
+        let pin = document.getElementById('login-pin').value.trim();
+
+        if (mobile.length !== 10) {
+            document.getElementById('login-error').innerText = "कृपया सही मोबाइल नंबर डालें।";
+            return;
+        }
+
+        db.ref('registered_vendors/' + mobile).once('value')
+            .then((snapshot) => {
+                let data = snapshot.val();
+                if (data && data.secretPin === pin) {
+                    activeMobile = mobile;
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('admin-section').classList.remove('hidden');
+                    document.getElementById('display-company-name').innerText = data.companyName;
+                    document.getElementById('display-mobile').innerText = mobile;
+                } else {
+                    document.getElementById('login-error').innerText = "गलत मोबाइल नंबर या पासवर्ड!";
+                }
+            })
+            .catch((error) => {
+                document.getElementById('login-error').innerText = "Error: " + error.message;
+            });
+    }
+
+    // प्रोडक्ट पब्लिश करना (सिर्फ उसी वेंडर के फोल्डर में जाएगा)
+    function publishProduct() {
+        if (!activeMobile) return;
+
+        let name = document.getElementById('p-name').value;
+        let price = document.getElementById('p-price').value;
+        let sku = document.getElementById('p-sku').value;
+
+        if(!name || !price) {
+            alert("कृपया प्रोडक्ट का नाम और कीमत भरें।");
+            return;
+        }
+
+        let productData = {
+            productName: name,
+            price: price,
+            sku: sku,
+            sellerMobile: activeMobile,
+            timestamp: Date.now()
         };
 
-        function initFirebase() {
-            const defaultUrl = "https://viziag-mart-default-rtdb.firebaseio.com";
-            const dbUrl = localStorage.getItem('viziag_firebase_url') || defaultUrl;
-            document.getElementById('firebaseUrlInput').value = dbUrl;
-
-            try {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp({ databaseURL: dbUrl });
-                }
-                db = firebase.database();
-                fetchProductsFromCloud();
-            } catch (err) {
-                console.error("Firebase init error:", err);
-                loadFromLocalStorageFallback();
-            }
-        }
-
-        function saveFirebaseConfig() {
-            const url = document.getElementById('firebaseUrlInput').value;
-            localStorage.setItem('viziag_firebase_url', url);
-            alert('Firebase Cloud URL saved successfully! Reconnecting...');
-            location.reload();
-        }
-
-        function fetchProductsFromCloud() {
-            if (!db) {
-                loadFromLocalStorageFallback();
-                return;
-            }
-            db.ref('viziag_products').on('value', (snapshot) => {
-                const data = snapshot.val();
-                globalProducts = [];
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        globalProducts.push({ id: key, ...data[key] });
-                    });
-                }
-                localStorage.setItem('viziag_products_cache', JSON.stringify(globalProducts));
-                renderProductCards(globalProducts);
-                renderAdminList(globalProducts);
-            }, (error) => {
-                console.error("Cloud fetch failed, using local fallback:", error);
-                loadFromLocalStorageFallback();
+        // डेटाबेस में उस वेंडर के मोबाइल फोल्डर के अंदर प्रोडक्ट सेव होगा
+        db.ref('vendors_products/' + activeMobile).push(productData)
+            .then(() => {
+                document.getElementById('status-msg').innerText = "Product Published Successfully!";
+                document.getElementById('p-name').value = '';
+                document.getElementById('p-price').value = '';
+                document.getElementById('p-sku').value = '';
+            })
+            .catch((error) => {
+                alert("Error: " + error.message);
             });
-        }
+    }
 
-        function loadFromLocalStorageFallback() {
-            let cached = JSON.parse(localStorage.getItem('viziag_products_cache')) || [];
-            globalProducts = cached;
-            renderProductCards(globalProducts);
-            renderAdminList(globalProducts);
-        }
+    function logoutVendor() {
+        location.reload();
+    }
+</script>
 
-        function openSettings() {
-            document.getElementById('settingsModal').classList.remove('hidden');
-            renderAdminList(globalProducts);
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.add('hidden');
-            resetForm();
-        }
-
-        function resetForm() {
-            document.getElementById('catalogForm').reset();
-            document.getElementById('editProductId').value = '';
-            document.getElementById('editingBadge').classList.add('hidden');
-            document.getElementById('cancelEditBtn').classList.add('hidden');
-            document.getElementById('formTitleText').innerHTML = `<span class="flex items-center"><i class="fa-solid fa-circle-plus text-[#ff6600] mr-2"></i> Register New Product (Live Cloud Sync)</span>`;
-            document.getElementById('saveBtn').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Publish to Live Cloud`;
-        }
-
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            const editId = document.getElementById('editProductId').value;
-            const compName = document.getElementById('companyName').value;
-            const compGst = document.getElementById('companyGst').value;
-            const name = document.getElementById('partName').value;
-            const code = document.getElementById('partCode').value;
-            const price = document.getElementById('partPrice').value;
-            const phone = document.getElementById('whatsappNumber').value;
-            const location = document.getElementById('partLocation').value;
-            const imageFile = document.getElementById('partImageFile').files[0];
-
-            if (imageFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    saveToCloudOrLocal(editId, compName, compGst, name, code, price, phone, location, e.target.result);
-                };
-                reader.readAsDataURL(imageFile);
-            } else {
-                let existingImage = "";
-                if (editId) {
-                    const existingProd = globalProducts.find(p => p.id === editId);
-                    if (existingProd) existingImage = existingProd.mainImage;
-                }
-                saveToCloudOrLocal(editId, compName, compGst, name, code, price, phone, location, existingImage);
-            }
-        }
-
-        function saveToCloudOrLocal(editId, compName, compGst, name, code, price, phone, location, mainImage) {
-            const productData = { compName, compGst, name, code, price, phone, location, mainImage };
-
-            if (db) {
-                if (editId) {
-                    db.ref('viziag_products/' + editId).update(productData, (error) => {
-                        if (!error) {
-                            alert('Product updated successfully on live cloud!');
-                            resetForm();
-                            closeSettings();
-                        } else {
-                            alert('Error updating product.');
-                        }
-                    });
-                } else {
-                    const newRef = db.ref('viziag_products').push();
-                    newRef.set(productData, (error) => {
-                        if (!error) {
-                            alert('Product published live to cloud successfully!');
-                            resetForm();
-                            closeSettings();
-                        } else {
-                            alert('Error publishing product.');
-                        }
-                    });
-                }
-            } else {
-                let products = JSON.parse(localStorage.getItem('viziag_products_cache')) || [];
-                if (editId) {
-                    products = products.map(p => p.id == editId ? { id: editId, ...productData } : p);
-                } else {
-                    productData.id = Date.now().toString();
-                    products.unshift(productData);
-                }
-                localStorage.setItem('viziag_products_cache', JSON.stringify(products));
-                globalProducts = products;
-                renderProductCards(globalProducts);
-                renderAdminList(globalProducts);
-                alert('Saved locally!');
-                resetForm();
-                closeSettings();
-            }
-        }
-
-        function editProduct(id) {
-            const p = globalProducts.find(item => item.id == id);
-            if (!p) return;
-
-            document.getElementById('editProductId').value = p.id;
-            document.getElementById('companyName').value = p.compName;
-            document.getElementById('companyGst').value = p.compGst;
-            document.getElementById('partName').value = p.name;
-            document.getElementById('partCode').value = p.code;
-            document.getElementById('partPrice').value = p.price;
-            document.getElementById('whatsappNumber').value = p.phone;
-            document.getElementById('partLocation').value = p.location;
-
-            document.getElementById('editingBadge').classList.remove('hidden');
-            document.getElementById('cancelEditBtn').classList.remove('hidden');
-            document.getElementById('formTitleText').innerHTML = `<span class="flex items-center text-amber-600"><i class="fa-solid fa-pen-to-square mr-2"></i> Edit Product: ${p.name}</span>`;
-            document.getElementById('saveBtn').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Update Changes Live`;
-            
-            document.querySelector('#settingsModal .overflow-y-auto').scrollTop = 0;
-        }
-
-        function deleteProduct(id) {
-            if (confirm('Are you sure you want to delete this product from live catalog?')) {
-                if (db) {
-                    db.ref('viziag_products/' + id).remove().then(() => {
-                        alert('Product deleted successfully!');
-                    });
-                } else {
-                    let products = JSON.parse(localStorage.getItem('viziag_products_cache')) || [];
-                    products = products.filter(p => p.id != id);
-                    localStorage.setItem('viziag_products_cache', JSON.stringify(products));
-                    globalProducts = products;
-                    renderProductCards(globalProducts);
-                    renderAdminList(globalProducts);
-                }
-            }
-        }
-
-        function renderAdminList(products) {
-            const listDiv = document.getElementById('adminProductList');
-            listDiv.innerHTML = "";
-
-            if (products.length === 0) {
-                listDiv.innerHTML = `<p class="text-slate-400 text-center py-2">No products available to edit.</p>`;
-                return;
-            }
-
-            products.forEach(p => {
-                const item = document.createElement('div');
-                item.className = "flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-200";
-                item.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <img src="${p.mainImage}" class="w-8 h-8 object-cover rounded">
-                        <div>
-                            <p class="font-bold text-slate-800">${p.name} <span class="text-[10px] text-slate-400">(₹${p.price})</span></p>
-                            <p class="text-[10px] text-slate-500">${p.compName} | SKU: ${p.code}</p>
-                        </div>
-                    </div>
-                    <div class="flex space-x-1">
-                        <button onclick="editProduct('${p.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded text-xs font-bold transition">
-                            <i class="fa-solid fa-pen"></i> Edit
-                        </button>
-                        <button onclick="deleteProduct('${p.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold transition">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                listDiv.appendChild(item);
-            });
-        }
-
-        function filterProducts() {
-            const query = document.getElementById('textSearchInput').value.toLowerCase();
-            const filtered = globalProducts.filter(p => 
-                p.name.toLowerCase().includes(query) || 
-                p.code.toLowerCase().includes(query) || 
-                p.compName.toLowerCase().includes(query) ||
-                p.location.toLowerCase().includes(query)
-            );
-            renderProductCards(filtered);
-        }
-
-        function runVisualSearch(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('searchedThumb').src = e.target.result;
-                document.getElementById('visualSearchAlert').classList.remove('hidden');
-                document.getElementById('visualSearchStatus').innerHTML = `Photo analyzed! Showing matching products from live cloud catalog...`;
-                setTimeout(() => {
-                    renderProductCards(globalProducts);
-                }, 800);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function clearVisualSearch() {
-            document.getElementById('visualSearchFile').value = '';
-            document.getElementById('visualSearchAlert').classList.add('hidden');
-            renderProductCards(globalProducts);
-        }
-
-        function registerBuyer(event) {
-            event.preventDefault();
-            const name = document.getElementById('buyerName').value;
-            const firm = document.getElementById('buyerFirm').value;
-            localStorage.setItem('viziag_buyer_name', name);
-            localStorage.setItem('viziag_buyer_firm', firm);
-            document.getElementById('buyerSuccessMsg').classList.remove('hidden');
-            document.getElementById('buyerForm').reset();
-            setTimeout(() => { window.location.hash = '#products'; }, 1500);
-        }
-
-        function renderProductCards(products) {
-            const grid = document.getElementById('productGrid');
-            const emptyMsg = document.getElementById('emptyCatalogMsg');
-            grid.innerHTML = "";
-
-            if (products.length === 0) {
-                emptyMsg.classList.remove('hidden');
-                return;
-            } else {
-                emptyMsg.classList.add('hidden');
-            }
-
-            products.forEach(p => {
-                const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
-                const registeredBuyer = localStorage.getItem('viziag_buyer_firm') || 'General Buyer';
-                const waLink = `https://wa.me/91${cleanPhone}?text=Hello%20${encodeURIComponent(p.compName)},%20I%20am%20${encodeURIComponent(registeredBuyer)}.%20I%20want%20to%20order%20${encodeURIComponent(p.name)}%20(SKU:%20${encodeURIComponent(p.code)})%20under%20Return%20Policy.`;
-
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-xs hover:shadow-md transition border border-slate-200 overflow-hidden flex flex-col justify-between";
-                card.innerHTML = `
-                    <div>
-                        <div class="bg-slate-200 h-44 flex items-center justify-center text-slate-500 relative overflow-hidden">
-                            <img src="${p.mainImage}" alt="${p.name}" class="w-full h-full object-cover">
-                            <span class="absolute top-2 right-2 bg-slate-900 text-white text-xs px-2 py-1 rounded">${p.location || 'Faridabad'}</span>
-                            <span class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-shield-check mr-1"></i> GST: ${p.compGst}</span>
-                        </div>
-                        <div class="p-4">
-                            <span class="text-xs text-[#ff6600] font-bold">${p.compName}</span>
-                            <h3 class="font-bold text-base text-slate-900 mt-1">${p.name}</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">SKU: ${p.code}</p>
-                            <p class="text-[10px] text-emerald-700 font-semibold mt-1"><i class="fa-solid fa-rotate-left mr-1"></i> 100% Returnable if Damaged</p>
-                            <div class="mt-3 flex items-baseline space-x-2">
-                                <span class="text-lg font-extrabold text-slate-900">₹${Number(p.price).toLocaleString('en-IN')}</span>
-                                <span class="text-xs text-slate-400">/ wholesale price</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4 pt-0">
-                        <a href="${waLink}" target="_blank" class="w-full bg-[#ff6600] hover:bg-orange-700 text-white text-sm font-medium py-2 rounded-lg transition flex items-center justify-center shadow">
-                            <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Contact Supplier (WhatsApp)
-                        </a>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-    </script>
 </body>
 </html>
