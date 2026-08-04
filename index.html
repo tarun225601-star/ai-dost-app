@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viziag Mart - Multi-Vendor Marketplace</title>
+    <title>Viziag Mart - Local Hyper-Local Marketplace</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -45,7 +45,12 @@
         .product-card {
             background: white; border-radius: 12px; overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: flex; flex-direction: column;
-            justify-content: space-between; transition: transform 0.2s;
+            justify-content: space-between; transition: transform 0.2s; position: relative;
+        }
+        .product-card.out-of-stock { opacity: 0.6; filter: grayscale(0.5); }
+        .stock-badge {
+            position: absolute; top: 10px; right: 10px; background: #dc3545; color: white;
+            padding: 4px 10px; font-size: 11px; font-weight: bold; border-radius: 4px; z-index: 10;
         }
         .product-img { width: 100%; height: 180px; object-fit: cover; background: #eee; }
         .product-info { padding: 15px; }
@@ -54,12 +59,21 @@
             border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 8px;
         }
         .product-name { font-size: 18px; font-weight: bold; margin: 0 0 5px 0; color: #222; }
-        .product-price { font-size: 16px; color: #16a34a; font-weight: bold; margin-bottom: 10px; }
-        .product-sku { font-size: 12px; color: #666; margin-bottom: 15px; }
+        .product-price { font-size: 16px; color: #16a34a; font-weight: bold; margin-bottom: 5px; }
+        .delivery-tag { font-size: 12px; color: #0284c7; background: #f0f9ff; padding: 3px 6px; border-radius: 4px; display: inline-block; margin-bottom: 10px; font-weight: 600; }
+        .product-sku { font-size: 12px; color: #666; margin-bottom: 10px; }
+        
+        .selector-box { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 12px; }
+        .selector-box label { font-size: 12px; font-weight: bold; color: #475569; display: block; margin-bottom: 4px; }
+        .selector-box select, .selector-box input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; box-sizing: border-box; }
+
+        .calc-total { font-size: 13px; font-weight: bold; color: #334155; margin-bottom: 10px; background: #fef3c7; padding: 6px 10px; border-radius: 6px; text-align: center; border: 1px solid #fde047; }
+
         .whatsapp-btn {
             background: #25d366; color: white; text-align: center; padding: 12px;
             text-decoration: none; font-weight: bold; display: block; border-radius: 0 0 12px 12px;
         }
+        .whatsapp-btn.disabled { background: #94a3b8; pointer-events: none; }
 
         .card {
             background: var(--card-bg); padding: 25px; border-radius: 16px;
@@ -68,11 +82,11 @@
         h2 { margin-top: 0; font-size: 20px; color: #222; }
         .input-group { margin-bottom: 15px; }
         label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #555; }
-        input {
+        input, select {
             width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
             box-sizing: border-box; font-size: 15px; background: var(--gray-light);
         }
-        input:focus { border-color: var(--primary); background: #fff; outline: none; }
+        input:focus, select:focus { border-color: var(--primary); background: #fff; outline: none; }
         .btn {
             width: 100%; padding: 14px; background: var(--primary); color: white;
             font-weight: bold; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
@@ -89,13 +103,53 @@
         }
         .modal-content { background: white; padding: 25px; border-radius: 16px; width: 90%; max-width: 420px; }
 
-        /* Vendor Dashboard Product Management List */
-        .my-product-item {
-            display: flex; align-items: center; justify-content: space-between;
-            background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; margin-bottom: 10px;
+        /* Compact Vendor Dashboard Grid Styles */
+        .vendor-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 5px;
         }
-        .my-product-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; }
-        .action-btns { display: flex; gap: 5px; }
+        .vendor-mini-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+        }
+        .vendor-mini-header {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .vendor-mini-header img {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+        .vendor-mini-info { overflow: hidden; }
+        .vendor-mini-title {
+            font-weight: bold;
+            font-size: 13px;
+            color: #222;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .vendor-mini-price { color: #16a34a; font-size: 12px; font-weight: 600; }
+        .vendor-mini-stock { font-size: 11px; font-weight: bold; }
+        .vendor-mini-actions { display: flex; gap: 6px; margin-top: 5px; }
+        .vendor-mini-actions button { flex: 1; padding: 5px; font-size: 11px; }
+
         .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
         .btn-edit { background: #3b82f6; color: white; }
         .btn-del { background: #ef4444; color: white; }
@@ -116,7 +170,7 @@
         <!-- Marketplace View -->
         <div id="tab-marketplace">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-                <h2 style="margin: 0; color: #222;">🔥 Live Wholesale Marketplace</h2>
+                <h2 style="margin: 0; color: #222;">🔥 Local Hyper-Local Market</h2>
                 <div id="buyer-status-banner" style="font-size: 13px; background: #e2e8f0; padding: 6px 12px; border-radius: 20px;">
                     🔒 Login to Order
                 </div>
@@ -153,7 +207,7 @@
             </div>
             <hr style="border:0; border-top:1px solid #eee; margin-bottom:20px;">
 
-            <h3 id="form-title" style="font-size:16px; margin-bottom:15px;">📦 Add Catalog Item (Product with Photo)</h3>
+            <h3 id="form-title" style="font-size:16px; margin-bottom:15px;">📦 Add / Manage Product Item</h3>
             
             <input type="hidden" id="edit-product-id" value="">
 
@@ -166,18 +220,50 @@
             </div>
 
             <div class="input-group">
-                <label>Product Name</label>
-                <input type="text" id="p-name" placeholder="e.g. Designer Item">
+                <label>Product Name (e.g. Samosa / Babbu Ghosa / Jalebi)</label>
+                <input type="text" id="p-name" placeholder="Item Name">
             </div>
 
             <div class="input-group">
-                <label>Wholesale Price (₹)</label>
-                <input type="number" id="p-price" placeholder="e.g. 450">
+                <label>Pricing Type (Rate Type)</label>
+                <select id="p-unit-type" onchange="toggleUnitFields()">
+                    <option value="piece">Per Piece (जैसे समोसा, बर्गर - प्रति पीस)</option>
+                    <option value="weight">Per Kg / Gram (जैसे फल, सब्ज़ी - वजन के हिसाब से)</option>
+                </select>
             </div>
 
             <div class="input-group">
-                <label>SKU Code / Location</label>
-                <input type="text" id="p-sku" placeholder="e.g. SKU-001">
+                <span id="price-label-text" style="font-size:13px; font-weight:600; color:#555; display:block; margin-bottom:5px;">Price per Piece (₹)</span>
+                <input type="number" id="p-price" placeholder="e.g. 15">
+            </div>
+
+            <div class="input-group">
+                <label>GST Rate (%)</label>
+                <select id="p-gst">
+                    <option value="0">0% GST (Tax Free)</option>
+                    <option value="5">5% GST</option>
+                    <option value="12">12% GST</option>
+                    <option value="18">18% GST</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Delivery Option</label>
+                <select id="p-delivery">
+                    <option value="🚚 Home Delivery Available">🚚 Home Delivery Available</option>
+                    <option value="🏃‍♂️ Self Pickup / Counter Collect">🏃‍♂️ Self Pickup / Counter Collect</option>
+                    <option value="⚡ Instant 30 Min Delivery">⚡ Instant 30 Min Delivery</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Location / Area (e.g. Sector 15A Faridabad)</label>
+                <input type="text" id="p-sku" placeholder="Area / Shop Location">
+            </div>
+
+            <div class="input-group" style="display: flex; align-items: center; gap: 10px; background: #fff3cd; padding: 10px; border-radius: 8px;">
+                <input type="checkbox" id="p-stock" style="width: 20px; height: 20px;" checked>
+                <label for="p-stock" style="margin: 0; color: #856404; cursor: pointer;">Stock Available (अनचेक करने पर 'Out of Stock' हो जाएगा)</label>
             </div>
 
             <button class="btn" id="publish-btn" onclick="saveOrUpdateProduct()">Publish Product Live 🚀</button>
@@ -186,8 +272,8 @@
             
             <hr style="border:0; border-top:1px solid #eee; margin:25px 0 20px 0;">
 
-            <h3 style="font-size:16px; margin-bottom:15px;">📋 Your Uploaded Products (Manage Items)</h3>
-            <div id="vendor-products-list" style="max-height: 300px; overflow-y: auto;">
+            <h3 style="font-size:16px; margin-bottom:15px;">📋 Your Uploaded Items (Compact View)</h3>
+            <div id="vendor-products-list">
                 <div style="text-align: center; color: #666; padding: 20px;">लोड हो रहा है...</div>
             </div>
 
@@ -221,8 +307,8 @@
                 <input type="tel" id="reg-mobile" placeholder="9876543210" maxlength="10">
             </div>
             <div class="input-group">
-                <label>Company / Store Name</label>
-                <input type="text" id="reg-company" placeholder="Store Name">
+                <label>Company / Shop Name</label>
+                <input type="text" id="reg-company" placeholder="Shop Name">
             </div>
             <div class="input-group">
                 <label>Create Secret Security PIN</label>
@@ -239,7 +325,7 @@
         <div class="modal-content">
             <h3>⚙️ Vendor Settings & PIN</h3>
             <div class="input-group">
-                <label>Company Name</label>
+                <label>Company / Shop Name</label>
                 <input type="text" id="settings-company">
             </div>
             <div class="input-group">
@@ -338,6 +424,44 @@
         loadMarketplaceProducts();
     }
 
+    function toggleUnitFields() {
+        let type = document.getElementById('p-unit-type').value;
+        let label = document.getElementById('price-label-text');
+        if(type === 'piece') {
+            label.innerText = "Price per Piece (₹)";
+        } else {
+            label.innerText = "Price per KG (₹)";
+        }
+    }
+
+    function calculateCardTotal(productId, basePrice, gstRate, unitType) {
+        let qtyInput = document.getElementById(`qty-${productId}`).value;
+        let qty = parseFloat(qtyInput) || 1;
+        
+        let subtotal = basePrice * qty;
+        let gstAmount = (subtotal * gstRate) / 100;
+        let grandTotal = subtotal + gstAmount;
+
+        let unitText = unitType === 'piece' ? 'Piece(s)' : 'KG';
+        document.getElementById(`total-display-${productId}`).innerHTML = `Total: ₹${grandTotal.toFixed(2)} <span style="font-size:11px; font-weight:normal; color:#555;">(Incl. ${gstRate}% GST)</span>`;
+        
+        updateWhatsAppLink(productId, qty, grandTotal.toFixed(2), unitText);
+    }
+
+    function updateWhatsAppLink(productId, qty, finalPrice, unitText) {
+        let btn = document.getElementById(`wa-btn-${productId}`);
+        if(!btn) return;
+        
+        let pName = btn.getAttribute('data-name');
+        let sellerMob = btn.getAttribute('data-mobile');
+        let compName = btn.getAttribute('data-company');
+
+        if(activeBuyerMobile) {
+            let orderText = encodeURIComponent(`Hello, I am buyer ${activeBuyerName} (${activeBuyerMobile}). I want to order ${qty} ${unitText} of ${pName} from ${compName}. Total Amount: ₹${finalPrice} (Incl. GST).`);
+            btn.href = `https://wa.me/91${sellerMob}?text=${orderText}`;
+        }
+    }
+
     function loadMarketplaceProducts() {
         const container = document.getElementById('products-container');
         db.ref('vendors_products').on('value', (snapshot) => {
@@ -353,7 +477,7 @@
             });
 
             if (allProducts.length === 0) {
-                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">अभी कोई प्रोडक्ट लाइव नहीं है। वेंडर पोर्टल से जोड़ें।</div>`;
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">अभी कोई आइटम लाइव नहीं है। वेंडर पोर्टल से जोड़ें।</div>`;
                 return;
             }
 
@@ -361,28 +485,79 @@
 
             allProducts.forEach(product => {
                 let card = document.createElement('div');
-                card.className = 'product-card';
+                let isOut = product.inStock === false;
+                card.className = 'product-card' + (isOut ? ' out-of-stock' : '');
+                
                 let imgSrc = product.productImage || 'https://via.placeholder.com/300x180?text=No+Image';
+                let stockBadge = isOut ? `<div class="stock-badge">OUT OF STOCK</div>` : '';
+                
+                let unitType = product.unitType || 'piece';
+                let basePrice = parseFloat(product.price) || 0;
+                let gstRate = parseFloat(product.gst) || 0;
+                
+                let defaultQty = 1;
+                let initialSub = basePrice * defaultQty;
+                let initialTotal = initialSub + (initialSub * gstRate / 100);
 
-                let orderBtnHTML = "";
-                if(activeBuyerMobile) {
-                    let orderText = encodeURIComponent(`Hello, I am buyer ${activeBuyerName} (${activeBuyerMobile}). I want to order ${product.productName} (₹${product.price}) from ${product.companyName}`);
-                    orderBtnHTML = `<a href="https://wa.me/91${product.sellerMobile}?text=${orderText}" target="_blank" class="whatsapp-btn">💬 Order on WhatsApp</a>`;
+                let selectorHTML = "";
+                if(isOut) {
+                    selectorHTML = `<div class="whatsapp-btn disabled">❌ Stock Out (Unavailable)</div>`;
                 } else {
-                    orderBtnHTML = `<div onclick="openBuyerModal()" class="whatsapp-btn" style="background:#007bff; cursor:pointer; text-align:center;">🔒 Login to Order on WhatsApp</div>`;
+                    let inputControl = "";
+                    if(unitType === 'piece') {
+                        inputControl = `
+                            <label>चुने (Pieces):</label>
+                            <select id="qty-${product.id}" onchange="calculateCardTotal('${product.id}', ${basePrice}, ${gstRate}, 'piece')">
+                                <option value="1">1 Piece</option>
+                                <option value="2">2 Pieces</option>
+                                <option value="3">3 Pieces</option>
+                                <option value="4">4 Pieces</option>
+                                <option value="5">5 Pieces</option>
+                                <option value="10">10 Pieces</option>
+                                <option value="20">20 Pieces</option>
+                            </select>
+                        `;
+                    } else {
+                        inputControl = `
+                            <label>वजन दर्ज करें (KG में):</label>
+                            <input type="number" id="qty-${product.id}" value="1" step="0.25" min="0.25" oninput="calculateCardTotal('${product.id}', ${basePrice}, ${gstRate}, 'weight')">
+                        `;
+                    }
+
+                    let orderBtnHTML = "";
+                    if(activeBuyerMobile) {
+                        let initialText = encodeURIComponent(`Hello, I am buyer ${activeBuyerName} (${activeBuyerMobile}). I want to order ${defaultQty} ${unitType === 'piece' ? 'Pieces' : 'KG'} of ${product.productName} from ${product.companyName}. Total Amount: ₹${initialTotal.toFixed(2)} (Incl. GST).`);
+                        orderBtnHTML = `<a id="wa-btn-${product.id}" href="https://wa.me/91${product.sellerMobile}?text=${initialText}" target="_blank" data-name="${product.productName}" data-mobile="${product.sellerMobile}" data-company="${product.companyName}" class="whatsapp-btn">💬 Order on WhatsApp</a>`;
+                    } else {
+                        orderBtnHTML = `<div onclick="openBuyerModal()" class="whatsapp-btn" style="background:#007bff; cursor:pointer; text-align:center;">🔒 Login to Order on WhatsApp</div>`;
+                    }
+
+                    selectorHTML = `
+                        <div class="product-info" style="padding-top:0; padding-bottom:10px;">
+                            <div class="selector-box">
+                                ${inputControl}
+                            </div>
+                            <div class="calc-total" id="total-display-${product.id}">
+                                Total: ₹${initialTotal.toFixed(2)} <span style="font-size:11px; font-weight:normal; color:#555;">(Incl. ${gstRate}% GST)</span>
+                            </div>
+                        </div>
+                        ${orderBtnHTML}
+                    `;
                 }
 
                 card.innerHTML = `
+                    ${stockBadge}
                     <div>
                         <img src="${imgSrc}" class="product-img">
-                        <div class="product-info">
+                        <div class="product-info" style="padding-bottom: 5px;">
                             <span class="company-badge">🏢 ${product.companyName || 'Verified Vendor'}</span>
                             <div class="product-name">${product.productName}</div>
-                            <div class="product-price">₹ ${product.price}</div>
+                            <div class="product-price">₹ ${basePrice} / ${unitType === 'piece' ? 'Piece' : 'KG'} + ${gstRate}% GST</div>
+                            <div class="delivery-tag">${product.deliveryOption || '🚚 Home Delivery Available'}</div>
                             <div class="product-sku">📍 ${product.sku || 'N/A'}</div>
                         </div>
                     </div>
-                    ${orderBtnHTML}
+                    ${selectorHTML}
                 `;
                 container.appendChild(card);
             });
@@ -464,7 +639,6 @@
         }
     }
 
-    // Load Vendor's own products for management (Edit/Delete)
     function loadVendorProducts() {
         const listContainer = document.getElementById('vendor-products-list');
         db.ref('vendors_products/' + activeMobile).on('value', (snapshot) => {
@@ -477,29 +651,39 @@
             });
 
             if(items.length === 0) {
-                listContainer.innerHTML = `<div style="text-align: center; color: #666; padding: 15px; font-size: 13px;">आपने अभी तक कोई प्रोडक्ट नहीं जोड़ा है।</div>`;
+                listContainer.innerHTML = `<div style="text-align: center; color: #666; padding: 15px; font-size: 13px;">आपने अभी तक कोई आइटम नहीं जोड़ा है।</div>`;
                 return;
             }
 
+            let gridWrapper = document.createElement('div');
+            gridWrapper.className = 'vendor-grid-container';
+
             items.reverse().forEach(item => {
                 let div = document.createElement('div');
-                div.className = 'my-product-item';
+                div.className = 'vendor-mini-card';
                 let img = item.productImage || 'https://via.placeholder.com/50?text=No+Img';
+                let stockStatus = item.inStock !== false ? '<span style="color:green;">In Stock</span>' : '<span style="color:red;">Out of Stock</span>';
+                
                 div.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <img src="${img}">
-                        <div>
-                            <div style="font-weight:bold; font-size:14px;">${item.productName}</div>
-                            <div style="color:#16a34a; font-size:13px; font-weight:600;">₹ ${item.price} | <span style="color:#666; font-weight:normal;">${item.sku || 'N/A'}</span></div>
+                    <div>
+                        <div class="vendor-mini-header">
+                            <img src="${img}">
+                            <div class="vendor-mini-info">
+                                <div class="vendor-mini-title" title="${item.productName}">${item.productName}</div>
+                                <div class="vendor-mini-price">₹ ${item.price} (${item.unitType === 'weight' ? 'KG' : 'Piece'})</div>
+                                <div class="vendor-mini-stock">${stockStatus}</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="action-btns">
-                        <button class="btn-sm btn-edit" onclick="editProduct('${item.id}', '${encodeURIComponent(item.productName)}', '${item.price}', '${encodeURIComponent(item.sku || '')}', '${encodeURIComponent(item.productImage || '')}')">Edit</button>
+                    <div class="vendor-mini-actions">
+                        <button class="btn-sm btn-edit" onclick="editProduct('${item.id}', '${encodeURIComponent(item.productName)}', '${item.price}', '${item.unitType || 'piece'}', '${item.gst || 0}', '${encodeURIComponent(item.sku || '')}', '${encodeURIComponent(item.productImage || '')}', '${encodeURIComponent(item.deliveryOption || '')}', ${item.inStock !== false})">Edit</button>
                         <button class="btn-sm btn-del" onclick="deleteProduct('${item.id}')">Delete</button>
                     </div>
                 `;
-                listContainer.appendChild(div);
+                gridWrapper.appendChild(div);
             });
+
+            listContainer.appendChild(gridWrapper);
         });
     }
 
@@ -507,18 +691,26 @@
         if (!activeMobile) return;
         let name = document.getElementById('p-name').value.trim();
         let price = document.getElementById('p-price').value.trim();
+        let unitType = document.getElementById('p-unit-type').value;
+        let gst = document.getElementById('p-gst').value;
         let sku = document.getElementById('p-sku').value.trim();
+        let delivery = document.getElementById('p-delivery').value;
+        let inStock = document.getElementById('p-stock').checked;
         let editId = document.getElementById('edit-product-id').value;
 
         if(!name || !price) {
-            alert("कृपया प्रोडक्ट का नाम और कीमत दर्ज करें।");
+            alert("कृपया आइटम का नाम और कीमत दर्ज करें।");
             return;
         }
 
         let productData = {
             productName: name,
             price: price,
+            unitType: unitType,
+            gst: gst,
             sku: sku,
+            deliveryOption: delivery,
+            inStock: inStock,
             companyName: activeCompanyName,
             sellerMobile: activeMobile,
             productImage: base64Image || document.getElementById('img-preview').src || "",
@@ -526,13 +718,11 @@
         };
 
         if(editId) {
-            // Update existing product
             db.ref('vendors_products/' + activeMobile + '/' + editId).update(productData).then(() => {
                 document.getElementById('status-msg').innerText = "Product Updated Successfully! ✅";
                 resetProductForm();
             });
         } else {
-            // Add new product
             db.ref('vendors_products/' + activeMobile).push(productData).then(() => {
                 document.getElementById('status-msg').innerText = "Product Published Successfully! 🎉";
                 resetProductForm();
@@ -540,12 +730,20 @@
         }
     }
 
-    function editProduct(id, name, price, sku, img) {
+    function editProduct(id, name, price, unitType, gst, sku, img, delivery, inStock) {
         document.getElementById('edit-product-id').value = id;
         document.getElementById('p-name').value = decodeURIComponent(name);
         document.getElementById('p-price').value = price;
+        document.getElementById('p-unit-type').value = unitType;
+        document.getElementById('p-gst').value = gst;
         document.getElementById('p-sku').value = decodeURIComponent(sku);
+        document.getElementById('p-stock').checked = inStock;
         
+        toggleUnitFields();
+
+        let decodedDeliv = decodeURIComponent(delivery);
+        if(decodedDeliv) document.getElementById('p-delivery').value = decodedDeliv;
+
         let decodedImg = decodeURIComponent(img);
         if(decodedImg && decodedImg.startsWith('data:image')) {
             base64Image = decodedImg;
@@ -553,7 +751,7 @@
             document.getElementById('img-preview-container').style.display = 'block';
         }
 
-        document.getElementById('form-title').innerText = "✏️ Edit Catalog Item";
+        document.getElementById('form-title').innerText = "✏️ Edit Item";
         document.getElementById('publish-btn').innerText = "Update Product 🔄";
         document.getElementById('cancel-edit-btn').classList.remove('hidden');
         window.scrollTo({top: 0, behavior: 'smooth'});
@@ -563,20 +761,24 @@
         document.getElementById('edit-product-id').value = "";
         document.getElementById('p-name').value = "";
         document.getElementById('p-price').value = "";
+        document.getElementById('p-unit-type').value = "piece";
+        document.getElementById('p-gst').value = "0";
         document.getElementById('p-sku').value = "";
+        document.getElementById('p-stock').checked = true;
         document.getElementById('p-image').value = "";
         document.getElementById('img-preview-container').style.display = 'none';
         base64Image = "";
-        document.getElementById('form-title').innerText = "📦 Add Catalog Item (Product with Photo)";
+        toggleUnitFields();
+        document.getElementById('form-title').innerText = "📦 Add / Manage Product Item";
         document.getElementById('publish-btn').innerText = "Publish Product Live 🚀";
         document.getElementById('cancel-edit-btn').classList.add('hidden');
         setTimeout(() => { document.getElementById('status-msg').innerText = ""; }, 3000);
     }
 
     function deleteProduct(id) {
-        if(confirm("क्या आप वाकई इस प्रोडक्ट को डिलीट करना चाहते हैं?")) {
+        if(confirm("क्या आप वाकई इस आइटम को डिलीट करना चाहते हैं?")) {
             db.ref('vendors_products/' + activeMobile + '/' + id).remove().then(() => {
-                alert("प्रोडक्ट सफलतापूर्वक डिलीट कर दिया गया है।");
+                alert("आइटम सफलतापूर्वक डिलीट कर दिया गया है।");
             });
         }
     }
