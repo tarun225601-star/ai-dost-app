@@ -20,12 +20,11 @@
             </div>
             <div class="hidden md:flex space-x-6 text-sm font-medium">
                 <a href="#products" class="hover:text-amber-400 transition">कैटलॉग</a>
-                <a href="#sellSection" class="hover:text-amber-400 transition">सेल (बेचें)</a>
-                <a href="#purchaseSection" class="hover:text-amber-400 transition">परचेज (खरीदें)</a>
-                <a href="#howitworks" class="hover:text-amber-400 transition">मॉडल</a>
+                <a href="#sellSection" class="hover:text-amber-400 transition">कंपनी रजिस्टर (Sell)</a>
+                <a href="#buyerSection" class="hover:text-amber-400 transition">क्लाइंट रजिस्टर (Buy)</a>
+                <a href="#strictPolicy" class="hover:text-amber-400 transition">सख्त नीतियां (Policies)</a>
             </div>
             <div class="flex items-center space-x-3">
-                <!-- Corner Settings Button -->
                 <button onclick="openSettings()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-400/40 px-3 py-2 rounded-lg text-sm transition flex items-center shadow">
                     <i class="fa-solid fa-gear mr-1"></i> सेटिंग
                 </button>
@@ -49,14 +48,6 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">AI Model Name</label>
                     <input type="text" id="aiModelName" value="grok-3.70b" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Supabase Project URL</label>
-                    <input type="text" id="supabaseUrl" placeholder="https://xyz.supabase.co" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Supabase Anon/Public API Key</label>
-                    <input type="password" id="supabaseKey" placeholder="eyJhbGci..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
-                </div>
                 <div class="pt-4 flex justify-end space-x-3">
                     <button onclick="closeSettings()" class="px-4 py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-100 transition">रद्द करें</button>
                     <button onclick="saveSettings()" class="px-5 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition">सेव करें</button>
@@ -68,16 +59,16 @@
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white py-14 px-4">
         <div class="max-w-5xl mx-auto text-center">
-            <span class="bg-amber-500/20 text-amber-400 text-xs font-semibold px-3 py-1 rounded-full border border-amber-400/30">फरीदाबाद इंडस्ट्रियल हब</span>
-            <h1 class="text-3xl md:text-5xl font-extrabold mt-4 mb-4">फैक्ट्री से सीधा दुकान तक</h1>
-            <p class="text-slate-300 text-sm md:text-base max-w-2xl mx-auto mb-6">ऑटो पार्ट्स और इंडस्ट्रियल कंपोनेंट्स के लिए पारदर्शी पर-पार्ट फी B2B प्लेटफॉर्म। 10-20 टन बल्क आर्डर सीधे WhatsApp पर करें।</p>
+            <span class="bg-amber-500/20 text-amber-400 text-xs font-semibold px-3 py-1 rounded-full border border-amber-400/30">100% लीगल और सुरक्षित B2B प्लेटफॉर्म</span>
+            <h1 class="text-3xl md:text-5xl font-extrabold mt-4 mb-4">फर्जीवाड़े और फेक रिव्यू की कोई जगह नहीं</h1>
+            <p class="text-slate-300 text-sm md:text-base max-w-2xl mx-auto mb-6">डैमेज माल की हंड्रेड परसेंट रिटर्न पॉलिसी और फ्रॉड कंपनियों को ऑटोमैटिक ब्लॉक करने वाला फरीदाबाद का नंबर 1 प्लेटफॉर्म।</p>
             
-            <div class="flex justify-center gap-4">
+            <div class="flex justify-center gap-4 flex-wrap">
                 <a href="#sellSection" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-5 py-2.5 rounded-lg text-sm shadow transition flex items-center">
-                    <i class="fa-solid fa-plus-circle mr-2"></i> नया कैटलॉग जोड़ें (Sell)
+                    <i class="fa-solid fa-industry mr-2"></i> कंपनी रजिस्ट्रेशन (Sell)
                 </a>
-                <a href="#purchaseSection" class="bg-white hover:bg-slate-100 text-indigo-900 font-bold px-5 py-2.5 rounded-lg text-sm shadow transition flex items-center">
-                    <i class="fa-solid fa-cart-shopping mr-2"></i> आर्डर दें (Purchase)
+                <a href="#buyerSection" class="bg-white hover:bg-slate-100 text-indigo-900 font-bold px-5 py-2.5 rounded-lg text-sm shadow transition flex items-center">
+                    <i class="fa-solid fa-user-check mr-2"></i> क्लाइंट रजिस्ट्रेशन (Buy)
                 </a>
             </div>
         </div>
@@ -86,17 +77,50 @@
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-4 py-10 space-y-12">
 
-        <!-- Add Catalog / Sell Section -->
+        <!-- Strict Rules & Return Policy Section -->
+        <section id="strictPolicy" class="bg-white border border-slate-200 p-6 md:p-8 rounded-2xl shadow-sm">
+            <div class="flex items-center space-x-3 mb-6 border-b pb-4">
+                <div class="bg-red-600 text-white p-3 rounded-xl text-xl"><i class="fa-solid fa-gavel"></i></div>
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900">प्लेटफॉर्म की सख्त नीतियां (Strict Rules & Return Policies)</h2>
+                    <p class="text-xs text-slate-500">पारदर्शी व्यापार के लिए हमारे कड़े नियम:</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-700">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div class="font-bold text-slate-900 text-sm mb-1 text-red-600"><i class="fa-solid fa-ban mr-1"></i> फेक रिव्यू पर परमानेंट बैन</div>
+                    <p>यदि किसी कंपनी या वेंडर पर लगातार 10-20 फर्जी या गंभीर शिकायतें (फ्रॉड/घटिया माल) पाई जाती हैं, तो उसे बिना किसी चेतावनी के प्लेटफॉर्म से हमेशा के लिए ब्लैकलिस्ट कर दिया जाएगा।</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div class="font-bold text-slate-900 text-sm mb-1 text-emerald-600"><i class="fa-solid fa-rotate-left mr-1"></i> डैमेज माल रिटर्न पॉलिसी</div>
+                    <p>यदि माल में कोई मैन्युफैक्चरिंग डिफेक्ट या ट्रांसपोर्ट डैमेज निकलता है (अनबॉक्सिंग वीडियो प्रूफ के साथ), तो वह माल पूरी तरह रिटर्न होगा और कंपनी को नया माल या रिफंड देना होगा।</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div class="font-bold text-slate-900 text-sm mb-1 text-indigo-900"><i class="fa-solid fa-shield-halved mr-1"></i> लीगल जीएसटी प्रूफ</div>
+                    <p>सप्लायर और क्लाइंट दोनों का जीएसटी नंबर, मोबाइल और बिजनेस टाइप वेरीफाई होने के बाद ही आर्डर और लिस्टिंग सिक्योर की जाती है ताकि किसी प्रकार का फ्रॉड न हो सके।</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. Company / Supplier Listing Form -->
         <section id="sellSection" class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
             <div class="flex items-center space-x-3 mb-6 border-b pb-4">
-                <div class="bg-amber-500 text-slate-900 p-3 rounded-xl text-xl"><i class="fa-solid fa-shop"></i></div>
+                <div class="bg-indigo-900 text-white p-3 rounded-xl text-xl"><i class="fa-solid fa-building"></i></div>
                 <div>
-                    <h2 class="text-xl font-bold text-slate-900">कैटलॉग जोड़ें / सेल (Vendor Listing)</h2>
-                    <p class="text-xs text-slate-500">गैलरी से सीधे फोटो चुनें, मोबाइल नंबर और थोक दाम लिस्ट करें।</p>
+                    <h2 class="text-xl font-bold text-slate-900">कंपनी / सप्लायर रजिस्ट्रेशन और कैटलॉग फॉर्म</h2>
+                    <p class="text-xs text-slate-500">जीएसटी प्रूफ और रिटर्न पॉलिसी की शर्तों के साथ उत्पाद जोड़ें।</p>
                 </div>
             </div>
             
             <form id="catalogForm" onsubmit="addCatalogItem(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">कंपनी / फर्म का नाम</label>
+                    <input type="text" id="companyName" placeholder="उदा. Sharma Engineering Works" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">कंपनी का GSTIN नंबर (प्रूफ)</label>
+                    <input type="text" id="companyGst" placeholder="उदा. 06AAAAA0000A1Z5" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm uppercase focus:outline-none focus:border-indigo-900">
+                </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">पार्ट का नाम</label>
                     <input type="text" id="partName" placeholder="उदा. Heavy Gear Box" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
@@ -114,38 +138,76 @@
                     <input type="tel" id="whatsappNumber" placeholder="उदा. 9811223344" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">गैलरी से एक या अधिक फोटो चुनें</label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">गैलरी से फोटो चुनें (मल्टीपल)</label>
                     <input type="file" id="partGallery" accept="image/*" multiple class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm bg-slate-50 focus:outline-none focus:border-indigo-900 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-900 hover:file:bg-indigo-100">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">कैटेगरी</label>
-                    <select id="partCategory" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
-                        <option value="ऑटो पार्ट्स">ऑटो पार्ट्स</option>
-                        <option value="माइक्रो-इलेक्ट्रॉनिक्स">माइक्रो-इलेक्ट्रॉनिक्स</option>
-                        <option value="रॉ मटेरियल / हार्डवेयर">रॉ मटेरियल / हार्डवेयर</option>
-                        <option value="बल्क मेटल (10-20 टन)">बल्क मेटल (10-20 टन)</option>
-                    </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">लोकेशन (फरीदाबाद)</label>
                     <input type="text" id="partLocation" placeholder="उदा. सेक्टर 24" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-900">
                 </div>
-                <div class="md:col-span-2 flex items-end">
+                <div class="md:col-span-3 flex items-end">
                     <button type="submit" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-medium py-2.5 rounded-lg text-sm transition shadow">
-                        <i class="fa-solid fa-cloud-arrow-up mr-1"></i> कैटलॉग में पब्लिश करें
+                        <i class="fa-solid fa-circle-check mr-1"></i> रिटर्न पॉलिसी के साथ कैटलॉग पब्लिश करें
                     </button>
                 </div>
             </form>
+        </section>
+
+        <!-- 2. Buyer / Client Registration Form -->
+        <section id="buyerSection" class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex items-center space-x-3 mb-6 border-b pb-4">
+                <div class="bg-emerald-600 text-white p-3 rounded-xl text-xl"><i class="fa-solid fa-user-tie"></i></div>
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900">खरीदार / क्लाइंट रजिस्ट्रेशन फॉर्म (Buyer Verification)</h2>
+                    <p class="text-xs text-slate-500">दुकानदार अपनी लीगल पहचान दर्ज कर सुरक्षित आर्डर दें।</p>
+                </div>
+            </div>
+            
+            <form id="buyerForm" onsubmit="registerBuyer(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">खरीदार / दुकानदार का नाम</label>
+                    <input type="text" id="buyerName" placeholder="उदा. अमित कुमार" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">फर्म / दुकान का नाम</label>
+                    <input type="text" id="buyerFirm" placeholder="उदा. Amit Auto Store" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">मोबाइल नंबर (WhatsApp)</label>
+                    <input type="tel" id="buyerPhone" placeholder="उदा. 9711002233" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">वह क्या काम करता है? (Business Type)</label>
+                    <select id="buyerBusinessType" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-600">
+                        <option value="ऑटो स्पेयर पार्ट्स डीलर">ऑटो स्पेयर पार्ट्स डीलर</option>
+                        <option value="मशीनरी मैन्युफैक्चरर">मशीनरी मैन्युफैक्चरर</option>
+                        <option value="हार्डवेयर होलसेलर">हार्डवेयर होलसेलर</option>
+                        <option value="इलेक्ट्रॉनिक्स असेंबलर">इलेक्ट्रॉनिक्स असेंबलर</option>
+                        <option value="अन्य कमर्शियल खरीदार">अन्य कमर्शियल खरीदार</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">दुकान/कारोबार का पता</label>
+                    <input type="text" id="buyerAddress" placeholder="उदा. एन.आई.टी. फरीदाबाद" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-600">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow">
+                        <i class="fa-solid fa-id-card mr-1"></i> क्लाइंट रजिस्टर करें
+                    </button>
+                </div>
+            </form>
+            <div id="buyerSuccessMsg" class="hidden mt-4 p-3 bg-emerald-50 text-emerald-800 text-xs rounded-lg border border-emerald-200">
+                <i class="fa-solid fa-check-circle mr-1"></i> आपका क्लाइंट रजिस्ट्रेशन सफल हो गया है! अब आप सुरक्षित रूप से आर्डर कर सकते हैं।
+            </div>
         </section>
 
         <!-- Products / Purchase Section -->
         <section id="products">
             <div id="purchaseSection" class="flex justify-between items-center mb-6">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-900 border-l-4 border-amber-500 pl-3">इंडस्ट्रियल पार्ट्स कैटलॉग (Purchase)</h2>
-                    <p class="text-xs text-slate-500 mt-1 ml-3">डायरेक्ट WhatsApp चैट के जरिए थोक आर्डर बुक करें।</p>
+                    <h2 class="text-2xl font-bold text-slate-900 border-l-4 border-amber-500 pl-3">वेरिफाइड इंडस्ट्रियल कैटलॉग</h2>
+                    <p class="text-xs text-slate-500 mt-1 ml-3">जीएसटी वेरीफाइड और रिटर्न पॉलिसी समर्थित उत्पाद।</p>
                 </div>
-                <span class="text-sm text-indigo-600 font-semibold bg-indigo-50 px-3 py-1 rounded-lg border border-indigo-100">पर-पार्ट फी मॉडल लागू</span>
             </div>
 
             <!-- Dynamic Product Grid -->
@@ -155,11 +217,13 @@
                         <div class="bg-slate-200 h-40 flex items-center justify-center text-slate-500 relative overflow-hidden">
                             <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=500&auto=format&fit=crop&q=60" alt="Gear Box" class="w-full h-full object-cover">
                             <span class="absolute top-2 right-2 bg-indigo-900 text-white text-xs px-2 py-1 rounded">सेक्टर 24</span>
+                            <span class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-shield-check mr-1"></i> GST Verified</span>
                         </div>
                         <div class="p-4">
-                            <span class="text-xs text-amber-600 font-bold uppercase">ऑटो पार्ट्स</span>
+                            <span class="text-xs text-indigo-900 font-bold">Sharma Engineering Works</span>
                             <h3 class="font-bold text-base text-slate-900 mt-1">Heavy Duty Gear Set</h3>
                             <p class="text-xs text-slate-500 mt-0.5">कोड: FBD-G-102</p>
+                            <p class="text-[10px] text-emerald-700 font-semibold mt-1"><i class="fa-solid fa-rotate-left mr-1"></i> डैमेज माल 100% रिटर्न योग्य</p>
                             <div class="mt-3 flex items-baseline space-x-2">
                                 <span class="text-lg font-extrabold text-slate-900">₹1,200</span>
                                 <span class="text-xs text-slate-400">/ पीस</span>
@@ -167,32 +231,10 @@
                         </div>
                     </div>
                     <div class="p-4 pt-0">
-                        <a href="https://wa.me/919811223344?text=Hello,%20I%20want%20to%20order%20Heavy%20Duty%20Gear%20Set%20(FBD-G-102)%20via%20Viziag%20Mart." target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 rounded-lg transition flex items-center justify-center shadow">
+                        <a href="https://wa.me/919811223344?text=Hello,%20I%20am%20a%20registered%20buyer.%20I%20want%20to%20order%20Heavy%20Duty%20Gear%20Set%20(FBD-G-102)%20under%20Return%20Policy." target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 rounded-lg transition flex items-center justify-center shadow">
                             <i class="fa-brands fa-whatsapp text-lg mr-2"></i> WhatsApp पर आर्डर दें
                         </a>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- How It Works Section -->
-        <section id="howitworks" class="bg-slate-200 p-6 md:p-8 rounded-2xl">
-            <div class="text-center max-w-2xl mx-auto mb-8">
-                <h2 class="text-xl font-bold text-slate-900">बिजिया मार्ट का वर्किंग मॉडल</h2>
-                <p class="text-xs text-slate-600 mt-1">बिना किसी फिक्स सब्सक्रिप्शन के सिर्फ पार्ट-टू-पार्ट ट्रांजैक्शन फीस और डायरेक्ट चैट।</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-300">
-                    <div class="text-amber-500 font-bold mb-1">01. गैलरी अपलोड</div>
-                    <p class="text-xs text-slate-600">फोन की गैलरी से सीधे एक या अधिक फोटो सेलेक्ट करके कैटलॉग बनाएं।</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-300">
-                    <div class="text-amber-500 font-bold mb-1">02. डायरेक्ट WhatsApp चैट</div>
-                    <p class="text-xs text-slate-600">खरीदार सीधे बटन दबाकर वेंडर से व्हाट्सएप पर बात करके 10-20 टन का माल बुक करते हैं।</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-300">
-                    <div class="text-amber-500 font-bold mb-1">03. पर-पार्ट फी</div>
-                    <p class="text-xs text-slate-600">हर सफल डील पर तय प्रति पार्ट या टन हिस्सा प्लेटफॉर्म का रहता है।</p>
                 </div>
             </div>
         </section>
@@ -200,8 +242,8 @@
 
     <!-- Footer -->
     <footer class="bg-slate-900 text-slate-400 py-6 px-4 text-center text-xs mt-12">
-        <p class="font-bold text-white text-sm">Viziag Mart (बिजिया मार्ट)</p>
-        <p class="text-slate-500 mt-1">फरीदाबाद, हरियाणा - इंडस्ट्रियल होलसेल प्लेटफॉर्म</p>
+        <p class="font-bold text-white text-sm">Viziag Mart (बिजिया मार्ट) - फरीदाबाद</p>
+        <p class="text-slate-500 mt-1">सप्लायर वेरिफिकेशन, ऑटो-ब्लैकलिस्ट और डैमेज रिटर्न पॉलिसी आधारित B2B प्लेटफॉर्म</p>
         <p class="mt-4">&copy; 2026 Viziag Mart. सर्वाधिकार सुरक्षित।</p>
     </footer>
 
@@ -210,8 +252,6 @@
         function openSettings() {
             document.getElementById('grokApiKey').value = localStorage.getItem('viziag_grok_key') || '';
             document.getElementById('aiModelName').value = localStorage.getItem('viziag_model') || 'grok-3.70b';
-            document.getElementById('supabaseUrl').value = localStorage.getItem('viziag_sb_url') || '';
-            document.getElementById('supabaseKey').value = localStorage.getItem('viziag_sb_key') || '';
             document.getElementById('settingsModal').classList.remove('hidden');
         }
 
@@ -222,35 +262,44 @@
         function saveSettings() {
             localStorage.setItem('viziag_grok_key', document.getElementById('grokApiKey').value);
             localStorage.setItem('viziag_model', document.getElementById('aiModelName').value);
-            localStorage.setItem('viziag_sb_url', document.getElementById('supabaseUrl').value);
-            localStorage.setItem('viziag_sb_key', document.getElementById('supabaseKey').value);
-            alert('सेटिंग्स सफलतापूर्वक सेव हो गई हैं!');
+            alert('सेटिंग्स सेव हो गई हैं!');
             closeSettings();
+        }
+
+        function registerBuyer(event) {
+            event.preventDefault();
+            const name = document.getElementById('buyerName').value;
+            const firm = document.getElementById('buyerFirm').value;
+            
+            localStorage.setItem('viziag_buyer_name', name);
+            localStorage.setItem('viziag_buyer_firm', firm);
+            
+            document.getElementById('buyerSuccessMsg').classList.remove('hidden');
+            document.getElementById('buyerForm').reset();
+            setTimeout(() => {
+                window.location.hash = '#products';
+            }, 1500);
         }
 
         function addCatalogItem(event) {
             event.preventDefault();
+            const compName = document.getElementById('companyName').value;
+            const compGst = document.getElementById('companyGst').value;
             const name = document.getElementById('partName').value;
             const code = document.getElementById('partCode').value;
             const price = document.getElementById('partPrice').value;
             const phone = document.getElementById('whatsappNumber').value;
             const fileInput = document.getElementById('partGallery');
-            const category = document.getElementById('partCategory').value;
             const location = document.getElementById('partLocation').value;
 
             let mainImage = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&auto=format&fit=crop&q=60";
-            let badgeText = "";
-
             if (fileInput.files && fileInput.files.length > 0) {
-                // Read the first selected file as local Data URL
                 mainImage = URL.createObjectURL(fileInput.files[0]);
-                if (fileInput.files.length > 1) {
-                    badgeText = `<div class="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center space-x-1"><i class="fa-solid fa-images"></i> <span>${fileInput.files.length} फोटो गैलरी से</span></div>`;
-                }
             }
 
             const cleanPhone = phone.replace(/[^0-9]/g, '');
-            const waLink = `https://wa.me/91${cleanPhone}?text=Hello,%20I%20want%20to%20inquire%20about%20${encodeURIComponent(name)}%20(Code:%20${encodeURIComponent(code)})%20listed%20on%20Viziag%20Mart.`;
+            const registeredBuyer = localStorage.getItem('viziag_buyer_firm') || 'General Buyer';
+            const waLink = `https://wa.me/91${cleanPhone}?text=Hello%20${encodeURIComponent(compName)},%20I%20am%20${encodeURIComponent(registeredBuyer)}.%20I%20want%20to%20order%20${encodeURIComponent(name)}%20(Code:%20${encodeURIComponent(code)})%20under%20Return%20Policy.`;
 
             const grid = document.getElementById('productGrid');
             const card = document.createElement('div');
@@ -260,12 +309,13 @@
                     <div class="bg-slate-200 h-40 flex items-center justify-center text-slate-500 relative overflow-hidden">
                         <img src="${mainImage}" alt="${name}" class="w-full h-full object-cover">
                         <span class="absolute top-2 right-2 bg-indigo-900 text-white text-xs px-2 py-1 rounded">${location}</span>
-                        ${badgeText}
+                        <span class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-shield-check mr-1"></i> GST: ${compGst}</span>
                     </div>
                     <div class="p-4">
-                        <span class="text-xs text-amber-600 font-bold uppercase">${category}</span>
+                        <span class="text-xs text-indigo-900 font-bold">${compName}</span>
                         <h3 class="font-bold text-base text-slate-900 mt-1">${name}</h3>
                         <p class="text-xs text-slate-500 mt-0.5">कोड: ${code}</p>
+                        <p class="text-[10px] text-emerald-700 font-semibold mt-1"><i class="fa-solid fa-rotate-left mr-1"></i> डैमेज माल 100% रिटर्न योग्य</p>
                         <div class="mt-3 flex items-baseline space-x-2">
                             <span class="text-lg font-extrabold text-slate-900">₹${Number(price).toLocaleString('en-IN')}</span>
                             <span class="text-xs text-slate-400">/ थोक मूल्य</span>
@@ -280,7 +330,7 @@
             `;
             grid.prepend(card);
             document.getElementById('catalogForm').reset();
-            alert('गैलरी से फोटो लेकर कैटलॉग सफलतापूर्वक पब्लिश हो गया है!');
+            alert('कैटलॉग और रिटर्न पॉलिसी की शर्तें सफलता트र्फ पब्लिश हो गई हैं!');
             window.location.hash = '#products';
         }
     </script>
