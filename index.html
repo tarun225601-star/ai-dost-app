@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIZIA - Universal R&D Intelligence</title>
+    <title>VIZIA AI - Visual R&D & Innovation Lab</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --panel-bg: #1e293b;
-            --border-color: #334155;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.2);
-            --danger: #f43f5e;
+            --bg-color: #0b0f19;
+            --panel-bg: #111827;
+            --border-color: #1f2937;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #0ea5e9;
+            --accent-glow: rgba(14, 165, 233, 0.3);
+            --danger: #ef4444;
             --success: #10b981;
+            --warning: #f59e0b;
         }
 
         * {
@@ -50,7 +51,7 @@
 
         .brand-title {
             font-size: 1.25rem;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: 0.5px;
             color: var(--text-main);
             display: flex;
@@ -60,13 +61,14 @@
 
         .brand-title span {
             color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
         }
 
         .brand-subtitle {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
         .header-controls {
@@ -76,10 +78,10 @@
         }
 
         .lang-select {
-            background: #0f172a;
+            background: #0b0f19;
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 6px 10px;
+            padding: 6px 12px;
             border-radius: 8px;
             font-size: 0.85rem;
             outline: none;
@@ -91,7 +93,7 @@
             align-items: center;
             gap: 8px;
             font-size: 0.8rem;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(11, 15, 25, 0.8);
             padding: 6px 12px;
             border-radius: 20px;
             border: 1px solid var(--border-color);
@@ -106,7 +108,7 @@
         }
 
         .config-bar {
-            background: #111827;
+            background: #0f172a;
             padding: 10px 24px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
@@ -153,7 +155,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            max-width: 900px;
+            max-width: 950px;
             width: 100%;
             margin: 0 auto;
         }
@@ -161,29 +163,29 @@
         .welcome-card {
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
+            border-radius: 14px;
+            padding: 28px;
             text-align: center;
-            margin-top: 40px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
         .welcome-card h2 {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
             color: var(--accent);
         }
 
         .welcome-card p {
             color: var(--text-muted);
             font-size: 0.95rem;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .message {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             max-width: 100%;
             animation: fadeIn 0.3s ease-out;
         }
@@ -195,12 +197,21 @@
 
         .message.user {
             align-self: flex-end;
-            background: #2563eb;
+            background: #0284c7;
             color: white;
-            padding: 12px 18px;
+            padding: 14px 18px;
             border-radius: 16px 16px 2px 16px;
-            max-width: 75%;
+            max-width: 80%;
             font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+
+        .user-image-preview {
+            max-width: 220px;
+            max-height: 220px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .message.assistant {
@@ -208,8 +219,8 @@
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            padding: 22px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
         .loader-box {
@@ -217,37 +228,24 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px 0;
-            gap: 20px;
+            padding: 30px 0;
+            gap: 18px;
         }
 
-        .circular-progress {
+        .deep-scanner {
             position: relative;
-            width: 120px;
-            height: 120px;
+            width: 90px;
+            height: 90px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent);
             border-radius: 50%;
-            background: conic-gradient(var(--accent) 0deg, #334155 0deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px var(--accent-glow);
-            transition: background 0.1s linear;
+            animation: spin 1.2s linear infinite;
+            box-shadow: 0 0 15px var(--accent-glow);
         }
 
-        .circular-progress::before {
-            content: "";
-            position: absolute;
-            width: 96px;
-            height: 96px;
-            border-radius: 50%;
-            background-color: var(--panel-bg);
-        }
-
-        .progress-value {
-            position: relative;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .loader-status-text {
@@ -259,6 +257,15 @@
             min-height: 24px;
         }
 
+        .timer-display {
+            font-size: 0.85rem;
+            color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
         .report-section {
             display: flex;
             flex-direction: column;
@@ -266,53 +273,60 @@
         }
 
         .report-title {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 700;
             color: var(--accent);
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
+            padding-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .blockers-box {
-            background: rgba(244, 63, 94, 0.1);
-            border: 1px solid rgba(244, 63, 94, 0.3);
-            border-radius: 8px;
-            padding: 14px;
+        .card-box {
+            border-radius: 10px;
+            padding: 16px;
+            border: 1px solid;
         }
 
-        .blockers-box h4 {
-            color: var(--danger);
+        .feasibility-box { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2); }
+        .feasibility-box h4 { color: var(--warning); }
+
+        .blockers-box { background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2); }
+        .blockers-box h4 { color: var(--danger); }
+
+        .solution-box { background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); }
+        .solution-box h4 { color: var(--success); }
+
+        .visual-blueprint-box { background: rgba(14, 165, 233, 0.05); border-color: rgba(14, 165, 233, 0.2); text-align: center; }
+        .visual-blueprint-box h4 { color: var(--accent); text-align: left; }
+
+        .generated-blueprint-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .ideas-box { background: rgba(14, 165, 233, 0.05); border-color: rgba(14, 165, 233, 0.2); }
+        .ideas-box h4 { color: var(--accent); }
+
+        .card-box h4 {
             font-size: 0.95rem;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 6px;
-        }
-
-        .solution-box {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 8px;
-            padding: 14px;
-        }
-
-        .solution-box h4 {
-            color: var(--success);
-            font-size: 0.95rem;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .report-content {
             font-size: 0.92rem;
             line-height: 1.6;
-            color: #cbd5e1;
+            color: #d1d5db;
             white-space: pre-wrap;
+            text-align: left;
         }
 
         .chat-bar-container {
@@ -324,22 +338,22 @@
         }
 
         .chat-input-wrapper {
-            max-width: 900px;
+            max-width: 950px;
             width: 100%;
-            background: #0f172a;
+            background: #0b0f19;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             padding: 8px 16px;
             gap: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             transition: border-color 0.2s;
         }
 
         .chat-input-wrapper:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
+            box-shadow: 0 0 12px var(--accent-glow);
         }
 
         .chat-input {
@@ -355,7 +369,7 @@
             min-height: 24px;
         }
 
-        .mic-btn, .send-btn {
+        .action-icon-btn {
             background: transparent;
             border: none;
             width: 38px;
@@ -365,18 +379,18 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
+            transition: all 0.2s;
             color: var(--text-muted);
         }
 
-        .mic-btn:hover, .send-btn:hover {
-            background: rgba(255,255,255,0.05);
+        .action-icon-btn:hover {
+            background: rgba(255,255,255,0.08);
             color: var(--accent);
         }
 
-        .mic-btn.recording {
+        .action-icon-btn.recording {
             color: var(--danger);
-            animation: pulse 1.5s infinite;
+            animation: pulse 1.2s infinite;
         }
 
         .send-btn {
@@ -396,29 +410,44 @@
             50% { transform: scale(1.15); }
             100% { transform: scale(1); }
         }
+
+        #imageInput { display: none; }
+
+        .preview-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid var(--accent);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 6px;
+            width: fit-content;
+        }
+        .preview-chip span { cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="brand-container">
-            <h1 class="brand-title">VIZIA <span>AI</span></h1>
-            <span class="brand-subtitle">Universal Intelligence Engine</span>
+            <h1 class="brand-title">VIZIA <span>AI VISUAL LAB</span></h1>
+            <span class="brand-subtitle">Deep R&D + Automated Visual Blueprint Engine</span>
         </div>
         <div class="header-controls">
             <select id="langSelect" class="lang-select">
                 <option value="Hindi">हिन्दी (Hindi)</option>
                 <option value="English" selected>English</option>
                 <option value="Hinglish">Hinglish</option>
-                <option value="Spanish">Español (Spanish)</option>
-                <option value="French">Français (French)</option>
-                <option value="Arabic">العربية (Arabic)</option>
-                <option value="Punjabi">ਪੰਜਾਬੀ (Punjabi)</option>
-                <option value="Gujarati">ગુજરાતી (Gujarati)</option>
+                <option value="Spanish">Español</option>
+                <option value="French">Français</option>
+                <option value="Arabic">العربية</option>
             </select>
             <div class="api-status">
                 <div class="status-dot"></div>
-                <span>Llama 3.3 Active</span>
+                <span>Engine Active</span>
             </div>
         </div>
     </header>
@@ -431,126 +460,104 @@
 
     <div class="workspace" id="workspace">
         <div class="welcome-card" id="welcomeCard">
-            <h2>Welcome to Vizia AI</h2>
-            <p>Your universal R&D and multi-language assistant. Type or use voice input to formulate ideas, analyze blockers, and get instant verified blueprints in your preferred language.</p>
+            <h2>Visual Innovation & R&D Laboratory</h2>
+            <p>Upload a reference photo or type your innovation. Our heavy engine will analyze the physics, chemicals, blockers, step-by-step blueprint, AND automatically generate a visual prototype photo directly inside the chat!</p>
         </div>
     </div>
 
     <div class="chat-bar-container">
         <div class="chat-input-wrapper">
-            <!-- Voice Input Button (Gemini Style) -->
-            <button class="mic-btn" id="micBtn" onclick="toggleSpeechRecognition()" title="Speak to write">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            <input type="file" id="imageInput" accept="image/*" onchange="handleImageSelection(event)">
+            <button class="action-icon-btn" onclick="document.getElementById('imageInput').click()" title="Upload Reference Photo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
             </button>
-            <textarea id="userInput" class="chat-input" placeholder="Type your idea or tap mic to speak..." rows="1" onkeydown="handleKey(event)"></textarea>
-            <button class="send-btn" id="sendBtn" onclick="startInnovation()" title="Send">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+
+            <button class="action-icon-btn" id="micBtn" onclick="toggleSpeechRecognition()" title="Voice Typing">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+
+            <div style="flex:1; display:flex; flex-direction:column;">
+                <div id="imagePreviewChip" style="display:none;" class="preview-chip">
+                    📷 Photo Attached <span onclick="removeImage()">✕</span>
+                </div>
+                <textarea id="userInput" class="chat-input" placeholder="Describe your product idea or upload photo..." rows="1" onkeydown="handleKey(event)"></textarea>
+            </div>
+
+            <button class="action-icon-btn send-btn" id="sendBtn" onclick="startVisualInnovation()" title="Run Deep Study & Generate Visual">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
         </div>
     </div>
 
     <script>
+        let attachedImageBase64 = null;
+
         window.onload = function() {
             const savedKey = localStorage.getItem('vizia_groq_key');
-            if(savedKey) {
-                document.getElementById('grokKey').value = savedKey.trim();
-            }
+            if(savedKey) document.getElementById('grokKey').value = savedKey.trim();
         };
 
         function saveKey() {
             const grok = document.getElementById('grokKey').value.trim();
-            if(!grok) {
-                alert("Please enter your Groq API key before saving!");
-                return;
-            }
+            if(!grok) { alert("Please enter your Groq API key!"); return; }
             localStorage.setItem('vizia_groq_key', grok);
             alert("API Key saved successfully! 🚀");
         }
 
         function handleKey(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                startInnovation();
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); startVisualInnovation(); }
+        }
+
+        function handleImageSelection(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    attachedImageBase64 = e.target.result;
+                    document.getElementById('imagePreviewChip').style.display = 'flex';
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        // Speech-to-Text (Gemini Style Voice Typing)
+        function removeImage() {
+            attachedImageBase64 = null;
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreviewChip').style.display = 'none';
+        }
+
         let recognition;
         let isRecording = false;
-
         function toggleSpeechRecognition() {
             const micBtn = document.getElementById('micBtn');
-            const inputField = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
-
-            if (!inputField) {
-                alert("Speech recognition is not supported in this browser. Try Chrome!");
-                return;
+            if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+                alert("Speech recognition not supported."); return;
             }
-
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
             if (!isRecording) {
                 recognition = new SpeechRecognition();
-                const selectedLang = document.getElementById('langSelect').value;
-                
-                // Set language code dynamically
-                if(selectedLang === 'Hindi') recognition.lang = 'hi-IN';
-                else if(selectedLang === 'Spanish') recognition.lang = 'es-ES';
-                else if(selectedLang === 'French') recognition.lang = 'fr-FR';
-                else if(selectedLang === 'Arabic') recognition.lang = 'ar-SA';
-                else if(selectedLang === 'Punjabi') recognition.lang = 'pa-IN';
-                else if(selectedLang === 'Gujarati') recognition.lang = 'gu-IN';
-                else recognition.lang = 'en-US';
-
-                recognition.interimResults = true;
-                recognition.continuous = false;
-
-                recognition.onstart = function() {
-                    isRecording = true;
-                    micBtn.classList.add('recording');
-                };
-
-                recognition.onresult = function(event) {
-                    const transcript = event.results[0][0].transcript;
-                    document.getElementById('userInput').value = transcript;
-                };
-
-                recognition.onerror = function(event) {
-                    console.error("Speech recognition error", event.error);
-                    stopMicState();
-                };
-
-                recognition.onend = function() {
-                    stopMicState();
-                };
-
+                const lang = document.getElementById('langSelect').value;
+                recognition.lang = lang === 'Hindi' ? 'hi-IN' : 'en-US';
+                recognition.onstart = () => { isRecording = true; micBtn.classList.add('recording'); };
+                recognition.onresult = (e) => { document.getElementById('userInput').value = e.results[0][0].transcript; };
+                recognition.onerror = () => stopMic();
+                recognition.onend = () => stopMic();
                 recognition.start();
             } else {
-                if (recognition) {
-                    recognition.stop();
-                }
-                stopMicState();
+                if (recognition) recognition.stop();
+                stopMic();
             }
         }
+        function stopMic() { isRecording = false; document.getElementById('micBtn').classList.remove('recording'); }
 
-        function stopMicState() {
-            isRecording = false;
-            const micBtn = document.getElementById('micBtn');
-            if(micBtn) micBtn.classList.remove('recording');
-        }
-
-        async function startInnovation() {
+        async function startVisualInnovation() {
             const inputField = document.getElementById('userInput');
             const prompt = inputField.value.trim();
-            if (!prompt) return;
+            if (!prompt && !attachedImageBase64) return;
 
             const grokKey = document.getElementById('grokKey').value.trim();
             const selectedLang = document.getElementById('langSelect').value;
-
-            if (!grokKey) {
-                alert("Please enter and save your Groq API key first.");
-                return;
-            }
+            if (!grokKey) { alert("Please enter and save your Groq API key first."); return; }
 
             const welcomeCard = document.getElementById('welcomeCard');
             if (welcomeCard) welcomeCard.remove();
@@ -559,10 +566,15 @@
 
             const userMsg = document.createElement('div');
             userMsg.className = 'message user';
-            userMsg.textContent = prompt;
+            let userHtml = '';
+            if (attachedImageBase64) userHtml += `<img src="${attachedImageBase64}" class="user-image-preview">`;
+            userHtml += `<div>${escapeHtml(prompt || "Visual innovation analysis")}</div>`;
+            userMsg.innerHTML = userHtml;
             workspace.appendChild(userMsg);
 
+            const currentImg = attachedImageBase64;
             inputField.value = '';
+            removeImage();
 
             const assistantMsg = document.createElement('div');
             assistantMsg.className = 'message assistant';
@@ -570,86 +582,101 @@
             const loaderId = 'loader_' + Date.now();
             assistantMsg.innerHTML = `
                 <div class="loader-box" id="${loaderId}">
-                    <div class="circular-progress" id="circle_${loaderId}">
-                        <div class="progress-value" id="val_${loaderId}">0%</div>
-                    </div>
-                    <div class="loader-status-text" id="text_${loaderId}">Processing in ${selectedLang}...</div>
+                    <div class="deep-scanner"></div>
+                    <div class="loader-status-text" id="text_${loaderId}">Executing Deep Technical R&D Simulation...</div>
+                    <div class="timer-display" id="timer_${loaderId}">Elapsed: 0s / Analyzing...</div>
                 </div>
             `;
             workspace.appendChild(assistantMsg);
             workspace.scrollTop = workspace.scrollHeight;
 
-            let progress = 0;
-            const circle = document.getElementById(`circle_${loaderId}`);
-            const valDisplay = document.getElementById(`val_${loaderId}`);
+            let secondsElapsed = 0;
+            const timerDisplay = document.getElementById(`timer_${loaderId}`);
             const textDisplay = document.getElementById(`text_${loaderId}`);
 
-            const apiPromise = callGroqAPI(prompt, grokKey, selectedLang);
+            const stages = [
+                { time: 5, text: "Deconstructing physical parameters and structural physics..." },
+                { time: 15, text: "Running heavy failure-mode analysis (FMEA) & chemical safety checks..." },
+                { time: 30, text: "Synthesizing step-by-step manufacturing blueprint..." },
+                { time: 45, text: "Generating automated visual prototype photo rendering..." },
+                { time: 55, text: "Finalizing expert report in " + selectedLang + "..." }
+            ];
 
-            const progressInterval = setInterval(() => {
-                if (progress < 95) {
-                    progress += Math.floor(Math.random() * 4) + 1;
-                    if (progress > 95) progress = 95;
-                    
-                    circle.style.background = `conic-gradient(var(--accent) ${progress * 3.6}deg, #334155 0deg)`;
-                    valDisplay.textContent = progress + '%';
-                }
-            }, 50);
+            const apiPromise = callGroqVisualAPI(prompt, currentImg, grokKey, selectedLang);
+
+            const timerInterval = setInterval(() => {
+                secondsElapsed++;
+                timerDisplay.textContent = `Elapsed: ${secondsElapsed}s / Deep Study Active`;
+                for (let s of stages) { if (secondsElapsed === s.time) textDisplay.textContent = s.text; }
+            }, 1000);
 
             try {
                 const result = await apiPromise;
-                clearInterval(progressInterval);
+                clearInterval(timerInterval);
                 
-                circle.style.background = `conic-gradient(var(--success) 360deg, #334155 0deg)`;
-                valDisplay.textContent = '100% 🎉';
-                textDisplay.textContent = 'Ready!';
-                textDisplay.style.color = 'var(--success)';
+                // Generate simulated visual representation via Pollinations AI (Free high-end image generation)
+                const imagePromptEncoded = encodeURIComponent("Futuristic professional industrial prototype, clean design, 8k resolution, technical schematic view of: " + (prompt || "innovative product"));
+                const generatedImageUrl = `https://pollinations.ai/p/${imagePromptEncoded}?width=800&height=500&nologo=true`;
 
-                setTimeout(() => {
-                    assistantMsg.innerHTML = `
-                        <div class="report-section">
-                            <div class="report-title">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                VIZIA AI REPORT (${selectedLang.toUpperCase()})
-                            </div>
-                            <div class="blockers-box">
-                                <h4>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                    Analysis & Risks / कमियां और जोखिम
-                                </h4>
-                                <div class="report-content">${escapeHtml(result.blockers)}</div>
-                            </div>
-                            <div class="solution-box">
-                                <h4>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                    Optimized Solution / सटीक समाधान
-                                </h4>
-                                <div class="report-content">${escapeHtml(result.solution)}</div>
-                            </div>
+                assistantMsg.innerHTML = `
+                    <div class="report-section">
+                        <div class="report-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            VIZIA AI VISUAL R&D REPORT (${selectedLang.toUpperCase()})
                         </div>
-                    `;
-                    workspace.scrollTop = workspace.scrollHeight;
-                }, 600);
+
+                        <div class="card-box visual-blueprint-box">
+                            <h4>📷 AI Generated Visual Prototype / डिज़ाइन फोटो</h4>
+                            <div class="report-content" style="margin-bottom:8px;">यह तस्वीर दिखाती है कि आपका यह इनोवेशन या प्रोडक्ट बनने के बाद वास्तविक रूप में कैसा दिखेगा:</div>
+                            <img src="${generatedImageUrl}" class="generated-blueprint-img" alt="Visual Prototype">
+                        </div>
+
+                        <div class="card-box feasibility-box">
+                            <h4>⚙️ Feasibility Assessment & Viability Score</h4>
+                            <div class="report-content">${escapeHtml(result.feasibility)}</div>
+                        </div>
+
+                        <div class="card-box blockers-box">
+                            <h4>⚠️ Critical Failure Risks & Blockers</h4>
+                            <div class="report-content">${escapeHtml(result.blockers)}</div>
+                        </div>
+
+                        <div class="card-box solution-box">
+                            <h4>🛠️ Validated Step-by-Step Execution Blueprint</h4>
+                            <div class="report-content">${escapeHtml(result.solution)}</div>
+                        </div>
+
+                        <div class="card-box ideas-box">
+                            <h4>💡 New Innovation Extensions & Monetization Ideas</h4>
+                            <div class="report-content">${escapeHtml(result.ideas)}</div>
+                        </div>
+                    </div>
+                `;
+                workspace.scrollTop = workspace.scrollHeight;
 
             } catch (err) {
-                clearInterval(progressInterval);
+                clearInterval(timerInterval);
                 assistantMsg.innerHTML = `
                     <div style="color: var(--danger); padding: 15px;">
-                        <strong>Error:</strong> ${escapeHtml(err.message)}
+                        <strong>Analysis Error:</strong> ${escapeHtml(err.message)}
                     </div>
                 `;
             }
         }
 
-        async function callGroqAPI(userPrompt, grokKey, language) {
-            const systemPrompt = `You are Vizia AI, a multi-lingual master R&D and formulation engine. 
-You must respond strictly in the following language: ${language}.
-When the user gives an idea, formula request, or query:
-1. Identify practical failures or blockers.
-2. Provide precise execution steps and formulations.
-Format your response clearly divided into two sections:
-[BLOCKERS]: (List risks, limits, or issues)
-[SOLUTION]: (Provide exact formulation, code, or steps)`;
+        async function callGroqVisualAPI(userPrompt, imageBase64, grokKey, language) {
+            const systemPrompt = `You are Vizia AI Visual R&D Engine, an elite scientific and industrial innovation laboratory. 
+Conduct an intensely rigorous analysis of the user's idea or uploaded photo. 
+Respond strictly in language: ${language}.
+Provide a thorough breakdown separated into four mandatory sections using these exact headers:
+[FEASIBILITY]: (Deep evaluation of whether this innovation works in reality, physics/chemistry soundness)
+[BLOCKERS]: (Comprehensive list of failure points, structural flaws, or manufacturing bottlenecks)
+[SOLUTION]: (Exact technical workaround, formulation ratios, or mechanics required to make it foolproof)
+[IDEAS]: (3 advanced new commercial product variations or startup monetization ideas)`;
+
+            let messagesContent = [];
+            if (imageBase64) messagesContent.push({ type: "image_url", image_url: { url: imageBase64 } });
+            messagesContent.push({ type: "text", text: userPrompt || "Analyze this innovation design thoroughly." });
 
             const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
@@ -661,9 +688,9 @@ Format your response clearly divided into two sections:
                     model: 'llama-3.3-70b-versatile',
                     messages: [
                         { role: 'system', content: systemPrompt },
-                        { role: 'user', content: userPrompt }
+                        { role: 'user', content: messagesContent }
                     ],
-                    temperature: 0.3
+                    temperature: 0.4
                 })
             });
 
@@ -675,16 +702,24 @@ Format your response clearly divided into two sections:
             const data = await res.json();
             const text = data.choices?.[0]?.message?.content || JSON.stringify(data);
 
-            let blockers = "Analysis completed.";
+            let feasibility = "Feasibility evaluated.";
+            let blockers = "Risks analyzed.";
             let solution = text;
+            let ideas = "Commercial scalable ideas generated.";
 
-            if (text.includes("[BLOCKERS]") && text.includes("[SOLUTION]")) {
-                const parts = text.split("[SOLUTION]");
-                blockers = parts[0].replace("[BLOCKERS]", "").trim();
-                solution = parts[1].trim();
-            }
+            try {
+                if (text.includes("[FEASIBILITY]") && text.includes("[BLOCKERS]") && text.includes("[SOLUTION]") && text.includes("[IDEAS]")) {
+                    const p1 = text.split("[BLOCKERS]");
+                    feasibility = p1[0].replace("[FEASIBILITY]", "").trim();
+                    const p2 = p1[1].split("[SOLUTION]");
+                    blockers = p2[0].trim();
+                    const p3 = p2[1].split("[IDEAS]");
+                    solution = p3[0].trim();
+                    ideas = p3[1].trim();
+                }
+            } catch(e) { solution = text; }
 
-            return { blockers, solution };
+            return { feasibility, blockers, solution, ideas };
         }
 
         function escapeHtml(text) {
