@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vizia - InnovateX Engine (Groq Llama Edition)</title>
+    <title>VIZIA - Universal R&D Intelligence</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -67,6 +67,23 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lang-select {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
         }
 
         .api-status {
@@ -315,6 +332,7 @@
             display: flex;
             align-items: center;
             padding: 8px 16px;
+            gap: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             transition: border-color 0.2s;
         }
@@ -337,9 +355,8 @@
             min-height: 24px;
         }
 
-        .send-btn {
-            background: var(--accent);
-            color: var(--bg-color);
+        .mic-btn, .send-btn {
+            background: transparent;
             border: none;
             width: 38px;
             height: 38px;
@@ -348,17 +365,36 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
+            transition: transform 0.1s, background 0.2s;
+            color: var(--text-muted);
+        }
+
+        .mic-btn:hover, .send-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--accent);
+        }
+
+        .mic-btn.recording {
+            color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+
+        .send-btn {
+            background: var(--accent);
+            color: var(--bg-color);
             font-weight: bold;
         }
 
         .send-btn:hover {
             opacity: 0.9;
             transform: scale(1.05);
+            color: var(--bg-color);
         }
 
-        .send-btn:active {
-            transform: scale(0.95);
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -366,12 +402,24 @@
 
     <header>
         <div class="brand-container">
-            <h1 class="brand-title">VIZIA <span>InnovateX Engine</span></h1>
-            <span class="brand-subtitle">Universal R&D & Formulation Intelligence</span>
+            <h1 class="brand-title">VIZIA <span>AI</span></h1>
+            <span class="brand-subtitle">Universal Intelligence Engine</span>
         </div>
-        <div class="api-status">
-            <div class="status-dot"></div>
-            <span>Groq Llama 3.3 Active</span>
+        <div class="header-controls">
+            <select id="langSelect" class="lang-select">
+                <option value="Hindi">हिन्दी (Hindi)</option>
+                <option value="English" selected>English</option>
+                <option value="Hinglish">Hinglish</option>
+                <option value="Spanish">Español (Spanish)</option>
+                <option value="French">Français (French)</option>
+                <option value="Arabic">العربية (Arabic)</option>
+                <option value="Punjabi">ਪੰਜਾਬੀ (Punjabi)</option>
+                <option value="Gujarati">ગુજરાતી (Gujarati)</option>
+            </select>
+            <div class="api-status">
+                <div class="status-dot"></div>
+                <span>Llama 3.3 Active</span>
+            </div>
         </div>
     </header>
 
@@ -383,15 +431,19 @@
 
     <div class="workspace" id="workspace">
         <div class="welcome-card" id="welcomeCard">
-            <h2>Welcome to Vizia InnovateX Engine</h2>
-            <p>Your master universal R&D facility powered by Groq Llama 3.3. Formulate industrial chemicals, safe repellents, food flavors, IoT sensors, or mechanical designs. Enter your parameters below to execute deep failure analysis and final optimized formulation.</p>
+            <h2>Welcome to Vizia AI</h2>
+            <p>Your universal R&D and multi-language assistant. Type or use voice input to formulate ideas, analyze blockers, and get instant verified blueprints in your preferred language.</p>
         </div>
     </div>
 
     <div class="chat-bar-container">
         <div class="chat-input-wrapper">
-            <textarea id="userInput" class="chat-input" placeholder="Type your formulation goal or innovation idea here..." rows="1" onkeydown="handleKey(event)"></textarea>
-            <button class="send-btn" id="sendBtn" onclick="startInnovation()" title="Run Innovation & Formulation">
+            <!-- Voice Input Button (Gemini Style) -->
+            <button class="mic-btn" id="micBtn" onclick="toggleSpeechRecognition()" title="Speak to write">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+            <textarea id="userInput" class="chat-input" placeholder="Type your idea or tap mic to speak..." rows="1" onkeydown="handleKey(event)"></textarea>
+            <button class="send-btn" id="sendBtn" onclick="startInnovation()" title="Send">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
         </div>
@@ -412,7 +464,7 @@
                 return;
             }
             localStorage.setItem('vizia_groq_key', grok);
-            alert("Groq API Key saved successfully! 🚀");
+            alert("API Key saved successfully! 🚀");
         }
 
         function handleKey(e) {
@@ -422,12 +474,78 @@
             }
         }
 
+        // Speech-to-Text (Gemini Style Voice Typing)
+        let recognition;
+        let isRecording = false;
+
+        function toggleSpeechRecognition() {
+            const micBtn = document.getElementById('micBtn');
+            const inputField = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+
+            if (!inputField) {
+                alert("Speech recognition is not supported in this browser. Try Chrome!");
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!isRecording) {
+                recognition = new SpeechRecognition();
+                const selectedLang = document.getElementById('langSelect').value;
+                
+                // Set language code dynamically
+                if(selectedLang === 'Hindi') recognition.lang = 'hi-IN';
+                else if(selectedLang === 'Spanish') recognition.lang = 'es-ES';
+                else if(selectedLang === 'French') recognition.lang = 'fr-FR';
+                else if(selectedLang === 'Arabic') recognition.lang = 'ar-SA';
+                else if(selectedLang === 'Punjabi') recognition.lang = 'pa-IN';
+                else if(selectedLang === 'Gujarati') recognition.lang = 'gu-IN';
+                else recognition.lang = 'en-US';
+
+                recognition.interimResults = true;
+                recognition.continuous = false;
+
+                recognition.onstart = function() {
+                    isRecording = true;
+                    micBtn.classList.add('recording');
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('userInput').value = transcript;
+                };
+
+                recognition.onerror = function(event) {
+                    console.error("Speech recognition error", event.error);
+                    stopMicState();
+                };
+
+                recognition.onend = function() {
+                    stopMicState();
+                };
+
+                recognition.start();
+            } else {
+                if (recognition) {
+                    recognition.stop();
+                }
+                stopMicState();
+            }
+        }
+
+        function stopMicState() {
+            isRecording = false;
+            const micBtn = document.getElementById('micBtn');
+            if(micBtn) micBtn.classList.remove('recording');
+        }
+
         async function startInnovation() {
             const inputField = document.getElementById('userInput');
             const prompt = inputField.value.trim();
             if (!prompt) return;
 
             const grokKey = document.getElementById('grokKey').value.trim();
+            const selectedLang = document.getElementById('langSelect').value;
 
             if (!grokKey) {
                 alert("Please enter and save your Groq API key first.");
@@ -455,7 +573,7 @@
                     <div class="circular-progress" id="circle_${loaderId}">
                         <div class="progress-value" id="val_${loaderId}">0%</div>
                     </div>
-                    <div class="loader-status-text" id="text_${loaderId}">Initializing Groq Llama 3.3 Protocol...</div>
+                    <div class="loader-status-text" id="text_${loaderId}">Processing in ${selectedLang}...</div>
                 </div>
             `;
             workspace.appendChild(assistantMsg);
@@ -466,13 +584,7 @@
             const valDisplay = document.getElementById(`val_${loaderId}`);
             const textDisplay = document.getElementById(`text_${loaderId}`);
 
-            const stages = [
-                { limit: 30, text: "Llama 3.3: Analyzing core physics, chemical structures & safety rules..." },
-                { limit: 60, text: "Simulating failure points, real-world variables & health limits..." },
-                { limit: 90, text: "Engineering foolproof workaround formulations & exact ratios..." }
-            ];
-
-            const apiPromise = callGroqAPI(prompt, grokKey);
+            const apiPromise = callGroqAPI(prompt, grokKey, selectedLang);
 
             const progressInterval = setInterval(() => {
                 if (progress < 95) {
@@ -481,13 +593,6 @@
                     
                     circle.style.background = `conic-gradient(var(--accent) ${progress * 3.6}deg, #334155 0deg)`;
                     valDisplay.textContent = progress + '%';
-
-                    for (let stage of stages) {
-                        if (progress <= stage.limit) {
-                            textDisplay.textContent = stage.text;
-                            break;
-                        }
-                    }
                 }
             }, 50);
 
@@ -497,7 +602,7 @@
                 
                 circle.style.background = `conic-gradient(var(--success) 360deg, #334155 0deg)`;
                 valDisplay.textContent = '100% 🎉';
-                textDisplay.textContent = 'Eureka! Formulation & Feasibility Report Ready.';
+                textDisplay.textContent = 'Ready!';
                 textDisplay.style.color = 'var(--success)';
 
                 setTimeout(() => {
@@ -505,19 +610,19 @@
                         <div class="report-section">
                             <div class="report-title">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                VIZIA INNOVATEX ANALYSIS REPORT (LLAMA 3.3)
+                                VIZIA AI REPORT (${selectedLang.toUpperCase()})
                             </div>
                             <div class="blockers-box">
                                 <h4>
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                    Detected Blockers & Failure Risks (Reality Check)
+                                    Analysis & Risks / कमियां और जोखिम
                                 </h4>
                                 <div class="report-content">${escapeHtml(result.blockers)}</div>
                             </div>
                             <div class="solution-box">
                                 <h4>
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                    Validated Formulation & Actionable Blueprint
+                                    Optimized Solution / सटीक समाधान
                                 </h4>
                                 <div class="report-content">${escapeHtml(result.solution)}</div>
                             </div>
@@ -530,20 +635,21 @@
                 clearInterval(progressInterval);
                 assistantMsg.innerHTML = `
                     <div style="color: var(--danger); padding: 15px;">
-                        <strong>API Execution Error:</strong> ${escapeHtml(err.message)}<br><small>Please verify your Groq API key and network connection.</small>
+                        <strong>Error:</strong> ${escapeHtml(err.message)}
                     </div>
                 `;
             }
         }
 
-        async function callGroqAPI(userPrompt, grokKey) {
-            const systemPrompt = `You are Vizia InnovateX Engine, powered by Llama 3.3, a master multi-disciplinary R&D AI.
-When the user gives an innovation idea, formulation request, chemical recipe, safe repellent formula, or machinery design:
-1. First, act as a strict failure-first analyst. Identify all physical, chemical, mechanical, or health blockers and reasons why this could fail in the real world.
-2. Second, provide the exact workaround, precise formulation ratios, and step-by-step verified execution blueprint.
+        async function callGroqAPI(userPrompt, grokKey, language) {
+            const systemPrompt = `You are Vizia AI, a multi-lingual master R&D and formulation engine. 
+You must respond strictly in the following language: ${language}.
+When the user gives an idea, formula request, or query:
+1. Identify practical failures or blockers.
+2. Provide precise execution steps and formulations.
 Format your response clearly divided into two sections:
-[BLOCKERS]: (List all practical failure points, health limits, physical warnings)
-[SOLUTION]: (Provide the exact foolproof formulation, ingredient ratios, safety measures, or code)`;
+[BLOCKERS]: (List risks, limits, or issues)
+[SOLUTION]: (Provide exact formulation, code, or steps)`;
 
             const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
@@ -569,7 +675,7 @@ Format your response clearly divided into two sections:
             const data = await res.json();
             const text = data.choices?.[0]?.message?.content || JSON.stringify(data);
 
-            let blockers = "Analysis completed by Llama.";
+            let blockers = "Analysis completed.";
             let solution = text;
 
             if (text.includes("[BLOCKERS]") && text.includes("[SOLUTION]")) {
