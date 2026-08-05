@@ -37,43 +37,46 @@
         
         .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
         
+        /* Compact Product Grid Styles */
         .product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 15px;
         }
         .product-card {
-            background: white; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: flex; flex-direction: column;
+            background: white; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06); display: flex; flex-direction: column;
             justify-content: space-between; transition: transform 0.2s; position: relative;
         }
         .product-card.out-of-stock { opacity: 0.6; filter: grayscale(0.5); }
         .stock-badge {
-            position: absolute; top: 10px; right: 10px; background: #dc3545; color: white;
-            padding: 4px 10px; font-size: 11px; font-weight: bold; border-radius: 4px; z-index: 10;
+            position: absolute; top: 8px; right: 8px; background: #dc3545; color: white;
+            padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 4px; z-index: 10;
         }
-        .product-img { width: 100%; height: 180px; object-fit: cover; background: #eee; }
-        .product-info { padding: 15px; }
+        .product-img { width: 100%; height: 130px; object-fit: cover; background: #eee; }
+        .product-info { padding: 10px; }
         .company-badge {
-            font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 3px 8px;
-            border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 8px;
+            font-size: 10px; background: #e0f2fe; color: #0369a1; padding: 2px 6px;
+            border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 6px;
         }
-        .product-name { font-size: 18px; font-weight: bold; margin: 0 0 5px 0; color: #222; }
-        .product-price { font-size: 16px; color: #16a34a; font-weight: bold; margin-bottom: 5px; }
-        .delivery-tag { font-size: 12px; color: #0284c7; background: #f0f9ff; padding: 3px 6px; border-radius: 4px; display: inline-block; margin-bottom: 10px; font-weight: 600; }
-        .product-sku { font-size: 12px; color: #666; margin-bottom: 10px; }
+        .product-name { font-size: 15px; font-weight: bold; margin: 0 0 4px 0; color: #222; }
+        .product-price { font-size: 14px; color: #16a34a; font-weight: bold; margin-bottom: 4px; }
+        .delivery-tag { font-size: 11px; color: #0284c7; background: #f0f9ff; padding: 2px 5px; border-radius: 4px; display: inline-block; margin-bottom: 8px; font-weight: 600; }
+        .product-sku { font-size: 11px; color: #666; margin-bottom: 8px; }
         
-        .selector-box { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 12px; }
-        .selector-box label { font-size: 12px; font-weight: bold; color: #475569; display: block; margin-bottom: 4px; }
-        .selector-box select, .selector-box input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; box-sizing: border-box; }
+        .selector-box { background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 8px; }
+        .selector-box label { font-size: 11px; font-weight: bold; color: #475569; display: block; margin-bottom: 3px; }
+        .selector-box select, .selector-box input { width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; background: white; box-sizing: border-box; }
 
-        .calc-total { font-size: 13px; font-weight: bold; color: #334155; margin-bottom: 10px; background: #fef3c7; padding: 6px 10px; border-radius: 6px; text-align: center; border: 1px solid #fde047; }
+        .calc-total { font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 8px; background: #fef3c7; padding: 5px 8px; border-radius: 4px; text-align: center; border: 1px solid #fde047; }
 
-        .whatsapp-btn {
-            background: #25d366; color: white; text-align: center; padding: 12px;
-            text-decoration: none; font-weight: bold; display: block; border-radius: 0 0 12px 12px;
+        .action-btn {
+            text-align: center; padding: 10px;
+            text-decoration: none; font-weight: bold; display: block; border-radius: 0 0 10px 10px; font-size: 13px; cursor: pointer; border: none; width: 100%;
         }
-        .whatsapp-btn.disabled { background: #94a3b8; pointer-events: none; }
+        .add-cart-btn { background: #0284c7; color: white; }
+        .add-cart-btn.added { background: #16a34a; }
+        .whatsapp-btn { background: #25d366; color: white; margin-top: 5px; }
 
         .card {
             background: var(--card-bg); padding: 25px; border-radius: 16px;
@@ -82,11 +85,11 @@
         h2 { margin-top: 0; font-size: 20px; color: #222; }
         .input-group { margin-bottom: 15px; }
         label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #555; }
-        input, select {
+        input, select, textarea {
             width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
             box-sizing: border-box; font-size: 15px; background: var(--gray-light);
         }
-        input:focus, select:focus { border-color: var(--primary); background: #fff; outline: none; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; outline: none; }
         .btn {
             width: 100%; padding: 14px; background: var(--primary); color: white;
             font-weight: bold; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
@@ -101,7 +104,7 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
-        .modal-content { background: white; padding: 25px; border-radius: 16px; width: 90%; max-width: 420px; }
+        .modal-content { background: white; padding: 25px; border-radius: 16px; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
 
         /* Compact Vendor Dashboard Grid Styles */
         .vendor-grid-container {
@@ -113,38 +116,13 @@
             padding: 5px;
         }
         .vendor-mini-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px;
+            display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.04);
         }
-        .vendor-mini-header {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .vendor-mini-header img {
-            width: 45px;
-            height: 45px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            flex-shrink: 0;
-        }
+        .vendor-mini-header { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+        .vendor-mini-header img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; flex-shrink: 0; }
         .vendor-mini-info { overflow: hidden; }
-        .vendor-mini-title {
-            font-weight: bold;
-            font-size: 13px;
-            color: #222;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .vendor-mini-title { font-weight: bold; font-size: 13px; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .vendor-mini-price { color: #16a34a; font-size: 12px; font-weight: 600; }
         .vendor-mini-stock { font-size: 11px; font-weight: bold; }
         .vendor-mini-actions { display: flex; gap: 6px; margin-top: 5px; }
@@ -153,6 +131,13 @@
         .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
         .btn-edit { background: #3b82f6; color: white; }
         .btn-del { background: #ef4444; color: white; }
+
+        /* Cart Floating Bar / Modal */
+        .cart-float-btn {
+            position: fixed; bottom: 20px; right: 20px; background: #16a34a; color: white;
+            padding: 12px 20px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer; z-index: 99; display: flex; align-items: center; gap: 8px; font-size: 15px;
+        }
     </style>
 </head>
 <body>
@@ -203,7 +188,7 @@
                     <h2 id="display-company-name" style="margin:0; color:var(--primary);">Admin Panel</h2>
                     <span style="font-size: 12px; color: #666;" id="display-mobile"></span>
                 </div>
-                <button class="btn-nav" style="background:#333; padding:6px 12px;" onclick="openSettings()">⚙️ Settings & PIN</button>
+                <button class="btn-nav" style="background:#333; padding:6px 12px;" onclick="openSettings()">⚙️ Shop Settings & Profile</button>
             </div>
             <hr style="border:0; border-top:1px solid #eee; margin-bottom:20px;">
 
@@ -227,8 +212,8 @@
             <div class="input-group">
                 <label>Pricing Type (Rate Type)</label>
                 <select id="p-unit-type" onchange="toggleUnitFields()">
-                    <option value="piece">Per Piece (जैसे समोसा, बर्गर - प्रति पीस)</option>
-                    <option value="weight">Per Kg / Gram (जैसे फल, सब्ज़ी - वजन के हिसाब से)</option>
+                    <option value="piece">Per Piece (जैसे समोसा - प्रति पीस)</option>
+                    <option value="weight">Per Kg / Gram (जैसे फल, सब्ज़ी - वजन)</option>
                 </select>
             </div>
 
@@ -281,10 +266,15 @@
         </div>
     </div>
 
+    <!-- Floating Cart Button -->
+    <div id="cart-float" class="cart-float-btn hidden" onclick="openCartModal()">
+        🛒 View Cart (<span id="cart-count">0</span>)
+    </div>
+
     <!-- Buyer Modal -->
     <div id="buyer-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>👤 Buyer Mobile Login</h2>
+            <h2>👤 Buyer Details & Login</h2>
             <div class="input-group">
                 <label>Mobile Number (10 Digits)</label>
                 <input type="tel" id="buyer-login-mobile" placeholder="9876543210" maxlength="10">
@@ -293,8 +283,33 @@
                 <label>Your Name</label>
                 <input type="text" id="buyer-login-name" placeholder="Enter your name">
             </div>
-            <button class="btn" onclick="saveBuyerLogin()">Continue to Marketplace</button>
+            <div class="input-group">
+                <label>Full Delivery Address (House No, Street, Area, City)</label>
+                <textarea id="buyer-login-address" rows="3" placeholder="अपना पूरा घर का पता यहाँ लिखें..."></textarea>
+            </div>
+            <button class="btn" onclick="saveBuyerLogin()">Save & Continue</button>
             <div class="switch-link" onclick="closeBuyerModal()" style="margin-top:15px;">Cancel</div>
+        </div>
+    </div>
+
+    <!-- Cart / Checkout Modal -->
+    <div id="cart-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <h2>🛍️ Your Shopping Cart & Order</h2>
+            <div id="cart-items-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
+                <!-- Cart list injected here -->
+            </div>
+            <div id="cart-total-box" style="font-size: 15px; font-weight: bold; background: #fef3c7; padding: 10px; border-radius: 6px; text-align: center; margin-bottom: 15px;">
+                Total Amount: ₹0.00
+            </div>
+            <div style="background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px;">
+                <b>Deliver to:</b> <span id="cart-buyer-name-disp"></span> (<span id="cart-buyer-mob-disp"></span>)<br>
+                <b>Address:</b> <span id="cart-buyer-addr-disp" style="color:#555;"></span>
+            </div>
+            <button id="final-whatsapp-order-btn" class="action-btn whatsapp-btn" style="border-radius: 8px; font-size: 15px; padding: 12px;" onclick="sendCartToWhatsApp()">
+                💬 Complete & Order on WhatsApp
+            </button>
+            <div class="switch-link" onclick="closeCartModal()" style="margin-top:15px;">Close / Continue Shopping</div>
         </div>
     </div>
 
@@ -323,10 +338,36 @@
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
-            <h3>⚙️ Vendor Settings & PIN</h3>
+            <h3>⚙️ Shop Settings & Profile</h3>
+            <div class="input-group">
+                <label>Shop Photo</label>
+                <input type="file" id="settings-shop-img" accept="image/*" onchange="previewShopImage()">
+                <div style="margin-top: 8px;">
+                    <img id="settings-shop-preview" src="" style="max-height: 80px; border-radius: 6px; border: 1px solid #ddd; display:none;">
+                </div>
+            </div>
             <div class="input-group">
                 <label>Company / Shop Name</label>
                 <input type="text" id="settings-company">
+            </div>
+            <div class="input-group">
+                <label>Owner Name</label>
+                <input type="text" id="settings-owner-name" placeholder="Owner Full Name">
+            </div>
+            <div class="input-group">
+                <label>Shop Full Address</label>
+                <textarea id="settings-shop-address" rows="2" placeholder="Shop Address (e.g. Sector 15A, Faridabad)"></textarea>
+            </div>
+            <div class="input-group">
+                <label>WhatsApp Number</label>
+                <input type="tel" id="settings-whatsapp" placeholder="10 Digits WhatsApp number" maxlength="10">
+            </div>
+            <div class="input-group">
+                <label>Shop Status (Open / Close)</label>
+                <select id="settings-shop-status">
+                    <option value="open">🟢 Open (दुकान खुली है)</option>
+                    <option value="close">🔴 Closed (दुकान बंद है)</option>
+                </select>
             </div>
             <div class="input-group">
                 <label>New Security PIN (Optional)</label>
@@ -352,12 +393,16 @@
     
     let activeBuyerMobile = localStorage.getItem('viziag_buyer_mobile') || "";
     let activeBuyerName = localStorage.getItem('viziag_buyer_name') || "";
+    let activeBuyerAddress = localStorage.getItem('viziag_buyer_address') || "";
     
     let base64Image = "";
+    let base64ShopImage = "";
+    let cart = JSON.parse(localStorage.getItem('viziag_cart')) || [];
 
     window.onload = function() {
         try {
             updateBuyerUI();
+            updateCartCount();
             loadMarketplaceProducts();
         } catch(e) {
             console.error(e);
@@ -393,24 +438,33 @@
             banner.innerHTML = `✅ Verified Buyer: <b>${activeBuyerName}</b> (<span style="color:red; cursor:pointer;" onclick="logoutBuyer()">Logout</span>)`;
             buyerBtn.innerText = "👤 " + activeBuyerName;
         } else {
-            banner.innerHTML = `🔒 <span style="color:#007bff; cursor:pointer;" onclick="openBuyerModal()">Login with Mobile to Order</span>`;
+            banner.innerHTML = `🔒 <span style="color:#007bff; cursor:pointer;" onclick="openBuyerModal()">Login with Mobile & Address</span>`;
             buyerBtn.innerText = "👤 Buyer Login";
         }
     }
 
-    function openBuyerModal() { document.getElementById('buyer-modal').classList.remove('hidden'); }
+    function openBuyerModal() {
+        document.getElementById('buyer-login-mobile').value = activeBuyerMobile;
+        document.getElementById('buyer-login-name').value = activeBuyerName;
+        document.getElementById('buyer-login-address').value = activeBuyerAddress;
+        document.getElementById('buyer-modal').classList.remove('hidden');
+    }
     function closeBuyerModal() { document.getElementById('buyer-modal').classList.add('hidden'); }
+
     function saveBuyerLogin() {
         let mob = document.getElementById('buyer-login-mobile').value.trim();
         let name = document.getElementById('buyer-login-name').value.trim();
-        if(mob.length !== 10 || !name) {
-            alert("कृपया सही 10 अंकों का मोबाइल नंबर और नाम दर्ज करें।");
+        let addr = document.getElementById('buyer-login-address').value.trim();
+        if(mob.length !== 10 || !name || !addr) {
+            alert("कृपया सही 10 अंकों का मोबाइल नंबर, नाम और पूरा पता दर्ज करें।");
             return;
         }
         activeBuyerMobile = mob;
         activeBuyerName = name;
+        activeBuyerAddress = addr;
         localStorage.setItem('viziag_buyer_mobile', mob);
         localStorage.setItem('viziag_buyer_name', name);
+        localStorage.setItem('viziag_buyer_address', addr);
         closeBuyerModal();
         updateBuyerUI();
         loadMarketplaceProducts();
@@ -418,8 +472,10 @@
     function logoutBuyer() {
         localStorage.removeItem('viziag_buyer_mobile');
         localStorage.removeItem('viziag_buyer_name');
+        localStorage.removeItem('viziag_buyer_address');
         activeBuyerMobile = "";
         activeBuyerName = "";
+        activeBuyerAddress = "";
         updateBuyerUI();
         loadMarketplaceProducts();
     }
@@ -437,129 +493,241 @@
     function calculateCardTotal(productId, basePrice, gstRate, unitType) {
         let qtyInput = document.getElementById(`qty-${productId}`).value;
         let qty = parseFloat(qtyInput) || 1;
-        
         let subtotal = basePrice * qty;
         let gstAmount = (subtotal * gstRate) / 100;
         let grandTotal = subtotal + gstAmount;
 
         let unitText = unitType === 'piece' ? 'Piece(s)' : 'KG';
-        document.getElementById(`total-display-${productId}`).innerHTML = `Total: ₹${grandTotal.toFixed(2)} <span style="font-size:11px; font-weight:normal; color:#555;">(Incl. ${gstRate}% GST)</span>`;
-        
-        updateWhatsAppLink(productId, qty, grandTotal.toFixed(2), unitText);
+        document.getElementById(`total-display-${productId}`).innerHTML = `Total: ₹${grandTotal.toFixed(2)} <span style="font-size:10px; font-weight:normal; color:#555;">(Inc. ${gstRate}% GST)</span>`;
     }
 
-    function updateWhatsAppLink(productId, qty, finalPrice, unitText) {
-        let btn = document.getElementById(`wa-btn-${productId}`);
-        if(!btn) return;
-        
-        let pName = btn.getAttribute('data-name');
-        let sellerMob = btn.getAttribute('data-mobile');
-        let compName = btn.getAttribute('data-company');
-
-        if(activeBuyerMobile) {
-            let orderText = encodeURIComponent(`Hello, I am buyer ${activeBuyerName} (${activeBuyerMobile}). I want to order ${qty} ${unitText} of ${pName} from ${compName}. Total Amount: ₹${finalPrice} (Incl. GST).`);
-            btn.href = `https://wa.me/91${sellerMob}?text=${orderText}`;
+    function addProductToCart(productId, productName, basePrice, gstRate, unitType, sellerMobile, companyName) {
+        if(!activeBuyerMobile || !activeBuyerAddress) {
+            alert("कृपया पहले 'Buyer Login' करके अपना नाम और पूरा पता दर्ज करें।");
+            openBuyerModal();
+            return;
         }
+
+        let qtyInput = document.getElementById(`qty-${productId}`).value;
+        let qty = parseFloat(qtyInput) || 1;
+        let subtotal = basePrice * qty;
+        let gstAmount = (subtotal * gstRate) / 100;
+        let grandTotal = subtotal + gstAmount;
+        let unitText = unitType === 'piece' ? 'Piece' : 'KG';
+
+        let existingIndex = cart.findIndex(item => item.productId === productId);
+        if(existingIndex > -1) {
+            cart[existingIndex].qty = qty;
+            cart[existingIndex].grandTotal = grandTotal.toFixed(2);
+            cart[existingIndex].unitText = unitText;
+        } else {
+            cart.push({
+                productId: productId,
+                productName: productName,
+                basePrice: basePrice,
+                qty: qty,
+                unitText: unitText,
+                gstRate: gstRate,
+                grandTotal: grandTotal.toFixed(2),
+                sellerMobile: sellerMobile,
+                companyName: companyName
+            });
+        }
+
+        localStorage.setItem('viziag_cart', JSON.stringify(cart));
+        updateCartCount();
+
+        let btn = document.getElementById(`cart-btn-${productId}`);
+        btn.innerText = "✅ Added to Cart";
+        btn.classList.add('added');
+        setTimeout(() => {
+            btn.innerText = "🛒 Add to Cart";
+            btn.classList.remove('added');
+        }, 1500);
+    }
+
+    function updateCartCount() {
+        let countEl = document.getElementById('cart-count');
+        let floatEl = document.getElementById('cart-float');
+        countEl.innerText = cart.length;
+        if(cart.length > 0) {
+            floatEl.classList.remove('hidden');
+        } else {
+            floatEl.classList.add('hidden');
+        }
+    }
+
+    function openCartModal() {
+        if(!activeBuyerMobile) {
+            openBuyerModal();
+            return;
+        }
+        let container = document.getElementById('cart-items-container');
+        container.innerHTML = "";
+        let totalSum = 0;
+
+        if(cart.length === 0) {
+            container.innerHTML = `<div style="text-align:center; color:#666; padding:20px;">आपका कार्ट खाली है।</div>`;
+            document.getElementById('cart-total-box.innerText = "Total Amount: ₹0.00";
+            document.getElementById('cart-modal').classList.remove('hidden');
+            return;
+        }
+
+        cart.forEach((item, idx) => {
+            totalSum += parseFloat(item.grandTotal);
+            let div = document.createElement('div');
+            div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:8px 12px; border-radius:6px; margin-bottom:8px; font-size:13px;";
+            div.innerHTML = `
+                <div>
+                    <b>${item.productName}</b> (${item.companyName})<br>
+                    <span style="color:#666;">${item.qty} ${item.unitText} × ₹${item.basePrice}</span>
+                </div>
+                <div style="text-align:right;">
+                    <b>₹${item.grandTotal}</b><br>
+                    <span style="color:red; cursor:pointer; font-size:11px;" onclick="removeFromCart(${idx})">❌ Remove</span>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+
+        document.getElementById('cart-total-box').innerHTML = `Grand Total: ₹${totalSum.toFixed(2)} (Incl. GST)`;
+        document.getElementById('cart-buyer-name-disp').innerText = activeBuyerName;
+        document.getElementById('cart-buyer-mob-disp').innerText = activeBuyerMobile;
+        document.getElementById('cart-buyer-addr-disp').innerText = activeBuyerAddress;
+        document.getElementById('cart-modal').classList.remove('hidden');
+    }
+
+    function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+
+    function removeFromCart(index) {
+        cart.splice(index, 1);
+        localStorage.setItem('viziag_cart', JSON.stringify(cart));
+        updateCartCount();
+        openCartModal();
+    }
+
+    function sendCartToWhatsApp() {
+        if(cart.length === 0) {
+            alert("कार्ट खाली है।");
+            return;
+        }
+        // Group by vendor or send to primary vendor of cart items
+        let sellerMobile = cart[0].sellerMobile;
+        let totalSum = cart.reduce((sum, item) => sum + parseFloat(item.grandTotal), 0);
+
+        let orderItemsText = cart.map(item => `• ${item.productName} - ${item.qty} ${item.unitText} = ₹${item.grandTotal} (${item.companyName})`).join('\n');
+
+        let message = `Hello, I want to place an order from Viziag Mart:\n\n*Customer Details:*\nName: ${activeBuyerName}\nMobile: ${activeBuyerMobile}\nDelivery Address: ${activeBuyerAddress}\n\n*Order Items:*\n${orderItemsText}\n\n*Grand Total:* ₹${totalSum.toFixed(2)} (Incl. GST)`;
+
+        let encodedMsg = encodeURIComponent(message);
+        window.open(`https://wa.me/91${sellerMobile}?text=${encodedMsg}`, '_blank');
+        
+        // Clear cart after order
+        cart = [];
+        localStorage.removeItem('viziag_cart');
+        updateCartCount();
+        closeCartModal();
     }
 
     function loadMarketplaceProducts() {
         const container = document.getElementById('products-container');
         db.ref('vendors_products').on('value', (snapshot) => {
-            container.innerHTML = "";
-            let allProducts = [];
+            db.ref('registered_vendors').once('value').then((vendorSnap) => {
+                let vendorProfiles = vendorSnap.val() || {};
+                container.innerHTML = "";
+                let allProducts = [];
 
-            snapshot.forEach((vendorSnapshot) => {
-                vendorSnapshot.forEach((productSnapshot) => {
-                    let pData = productSnapshot.val();
-                    pData.id = productSnapshot.key;
-                    allProducts.push(pData);
+                snapshot.forEach((vendorSnapshot) => {
+                    let vMob = vendorSnapshot.key;
+                    let vProfile = vendorProfiles[vMob] || {};
+                    
+                    // Check if shop is closed by vendor setting
+                    if(vProfile.shopStatus === 'close') return; // Skip closed shops
+
+                    vendorSnapshot.forEach((productSnapshot) => {
+                        let pData = productSnapshot.val();
+                        pData.id = productSnapshot.key;
+                        pData.shopPhoto = vProfile.shopPhoto || "";
+                        pData.shopAddress = vProfile.shopAddress || pData.sku;
+                        allProducts.push(pData);
+                    });
                 });
-            });
 
-            if (allProducts.length === 0) {
-                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">अभी कोई आइटम लाइव नहीं है। वेंडर पोर्टल से जोड़ें।</div>`;
-                return;
-            }
-
-            allProducts.sort((a, b) => b.timestamp - a.timestamp);
-
-            allProducts.forEach(product => {
-                let card = document.createElement('div');
-                let isOut = product.inStock === false;
-                card.className = 'product-card' + (isOut ? ' out-of-stock' : '');
-                
-                let imgSrc = product.productImage || 'https://via.placeholder.com/300x180?text=No+Image';
-                let stockBadge = isOut ? `<div class="stock-badge">OUT OF STOCK</div>` : '';
-                
-                let unitType = product.unitType || 'piece';
-                let basePrice = parseFloat(product.price) || 0;
-                let gstRate = parseFloat(product.gst) || 0;
-                
-                let defaultQty = 1;
-                let initialSub = basePrice * defaultQty;
-                let initialTotal = initialSub + (initialSub * gstRate / 100);
-
-                let selectorHTML = "";
-                if(isOut) {
-                    selectorHTML = `<div class="whatsapp-btn disabled">❌ Stock Out (Unavailable)</div>`;
-                } else {
-                    let inputControl = "";
-                    if(unitType === 'piece') {
-                        inputControl = `
-                            <label>चुने (Pieces):</label>
-                            <select id="qty-${product.id}" onchange="calculateCardTotal('${product.id}', ${basePrice}, ${gstRate}, 'piece')">
-                                <option value="1">1 Piece</option>
-                                <option value="2">2 Pieces</option>
-                                <option value="3">3 Pieces</option>
-                                <option value="4">4 Pieces</option>
-                                <option value="5">5 Pieces</option>
-                                <option value="10">10 Pieces</option>
-                                <option value="20">20 Pieces</option>
-                            </select>
-                        `;
-                    } else {
-                        inputControl = `
-                            <label>वजन दर्ज करें (KG में):</label>
-                            <input type="number" id="qty-${product.id}" value="1" step="0.25" min="0.25" oninput="calculateCardTotal('${product.id}', ${basePrice}, ${gstRate}, 'weight')">
-                        `;
-                    }
-
-                    let orderBtnHTML = "";
-                    if(activeBuyerMobile) {
-                        let initialText = encodeURIComponent(`Hello, I am buyer ${activeBuyerName} (${activeBuyerMobile}). I want to order ${defaultQty} ${unitType === 'piece' ? 'Pieces' : 'KG'} of ${product.productName} from ${product.companyName}. Total Amount: ₹${initialTotal.toFixed(2)} (Incl. GST).`);
-                        orderBtnHTML = `<a id="wa-btn-${product.id}" href="https://wa.me/91${product.sellerMobile}?text=${initialText}" target="_blank" data-name="${product.productName}" data-mobile="${product.sellerMobile}" data-company="${product.companyName}" class="whatsapp-btn">💬 Order on WhatsApp</a>`;
-                    } else {
-                        orderBtnHTML = `<div onclick="openBuyerModal()" class="whatsapp-btn" style="background:#007bff; cursor:pointer; text-align:center;">🔒 Login to Order on WhatsApp</div>`;
-                    }
-
-                    selectorHTML = `
-                        <div class="product-info" style="padding-top:0; padding-bottom:10px;">
-                            <div class="selector-box">
-                                ${inputControl}
-                            </div>
-                            <div class="calc-total" id="total-display-${product.id}">
-                                Total: ₹${initialTotal.toFixed(2)} <span style="font-size:11px; font-weight:normal; color:#555;">(Incl. ${gstRate}% GST)</span>
-                            </div>
-                        </div>
-                        ${orderBtnHTML}
-                    `;
+                if (allProducts.length === 0) {
+                    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">अभी कोई खुली हुई दुकान या आइटम लाइव नहीं है।</div>`;
+                    return;
                 }
 
-                card.innerHTML = `
-                    ${stockBadge}
-                    <div>
-                        <img src="${imgSrc}" class="product-img">
-                        <div class="product-info" style="padding-bottom: 5px;">
-                            <span class="company-badge">🏢 ${product.companyName || 'Verified Vendor'}</span>
-                            <div class="product-name">${product.productName}</div>
-                            <div class="product-price">₹ ${basePrice} / ${unitType === 'piece' ? 'Piece' : 'KG'} + ${gstRate}% GST</div>
-                            <div class="delivery-tag">${product.deliveryOption || '🚚 Home Delivery Available'}</div>
-                            <div class="product-sku">📍 ${product.sku || 'N/A'}</div>
+                allProducts.sort((a, b) => b.timestamp - a.timestamp);
+
+                allProducts.forEach(product => {
+                    let card = document.createElement('div');
+                    let isOut = product.inStock === false;
+                    card.className = 'product-card' + (isOut ? ' out-of-stock' : '');
+                    
+                    let imgSrc = product.productImage || 'https://via.placeholder.com/210x130?text=No+Image';
+                    let stockBadge = isOut ? `<div class="stock-badge">OUT OF STOCK</div>` : '';
+                    
+                    let unitType = product.unitType || 'piece';
+                    let basePrice = parseFloat(product.price) || 0;
+                    let gstRate = parseFloat(product.gst) || 0;
+                    
+                    let defaultQty = 1;
+                    let initialSub = basePrice * defaultQty;
+                    let initialTotal = initialSub + (initialSub * gstRate / 100);
+
+                    let selectorHTML = "";
+                    if(isOut) {
+                        selectorHTML = `<div class="action-btn" style="background:#94a3b8; color:white;">❌ Stock Out</div>`;
+                    } else {
+                        let inputControl = "";
+                        if(unitType === 'piece') {
+                            inputControl = `
+                                <label>चुने (Pieces):</label>
+                                <select id="qty-${product.id}" onchange="calculateCardTotal('${product.id}', ${basePrice}, ${gstRate}, 'piece')">
+                                    <option value="1">1 Piece</option>
+                                    <option value="2">2 Pieces</option>
+                                    <option value="3">3 Pieces</option>
+                                    <option value="5">5 Pieces</option>
+                                    <option value="10">10 Pieces</option>
+                                </select>
+                            `;
+                        } else {
+                            inputControl = `
+                                <label>वजन (KG में):</label>
+                                <input type="number" id="qty-${product.id}" value="1" step="0.25" min="0.25" oninput="calculateCardTotal('${product.id}', ${basePrice}, ${gstRate}, 'weight')">
+                            `;
+                        }
+
+                        selectorHTML = `
+                            <div class="product-info" style="padding-top:0; padding-bottom:8px;">
+                                <div class="selector-box">
+                                    ${inputControl}
+                                </div>
+                                <div class="calc-total" id="total-display-${product.id}">
+                                    Total: ₹${initialTotal.toFixed(2)} <span style="font-size:10px; font-weight:normal; color:#555;">(Inc. ${gstRate}% GST)</span>
+                                </div>
+                            </div>
+                            <button id="cart-btn-${product.id}" class="action-btn add-cart-btn" onclick="addProductToCart('${product.id}', '${product.productName}', ${basePrice}, ${gstRate}, '${unitType}', '${product.sellerMobile}', '${product.companyName}')">🛒 Add to Cart</button>
+                        `;
+                    }
+
+                    card.innerHTML = `
+                        ${stockBadge}
+                        <div>
+                            <img src="${imgSrc}" class="product-img">
+                            <div class="product-info" style="padding-bottom: 5px;">
+                                <span class="company-badge">🏢 ${product.companyName || 'Verified Vendor'}</span>
+                                <div class="product-name">${product.productName}</div>
+                                <div class="product-price">₹ ${basePrice} / ${unitType === 'piece' ? 'Piece' : 'KG'}</div>
+                                <div class="delivery-tag">${product.deliveryOption || '🚚 Home Delivery'}</div>
+                                <div class="product-sku">📍 ${product.shopAddress || product.sku || 'N/A'}</div>
+                            </div>
                         </div>
-                    </div>
-                    ${selectorHTML}
-                `;
-                container.appendChild(card);
+                        ${selectorHTML}
+                    `;
+                    container.appendChild(card);
+                });
             });
         });
     }
@@ -615,7 +783,11 @@
         db.ref('registered_vendors/' + mobile).set({
             companyName: company,
             mobile: mobile,
-            secretPin: pin
+            secretPin: pin,
+            shopStatus: 'open',
+            shopAddress: '',
+            ownerName: '',
+            shopPhoto: ''
         }).then(() => {
             alert("वेंडर रजिस्ट्रेशन सफल!");
             closeRegisterModal();
@@ -634,6 +806,19 @@
                 base64Image = e.target.result;
                 document.getElementById('img-preview').src = base64Image;
                 document.getElementById('img-preview-container').style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function previewShopImage() {
+        let file = document.getElementById('settings-shop-img').files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                base64ShopImage = e.target.result;
+                document.getElementById('settings-shop-preview').src = base64ShopImage;
+                document.getElementById('settings-shop-preview').style.display = 'block';
             }
             reader.readAsDataURL(file);
         }
@@ -784,23 +969,51 @@
     }
 
     function openSettings() {
-        document.getElementById('settings-company').value = activeCompanyName;
-        document.getElementById('settings-new-pin').value = "";
-        document.getElementById('settings-modal').classList.remove('hidden');
+        db.ref('registered_vendors/' + activeMobile).once('value').then((snapshot) => {
+            let data = snapshot.val() || {};
+            document.getElementById('settings-company').value = data.companyName || activeCompanyName;
+            document.getElementById('settings-owner-name').value = data.ownerName || "";
+            document.getElementById('settings-shop-address').value = data.shopAddress || "";
+            document.getElementById('settings-whatsapp').value = data.whatsapp || activeMobile;
+            document.getElementById('settings-shop-status').value = data.shopStatus || "open";
+            document.getElementById('settings-new-pin').value = "";
+
+            if(data.shopPhoto) {
+                base64ShopImage = data.shopPhoto;
+                document.getElementById('settings-shop-preview').src = data.shopPhoto;
+                document.getElementById('settings-shop-preview').style.display = 'block';
+            } else {
+                document.getElementById('settings-shop-preview').style.display = 'none';
+            }
+
+            document.getElementById('settings-modal').classList.remove('hidden');
+        });
     }
     function closeSettings() { document.getElementById('settings-modal').classList.add('hidden'); }
 
     function updateSettings() {
         let newCompany = document.getElementById('settings-company').value.trim();
+        let ownerName = document.getElementById('settings-owner-name').value.trim();
+        let shopAddress = document.getElementById('settings-shop-address').value.trim();
+        let whatsapp = document.getElementById('settings-whatsapp').value.trim();
+        let shopStatus = document.getElementById('settings-shop-status').value;
         let newPin = document.getElementById('settings-new-pin').value.trim();
-        let updateData = { companyName: newCompany };
+
+        let updateData = {
+            companyName: newCompany,
+            ownerName: ownerName,
+            shopAddress: shopAddress,
+            whatsapp: whatsapp,
+            shopStatus: shopStatus
+        };
         if(newPin) updateData.secretPin = newPin;
+        if(base64ShopImage) updateData.shopPhoto = base64ShopImage;
 
         db.ref('registered_vendors/' + activeMobile).update(updateData).then(() => {
             activeCompanyName = newCompany;
             localStorage.setItem('viziag_company', newCompany);
             document.getElementById('display-company-name').innerText = newCompany;
-            document.getElementById('settings-msg').innerText = "Updated Successfully!";
+            document.getElementById('settings-msg').innerText = "Settings Updated Successfully! ✅";
             setTimeout(closeSettings, 1500);
         });
     }
