@@ -106,7 +106,6 @@
         }
         .modal-content { background: white; padding: 25px; border-radius: 16px; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
 
-        /* Compact Vendor Dashboard Grid Styles */
         .vendor-grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -132,7 +131,6 @@
         .btn-edit { background: #3b82f6; color: white; }
         .btn-del { background: #ef4444; color: white; }
 
-        /* Cart Floating Bar / Modal */
         .cart-float-btn {
             position: fixed; bottom: 20px; right: 20px; background: #16a34a; color: white;
             padding: 12px 20px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -296,9 +294,7 @@
     <div id="cart-modal" class="modal hidden">
         <div class="modal-content" style="max-width: 500px;">
             <h2>🛍️ Your Shopping Cart & Order</h2>
-            <div id="cart-items-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
-                <!-- Cart list injected here -->
-            </div>
+            <div id="cart-items-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
             <div id="cart-total-box" style="font-size: 15px; font-weight: bold; background: #fef3c7; padding: 10px; border-radius: 6px; text-align: center; margin-bottom: 15px;">
                 Total Amount: ₹0.00
             </div>
@@ -568,7 +564,7 @@
 
         if(cart.length === 0) {
             container.innerHTML = `<div style="text-align:center; color:#666; padding:20px;">आपका कार्ट खाली है।</div>`;
-            document.getElementById('cart-total-box.innerText = "Total Amount: ₹0.00";
+            document.getElementById('cart-total-box').innerText = "Total Amount: ₹0.00";
             document.getElementById('cart-modal').classList.remove('hidden');
             return;
         }
@@ -611,7 +607,6 @@
             alert("कार्ट खाली है।");
             return;
         }
-        // Group by vendor or send to primary vendor of cart items
         let sellerMobile = cart[0].sellerMobile;
         let totalSum = cart.reduce((sum, item) => sum + parseFloat(item.grandTotal), 0);
 
@@ -622,7 +617,6 @@
         let encodedMsg = encodeURIComponent(message);
         window.open(`https://wa.me/91${sellerMobile}?text=${encodedMsg}`, '_blank');
         
-        // Clear cart after order
         cart = [];
         localStorage.removeItem('viziag_cart');
         updateCartCount();
@@ -641,8 +635,7 @@
                     let vMob = vendorSnapshot.key;
                     let vProfile = vendorProfiles[vMob] || {};
                     
-                    // Check if shop is closed by vendor setting
-                    if(vProfile.shopStatus === 'close') return; // Skip closed shops
+                    if(vProfile.shopStatus === 'close') return;
 
                     vendorSnapshot.forEach((productSnapshot) => {
                         let pData = productSnapshot.val();
